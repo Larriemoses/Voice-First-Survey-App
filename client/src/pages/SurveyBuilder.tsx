@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaMicrophoneAlt,
   FaPlus,
@@ -7,6 +7,9 @@ import {
   FaClock,
   FaRocket,
   FaLink,
+  FaEye,
+  FaCopy,
+  FaCheckCircle,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import {
@@ -32,6 +35,8 @@ type Question = {
 
 export default function SurveyBuilder() {
   const { surveyId } = useParams();
+  const navigate = useNavigate();
+
   const [survey, setSurvey] = useState<Survey | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -39,13 +44,17 @@ export default function SurveyBuilder() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [copying, setCopying] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function loadData() {
     if (!surveyId) return;
 
     try {
       setLoading(true);
+      setError("");
+
       const [surveyData, questionData] = await Promise.all([
         getSurveyById(surveyId),
         getSurveyQuestions(surveyId),
@@ -68,6 +77,7 @@ export default function SurveyBuilder() {
   async function handleAddQuestion(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (!surveyId) return;
 
@@ -81,13 +91,14 @@ export default function SurveyBuilder() {
 
       await addQuestion({
         survey_id: surveyId,
-        prompt,
+        prompt: prompt.trim(),
         order_index: questions.length + 1,
         max_duration_seconds: Number(maxDuration) || 120,
       });
 
       setPrompt("");
       setMaxDuration("120");
+      setSuccessMessage("Question added successfully.");
       await loadData();
     } catch (err) {
       console.error("Add question error:", err);
@@ -99,6 +110,10 @@ export default function SurveyBuilder() {
 
   async function handlePublishSurvey() {
     if (!surveyId) return;
+
+    setError("");
+    setSuccessMessage("");
+
     if (questions.length === 0) {
       setError("Add at least one question before publishing.");
       return;
@@ -108,6 +123,7 @@ export default function SurveyBuilder() {
       setPublishing(true);
       const updated = await publishSurvey(surveyId);
       setSurvey(updated);
+      setSuccessMessage("Survey published successfully.");
     } catch (err) {
       console.error("Publish survey error:", err);
       setError(
@@ -115,6 +131,19 @@ export default function SurveyBuilder() {
       );
     } finally {
       setPublishing(false);
+    }
+  }
+
+  async function handleCopyLink() {
+    try {
+      setCopying(true);
+      await navigator.clipboard.writeText(publicLink);
+      setSuccessMessage("Public survey link copied.");
+    } catch (err) {
+      console.error("Copy link error:", err);
+      setError("Failed to copy link.");
+    } finally {
+      setCopying(false);
     }
   }
 
@@ -144,16 +173,35 @@ export default function SurveyBuilder() {
               </div>
 
               <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => navigate(`/surveys/${surveyId}/responses`)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  <FaEye className="h-4 w-4" />
+                  View Responses
+                </button>
+
                 {survey?.status === "published" ? (
-                  <a
-                    href={publicLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                  >
-                    <FaLink className="h-4 w-4" />
-                    Open Public Survey
-                  </a>
+                  <>
+                    <button
+                      onClick={handleCopyLink}
+                      disabled={copying}
+                      className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      <FaCopy className="h-4 w-4" />
+                      {copying ? "Copying..." : "Copy Link"}
+                    </button>
+
+                    <a
+                      href={publicLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black"
+                    >
+                      <FaLink className="h-4 w-4" />
+                      Open Public Survey
+                    </a>
+                  </>
                 ) : (
                   <button
                     onClick={handlePublishSurvey}
@@ -166,6 +214,19 @@ export default function SurveyBuilder() {
                 )}
               </div>
             </div>
+
+            {error ? (
+              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </div>
+            ) : null}
+
+            {successMessage ? (
+              <div className="inline-flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                <FaCheckCircle className="h-4 w-4" />
+                {successMessage}
+              </div>
+            ) : null}
 
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
@@ -202,12 +263,6 @@ export default function SurveyBuilder() {
                       className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
                     />
                   </div>
-
-                  {error ? (
-                    <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                      {error}
-                    </div>
-                  ) : null}
 
                   <button
                     type="submit"

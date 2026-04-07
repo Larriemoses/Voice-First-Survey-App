@@ -11,6 +11,8 @@ import CreateSurvey from "./pages/CreateSurvey";
 import SurveyBuilder from "./pages/SurveyBuilder";
 import PublicSurvey from "./pages/PublicSurvey";
 import RespondSurvey from "./pages/RespondSurvey";
+import SurveyThankYou from "./pages/SurveyThankYou";
+import SurveyResponses from "./pages/SurveyResponses";
 
 export default function App() {
   return (
@@ -81,6 +83,18 @@ export default function App() {
       <Route
         path="/take-survey/:surveyId/respond/:respondentId"
         element={<RespondSurvey />}
+      />
+      <Route
+        path="/take-survey/:surveyId/thank-you"
+        element={<SurveyThankYou />}
+      />
+      <Route
+        path="/surveys/:surveyId/responses"
+        element={
+          <ProtectedRoute>
+            <SurveyResponses />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );
