@@ -4,14 +4,19 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Onboarding from "./pages/Onboarding";
+import AuthGate from "./pages/AuthGate";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Surveys from "./pages/Surveys";
+import CreateSurvey from "./pages/CreateSurvey";
+import SurveyBuilder from "./pages/SurveyBuilder";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/auth-check" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/auth-check" element={<AuthGate />} />
 
       <Route
         path="/dashboard"
@@ -36,6 +41,32 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Onboarding />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/surveys"
+        element={
+          <ProtectedRoute>
+            <Surveys />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/surveys/create"
+        element={
+          <ProtectedRoute>
+            <CreateSurvey />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/surveys/:surveyId"
+        element={
+          <ProtectedRoute>
+            <SurveyBuilder />
           </ProtectedRoute>
         }
       />

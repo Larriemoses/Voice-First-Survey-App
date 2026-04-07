@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
@@ -7,13 +7,73 @@ type Props = {
 };
 
 export default function DashboardShell({ children }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+
+      if (!mobile) {
+        setMobileSidebarOpen(false);
+      }
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  function handleToggleSidebar() {
+    if (isMobile) {
+      setMobileSidebarOpen((prev) => !prev);
+    } else {
+      setDesktopCollapsed((prev) => !prev);
+    }
+  }
+
+  function closeMobileSidebar() {
+    setMobileSidebarOpen(false);
+  }
+
+  const desktopSidebarWidth = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="flex min-h-[calc(100vh-64px)]">
-        <Sidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
+      <Navbar
+        isMobile={isMobile}
+        desktopCollapsed={desktopCollapsed}
+        mobileSidebarOpen={mobileSidebarOpen}
+        onToggleSidebar={handleToggleSidebar}
+      />
+
+      <Sidebar
+        isMobile={isMobile}
+        collapsed={desktopCollapsed}
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={closeMobileSidebar}
+      />
+
+      {isMobile && mobileSidebarOpen ? (
+        <button
+          aria-label="Close sidebar overlay"
+          onClick={closeMobileSidebar}
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[1px]"
+        />
+      ) : null}
+
+      <main
+        className={[
+          "min-h-[calc(100vh-64px)] pt-16 transition-all duration-300",
+          desktopSidebarWidth,
+        ].join(" ")}
+      >
+        <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

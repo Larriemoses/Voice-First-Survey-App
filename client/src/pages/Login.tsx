@@ -24,7 +24,7 @@ export default function Login() {
     }
 
     setLoading(false);
-    navigate("/dashboard");
+    navigate("/auth-check");
   }
 
   async function handleGoogle() {

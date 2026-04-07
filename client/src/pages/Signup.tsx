@@ -36,7 +36,7 @@ export default function Signup() {
     }
 
     setLoading(false);
-    navigate("/dashboard");
+    navigate("/auth-check");
   }
 
   async function handleGoogle() {

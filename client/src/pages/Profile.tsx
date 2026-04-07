@@ -1,6 +1,24 @@
+import { useEffect, useState } from "react";
 import DashboardShell from "../components/DashboardShell";
+import { getCurrentUser } from "../lib/auth";
 
 export default function Profile() {
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+
+  useEffect(() => {
+    async function load() {
+      const user = await getCurrentUser();
+
+      if (!user) return;
+
+      setEmail(user.email || "");
+      setFullName((user.user_metadata?.full_name as string) || "");
+    }
+
+    load();
+  }, []);
+
   return (
     <DashboardShell>
       <div className="max-w-2xl space-y-6">
@@ -20,6 +38,8 @@ export default function Profile() {
                 Full name
               </label>
               <input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
                 placeholder="Your full name"
               />
@@ -30,14 +50,16 @@ export default function Profile() {
                 Email
               </label>
               <input
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+                value={email}
+                readOnly
+                className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none"
                 placeholder="you@company.com"
               />
             </div>
 
-            <button className="mt-2 w-fit rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white hover:bg-black">
-              Save changes
-            </button>
+            <p className="text-xs text-gray-500">
+              Email is managed by your authentication provider.
+            </p>
           </div>
         </div>
       </div>
