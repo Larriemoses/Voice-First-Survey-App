@@ -5,9 +5,16 @@ import {
   FaPlus,
   FaClipboardList,
   FaClock,
+  FaRocket,
+  FaLink,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
-import { addQuestion, getSurveyById, getSurveyQuestions } from "../lib/surveys";
+import {
+  addQuestion,
+  getSurveyById,
+  getSurveyQuestions,
+  publishSurvey,
+} from "../lib/surveys";
 
 type Survey = {
   id: string;
@@ -31,6 +38,7 @@ export default function SurveyBuilder() {
   const [maxDuration, setMaxDuration] = useState("120");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState("");
 
   async function loadData() {
@@ -89,6 +97,29 @@ export default function SurveyBuilder() {
     }
   }
 
+  async function handlePublishSurvey() {
+    if (!surveyId) return;
+    if (questions.length === 0) {
+      setError("Add at least one question before publishing.");
+      return;
+    }
+
+    try {
+      setPublishing(true);
+      const updated = await publishSurvey(surveyId);
+      setSurvey(updated);
+    } catch (err) {
+      console.error("Publish survey error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to publish survey.",
+      );
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  const publicLink = `${window.location.origin}/take-survey/${surveyId}`;
+
   return (
     <DashboardShell>
       <div className="space-y-8">
@@ -98,21 +129,46 @@ export default function SurveyBuilder() {
           </div>
         ) : (
           <>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <FaClipboardList className="h-7 w-7 text-indigo-600" />
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {survey?.title || "Survey Builder"}
-                </h2>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <FaClipboardList className="h-7 w-7 text-indigo-600" />
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    {survey?.title || "Survey Builder"}
+                  </h2>
+                </div>
+                <p className="text-sm text-gray-500">
+                  {survey?.description ||
+                    "Build your voice survey questions here."}
+                </p>
               </div>
-              <p className="text-sm text-gray-500">
-                {survey?.description ||
-                  "Build your voice survey questions here."}
-              </p>
+
+              <div className="flex flex-wrap gap-3">
+                {survey?.status === "published" ? (
+                  <a
+                    href={publicLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  >
+                    <FaLink className="h-4 w-4" />
+                    Open Public Survey
+                  </a>
+                ) : (
+                  <button
+                    onClick={handlePublishSurvey}
+                    disabled={publishing}
+                    className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
+                  >
+                    <FaRocket className="h-4 w-4" />
+                    {publishing ? "Publishing..." : "Publish Survey"}
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
                 <div className="flex items-center gap-3">
                   <FaMicrophoneAlt className="h-5 w-5 text-rose-600" />
                   <h3 className="text-lg font-semibold text-gray-900">
@@ -185,9 +241,11 @@ export default function SurveyBuilder() {
                   </div>
 
                   <div>
-                    <p className="text-gray-500">Recommended Next Step</p>
-                    <p className="mt-1 font-medium text-gray-900">
-                      Add all your questions, then publish
+                    <p className="text-gray-500">Public Link</p>
+                    <p className="mt-1 break-all font-medium text-gray-900">
+                      {survey?.status === "published"
+                        ? publicLink
+                        : "Publish survey first"}
                     </p>
                   </div>
                 </div>

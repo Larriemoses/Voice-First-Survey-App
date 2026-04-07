@@ -94,3 +94,50 @@ export async function addQuestion(input: {
   if (error) throw error;
   return data;
 }
+
+export async function publishSurvey(surveyId: string) {
+  const { data, error } = await supabase
+    .from("surveys")
+    .update({ status: "published" })
+    .eq("id", surveyId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function closeSurvey(surveyId: string) {
+  const { data, error } = await supabase
+    .from("surveys")
+    .update({ status: "closed" })
+    .eq("id", surveyId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getPublicSurveyById(surveyId: string) {
+  const { data, error } = await supabase
+    .from("surveys")
+    .select("*")
+    .eq("id", surveyId)
+    .eq("status", "published")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getPublicSurveyQuestions(surveyId: string) {
+  const { data, error } = await supabase
+    .from("questions")
+    .select("*")
+    .eq("survey_id", surveyId)
+    .order("order_index", { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}

@@ -9,6 +9,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Surveys from "./pages/Surveys";
 import CreateSurvey from "./pages/CreateSurvey";
 import SurveyBuilder from "./pages/SurveyBuilder";
+import PublicSurvey from "./pages/PublicSurvey";
+import RespondSurvey from "./pages/RespondSurvey";
 
 export default function App() {
   return (
@@ -17,6 +19,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/auth-check" element={<AuthGate />} />
+      <Route path="/take-survey/:surveyId" element={<PublicSurvey />} />
 
       <Route
         path="/dashboard"
@@ -69,6 +72,15 @@ export default function App() {
             <SurveyBuilder />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/take-survey/:surveyId/respond/:respondentId"
+        element={<RespondSurvey />}
+      />
+      <Route path="/take-survey/:surveyId" element={<PublicSurvey />} />
+      <Route
+        path="/take-survey/:surveyId/respond/:respondentId"
+        element={<RespondSurvey />}
       />
     </Routes>
   );
