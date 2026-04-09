@@ -13,27 +13,8 @@ import {
   downloadResponseAudio,
   exportSurveyResponsesAsCSV,
   getSurveyResponsesForAdmin,
+  type ResponseItem,
 } from "../lib/responses";
-
-type ResponseItem = {
-  id: string;
-  audio_path: string;
-  mime_type: string | null;
-  file_size_bytes: number | null;
-  duration_seconds: number | null;
-  created_at: string;
-  respondent: {
-    id: string;
-    display_name: string | null;
-    email: string | null;
-    phone: string | null;
-  } | null;
-  question: {
-    id: string;
-    prompt: string;
-    order_index: number;
-  } | null;
-};
 
 export default function SurveyResponses() {
   const { surveyId } = useParams();

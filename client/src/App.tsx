@@ -13,15 +13,17 @@ import PublicSurvey from "./pages/PublicSurvey";
 import RespondSurvey from "./pages/RespondSurvey";
 import SurveyThankYou from "./pages/SurveyThankYou";
 import SurveyResponses from "./pages/SurveyResponses";
+import Home from "./pages/Home";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/auth-check" replace />} />
+      <Route path="/" element={<Navigate to="/home  " replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/auth-check" element={<AuthGate />} />
       <Route path="/take-survey/:surveyId" element={<PublicSurvey />} />
+      <Route path="/home" element={<Home />} />
 
       <Route
         path="/dashboard"

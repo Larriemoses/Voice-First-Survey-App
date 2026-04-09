@@ -1,5 +1,40 @@
 import { supabase } from "./supabase";
 
+export type ResponseItem = {
+  id: string;
+  audio_path: string;
+  mime_type: string | null;
+  file_size_bytes: number | null;
+  duration_seconds: number | null;
+  created_at: string;
+  respondent: {
+    id: string;
+    display_name: string | null;
+    email: string | null;
+    phone: string | null;
+  } | null;
+  question: {
+    id: string;
+    prompt: string;
+    order_index: number;
+  } | null;
+};
+
+type RelationValue<T> = T | T[] | null;
+
+type ResponseQueryRow = Omit<ResponseItem, "respondent" | "question"> & {
+  respondent: RelationValue<NonNullable<ResponseItem["respondent"]>>;
+  question: RelationValue<NonNullable<ResponseItem["question"]>>;
+};
+
+function normalizeRelation<T>(value: RelationValue<T>): T | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+
+  return value ?? null;
+}
+
 export async function uploadSurveyResponse(input: {
   surveyId: string;
   respondentId: string;
@@ -45,7 +80,9 @@ export async function uploadSurveyResponse(input: {
   return { success: true, audio_path: filePath };
 }
 
-export async function getSurveyResponsesForAdmin(surveyId: string) {
+export async function getSurveyResponsesForAdmin(
+  surveyId: string,
+): Promise<ResponseItem[]> {
   const { data, error } = await supabase
     .from("responses")
     .select(
@@ -73,7 +110,14 @@ export async function getSurveyResponsesForAdmin(surveyId: string) {
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data || [];
+
+  const rows = (data ?? []) as ResponseQueryRow[];
+
+  return rows.map((item) => ({
+    ...item,
+    respondent: normalizeRelation(item.respondent),
+    question: normalizeRelation(item.question),
+  }));
 }
 
 export async function downloadResponseAudio(audioPath: string) {
@@ -88,7 +132,7 @@ export async function downloadResponseAudio(audioPath: string) {
 export async function exportSurveyResponsesAsCSV(surveyId: string) {
   const responses = await getSurveyResponsesForAdmin(surveyId);
 
-  const rows = responses.map((item: any) => ({
+  const rows = responses.map((item) => ({
     respondent_name: item.respondent?.display_name || "",
     respondent_email: item.respondent?.email || "",
     respondent_phone: item.respondent?.phone || "",
@@ -107,7 +151,7 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
     ...rows.map((row) =>
       headers
         .map((header) => {
-          const value = String((row as any)[header] ?? "");
+          const value = String(row[header as keyof typeof row] ?? "");
           return `"${value.replace(/"/g, '""')}"`;
         })
         .join(","),
