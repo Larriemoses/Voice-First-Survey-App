@@ -3,10 +3,13 @@ import { supabase } from "./supabase";
 export type ResponseItem = {
   id: string;
   audio_path: string;
+  audio_path_mp3?: string | null;
   mime_type: string | null;
   file_size_bytes: number | null;
   duration_seconds: number | null;
   created_at: string;
+  transcript?: string | null;
+  transcript_status?: string | null;
   respondent: {
     id: string;
     display_name: string | null;
@@ -89,10 +92,13 @@ export async function getSurveyResponsesForAdmin(
       `
       id,
       audio_path,
+      audio_path_mp3,
       mime_type,
       file_size_bytes,
       duration_seconds,
       created_at,
+      transcript,
+      transcript_status,
       respondent:respondents (
         id,
         display_name,
@@ -138,7 +144,10 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
     respondent_phone: item.respondent?.phone || "",
     question_order: item.question?.order_index || "",
     question_prompt: item.question?.prompt || "",
+    transcript: item.transcript || "",
+    transcript_status: item.transcript_status || "",
     audio_path: item.audio_path || "",
+    audio_path_mp3: item.audio_path_mp3 || "",
     mime_type: item.mime_type || "",
     file_size_bytes: item.file_size_bytes || "",
     duration_seconds: item.duration_seconds || "",
