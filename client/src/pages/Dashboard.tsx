@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaClipboardList,
@@ -9,12 +9,15 @@ import {
   FaUser,
   FaRocket,
   FaCheckCircle,
+  FaArrowRight,
+  FaWaveSquare,
 } from "react-icons/fa";
 import { FaHardDrive } from "react-icons/fa6";
 
 import DashboardShell from "../components/DashboardShell";
 import { getMyOrganizationMembership } from "../lib/organization";
 import { getCurrentUser } from "../lib/auth";
+import { supabase } from "../lib/supabase";
 
 type OrgState = {
   id?: string;
@@ -29,24 +32,85 @@ type OrgState = {
   } | null;
 } | null;
 
+type MetricsState = {
+  totalSurveys: number;
+  publishedSurveys: number;
+  totalResponses: number;
+  teamMembers: number;
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [membership, setMembership] = useState<OrgState>(null);
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [metrics, setMetrics] = useState<MetricsState>({
+    totalSurveys: 0,
+    publishedSurveys: 0,
+    totalResponses: 0,
+    teamMembers: 1,
+  });
 
   useEffect(() => {
     async function load() {
       try {
-        const [membershipData, user] = await Promise.all([
+        setLoading(true);
+        setLoadError("");
+
+        const [membershipData] = await Promise.all([
           getMyOrganizationMembership(),
           getCurrentUser(),
         ]);
 
         setMembership(membershipData);
-        setEmail(user?.email || "");
+
+        const orgId = membershipData?.organization?.id;
+        if (!orgId) {
+          setLoading(false);
+          return;
+        }
+
+        const { data: surveys, error: surveysError } = await supabase
+          .from("surveys")
+          .select("id, status")
+          .eq("organization_id", orgId);
+
+        if (surveysError) throw surveysError;
+
+        const surveyIds = (surveys || []).map((survey) => survey.id);
+        const totalSurveys = surveys?.length || 0;
+        const publishedSurveys =
+          surveys?.filter((survey) => survey.status === "published").length ||
+          0;
+
+        const [
+          { count: responseCount, error: responsesError },
+          { count: memberCount, error: membersError },
+        ] = await Promise.all([
+          surveyIds.length > 0
+            ? supabase
+                .from("responses")
+                .select("id", { count: "exact", head: true })
+                .in("survey_id", surveyIds)
+            : Promise.resolve({ count: 0, error: null } as const),
+          supabase
+            .from("organization_members")
+            .select("id", { count: "exact", head: true })
+            .eq("organization_id", orgId),
+        ]);
+
+        if (responsesError) throw responsesError;
+        if (membersError) throw membersError;
+
+        setMetrics({
+          totalSurveys,
+          publishedSurveys,
+          totalResponses: responseCount || 0,
+          teamMembers: memberCount || 1,
+        });
       } catch (error) {
         console.error("Dashboard load error:", error);
+        setLoadError("Failed to load dashboard data.");
       } finally {
         setLoading(false);
       }
@@ -62,199 +126,273 @@ export default function Dashboard() {
     ? new Date(membership.organization.created_at).toLocaleDateString()
     : "—";
 
+  const workspaceState = useMemo(() => {
+    if (!membership?.organization) return "Pending";
+    if (metrics.totalSurveys === 0) return "Ready";
+    if (metrics.publishedSurveys === 0) return "Draft";
+    return "Active";
+  }, [membership, metrics]);
+
   return (
     <DashboardShell>
-      <div className="space-y-8">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3">
-            <FaChartBar className="h-8 w-8 text-indigo-600" />
-            <h2 className="text-2xl font-semibold text-gray-900">Dashboard</h2>
+      <div className="space-y-6">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-gradient-to-br from-white via-white to-[#EAF2FF] shadow-[0_30px_80px_-30px_rgba(15,23,42,0.22)]">
+          <div className="flex flex-col gap-5 px-6 py-7 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#EAF2FF] px-4 py-2 text-sm font-medium text-[#0B4EA2]">
+                <FaWaveSquare className="h-4 w-4" />
+                Survica workspace
+              </div>
+
+              <div>
+                <h2 className="text-3xl font-semibold tracking-tight text-slate-900">
+                  {orgName}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Voice survey intelligence dashboard
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <div className="rounded-xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-200">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Workspace
+                </p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {workspaceState}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-200">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  Role
+                </p>
+                <p className="mt-1 text-sm font-medium capitalize text-slate-900">
+                  {role}
+                </p>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-gray-500">
-            Welcome to your organization workspace.
-          </p>
         </div>
 
         {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Loading dashboard...</p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-sm text-slate-500">Loading dashboard...</p>
+          </div>
+        ) : loadError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+            <p className="text-sm text-red-600">{loadError}</p>
           </div>
         ) : (
           <>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-lg">
-                <div className="flex items-center gap-2">
-                  <FaUsers className="h-5 w-5 text-blue-600 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-sm text-gray-500">Organization</p>
+              <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0B4EA2]/30 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                    <FaClipboardList className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-400">
+                    Total
+                  </span>
                 </div>
-                <h3 className="mt-2 text-xl font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
-                  {orgName}
+                <p className="mt-4 text-sm text-slate-500">Surveys</p>
+                <h3 className="mt-2 text-3xl font-semibold text-slate-900">
+                  {metrics.totalSurveys}
                 </h3>
               </div>
 
-              <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-green-300 hover:shadow-lg">
-                <div className="flex items-center gap-2">
-                  <FaClipboardList className="h-5 w-5 text-green-600 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-sm text-gray-500">Organization Slug</p>
+              <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#F56A00]/30 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                    <FaRocket className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-400">
+                    Live
+                  </span>
                 </div>
-                <h3 className="mt-2 text-xl font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600">
-                  {orgSlug}
+                <p className="mt-4 text-sm text-slate-500">Published</p>
+                <h3 className="mt-2 text-3xl font-semibold text-slate-900">
+                  {metrics.publishedSurveys}
                 </h3>
               </div>
 
-              <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-purple-300 hover:shadow-lg">
-                <div className="flex items-center gap-2">
-                  <FaRocket className="h-5 w-5 text-purple-600 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-sm text-gray-500">Your Role</p>
+              <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-600">
+                    <FaCheckCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-400">
+                    Collected
+                  </span>
                 </div>
-                <h3 className="mt-2 text-xl font-semibold capitalize text-gray-900 transition-colors duration-300 group-hover:text-purple-600">
-                  {role}
+                <p className="mt-4 text-sm text-slate-500">Responses</p>
+                <h3 className="mt-2 text-3xl font-semibold text-slate-900">
+                  {metrics.totalResponses}
                 </h3>
               </div>
 
-              <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-orange-300 hover:shadow-lg">
-                <div className="flex items-center gap-2">
-                  <FaCalendar className="h-5 w-5 text-orange-600 transition-transform duration-300 group-hover:scale-110" />
-                  <p className="text-sm text-gray-500">Organization Created</p>
+              <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="rounded-2xl bg-cyan-50 p-3 text-cyan-600">
+                    <FaUsers className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-400">
+                    Team
+                  </span>
                 </div>
-                <h3 className="mt-2 text-xl font-semibold text-gray-900 transition-colors duration-300 group-hover:text-orange-600">
-                  {orgCreatedAt}
+                <p className="mt-4 text-sm text-slate-500">Members</p>
+                <h3 className="mt-2 text-3xl font-semibold text-slate-900">
+                  {metrics.teamMembers}
                 </h3>
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-              <div className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-lg lg:col-span-2">
+            <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FaBriefcase className="h-6 w-6 text-indigo-600 transition-transform duration-300 group-hover:scale-110" />
-                  <h3 className="text-lg font-semibold text-gray-900 transition-colors duration-300 group-hover:text-indigo-600">
-                    Workspace Overview
-                  </h3>
+                  <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                    <FaBriefcase className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      Workspace Snapshot
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Core organization information at a glance.
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  This is your control center for surveys, responses, and team
-                  activity.
-                </p>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="group/stat rounded-xl bg-gray-50 p-4 transition-all duration-300 hover:bg-indigo-50">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-[#0B4EA2]/20 hover:bg-[#EAF2FF]/40">
                     <div className="flex items-center gap-2">
-                      <FaClipboardList className="h-4 w-4 text-indigo-500" />
-                      <p className="text-sm text-gray-500">Published Surveys</p>
+                      <FaUsers className="h-4 w-4 text-[#0B4EA2]" />
+                      <p className="text-sm text-slate-500">Organization</p>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-gray-900 transition-colors duration-300 group-hover/stat:text-indigo-600">
-                      0
+                    <p className="mt-3 text-lg font-semibold text-slate-900">
+                      {orgName}
                     </p>
                   </div>
 
-                  <div className="group/stat rounded-xl bg-gray-50 p-4 transition-all duration-300 hover:bg-green-50">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-[#F56A00]/20 hover:bg-[#FFF1E7]/50">
                     <div className="flex items-center gap-2">
-                      <FaCheckCircle className="h-4 w-4 text-green-500" />
-                      <p className="text-sm text-gray-500">Total Responses</p>
+                      <FaClipboardList className="h-4 w-4 text-[#F56A00]" />
+                      <p className="text-sm text-slate-500">Slug</p>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-gray-900 transition-colors duration-300 group-hover/stat:text-green-600">
-                      0
+                    <p className="mt-3 text-lg font-semibold text-slate-900">
+                      {orgSlug}
                     </p>
                   </div>
 
-                  <div className="group/stat rounded-xl bg-gray-50 p-4 transition-all duration-300 hover:bg-blue-50">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-violet-200 hover:bg-violet-50">
                     <div className="flex items-center gap-2">
-                      <FaUsers className="h-4 w-4 text-blue-500" />
-                      <p className="text-sm text-gray-500">Team Members</p>
+                      <FaUser className="h-4 w-4 text-violet-600" />
+                      <p className="text-sm text-slate-500">Role</p>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-gray-900 transition-colors duration-300 group-hover/stat:text-blue-600">
-                      1
+                    <p className="mt-3 text-lg font-semibold capitalize text-slate-900">
+                      {role}
                     </p>
                   </div>
 
-                  <div className="group/stat rounded-xl bg-gray-50 p-4 transition-all duration-300 hover:bg-orange-50">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-amber-200 hover:bg-amber-50">
                     <div className="flex items-center gap-2">
-                      <FaHardDrive className="h-4 w-4 text-orange-500" />
-                      <p className="text-sm text-gray-500">Storage Usage</p>
+                      <FaCalendar className="h-4 w-4 text-amber-600" />
+                      <p className="text-sm text-slate-500">Created On</p>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-gray-900 transition-colors duration-300 group-hover/stat:text-orange-600">
-                      0 MB
+                    <p className="mt-3 text-lg font-semibold text-slate-900">
+                      {orgCreatedAt}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-cyan-300 hover:shadow-lg">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FaUser className="h-6 w-6 text-cyan-600 transition-transform duration-300 group-hover:scale-110" />
-                  <h3 className="text-lg font-semibold text-gray-900 transition-colors duration-300 group-hover:text-cyan-600">
-                    Account Summary
-                  </h3>
-                </div>
-
-                <div className="mt-4 space-y-4 text-sm">
-                  <div>
-                    <p className="text-gray-500">Signed in as</p>
-                    <p className="mt-1 font-medium text-gray-900">
-                      {email || "—"}
-                    </p>
+                  <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                    <FaRocket className="h-5 w-5" />
                   </div>
-
                   <div>
-                    <p className="text-gray-500">Onboarding Status</p>
-                    <p className="mt-1 font-medium text-green-600">
-                      {membership?.organization ? "Completed" : "Pending"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-500">Next Recommended Action</p>
-                    <p className="mt-1 font-medium text-gray-900">
-                      Create your first survey
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      Quick Actions
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Move across your workflow faster.
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-rose-300 hover:shadow-lg">
-              <div className="flex items-center gap-3">
-                <FaRocket className="h-6 w-6 text-rose-600 transition-transform duration-300 group-hover:scale-110" />
-                <h3 className="text-lg font-semibold text-gray-900 transition-colors duration-300 group-hover:text-rose-600">
-                  Quick Actions
-                </h3>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Start building your survey workflow from here.
-              </p>
+                <div className="mt-5 grid gap-3">
+                  <button
+                    onClick={() => navigate("/surveys/create")}
+                    className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl bg-white p-2 text-[#0B4EA2] shadow-sm">
+                        <FaClipboardList className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          Create Survey
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Start a new survey flow
+                        </p>
+                      </div>
+                    </div>
+                    <FaArrowRight className="h-4 w-4 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                  </button>
 
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  onClick={() => navigate("/surveys/create")}
-                  className="group/btn flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-black hover:shadow-lg active:scale-95"
-                >
-                  <FaClipboardList className="h-4 w-4 transition-transform duration-300 group-hover/btn:rotate-12" />
-                  Create Survey
-                </button>
+                  <button
+                    onClick={() => navigate("/surveys")}
+                    className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl bg-white p-2 text-[#0B4EA2] shadow-sm">
+                        <FaChartBar className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          View Surveys
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Monitor surveys and responses
+                        </p>
+                      </div>
+                    </div>
+                    <FaArrowRight className="h-4 w-4 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                  </button>
 
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="group/btn flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-gray-400 hover:bg-gray-50 active:scale-95"
-                >
-                  <FaUser className="h-4 w-4 transition-transform duration-300 group-hover/btn:scale-110" />
-                  Manage Profile
-                </button>
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl bg-white p-2 text-[#0B4EA2] shadow-sm">
+                        <FaUser className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          Manage Profile
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Update account details
+                        </p>
+                      </div>
+                    </div>
+                    <FaArrowRight className="h-4 w-4 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => navigate("/onboarding")}
-                  className="group/btn flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-gray-400 hover:bg-gray-50 active:scale-95"
-                >
-                  <FaBriefcase className="h-4 w-4 transition-transform duration-300 group-hover/btn:scale-110" />
-                  View Organization
-                </button>
-
-                <button
-                  onClick={() => navigate("/surveys")}
-                  className="group/btn flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition-all duration-300 hover:border-gray-400 hover:bg-gray-50 active:scale-95"
-                >
-                  <FaChartBar className="h-4 w-4 transition-transform duration-300 group-hover/btn:scale-110" />
-                  View Surveys
-                </button>
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+                    <FaHardDrive className="h-4 w-4 text-[#F56A00]" />
+                    Storage usage
+                  </div>
+                  <p className="mt-2 text-sm text-slate-500">
+                    Tracking enabled. Usage details will appear as uploads grow.
+                  </p>
+                </div>
               </div>
             </div>
           </>

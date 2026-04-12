@@ -5,14 +5,12 @@ import { signOutUser } from "../lib/auth";
 type NavbarProps = {
   isMobile: boolean;
   desktopCollapsed: boolean;
-  mobileSidebarOpen: boolean;
   onToggleSidebar: () => void;
 };
 
 export default function Navbar({
   isMobile,
   desktopCollapsed,
-  mobileSidebarOpen,
   onToggleSidebar,
 }: NavbarProps) {
   const navigate = useNavigate();

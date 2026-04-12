@@ -45,7 +45,6 @@ export default function DashboardShell({ children }: Props) {
       <Navbar
         isMobile={isMobile}
         desktopCollapsed={desktopCollapsed}
-        mobileSidebarOpen={mobileSidebarOpen}
         onToggleSidebar={handleToggleSidebar}
       />
 

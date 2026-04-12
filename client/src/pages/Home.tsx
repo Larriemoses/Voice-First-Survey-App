@@ -7,9 +7,9 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { supabase } from "../lib/supabase";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: {
     opacity: 1,
@@ -18,7 +18,7 @@ const fadeUp = {
   },
 };
 
-const staggerWrap = {
+const staggerWrap: Variants = {
   hidden: {},
   show: {
     transition: {
@@ -33,7 +33,7 @@ const floatAnim = {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: "easeInOut" as const,
     },
   },
 };
