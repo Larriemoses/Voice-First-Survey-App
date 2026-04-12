@@ -1,23 +1,41 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import {
+  FaMicrophoneAlt,
+  FaChartLine,
+  FaGlobe,
+  FaArrowRight,
+} from "react-icons/fa";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
 
-// 🔥 Upgraded Button (clean + consistent colors)
-const Button = ({ children, className = "", variant, onClick }: any) => {
-  const base =
-    "rounded-2xl px-6 py-3 font-semibold transition-all duration-300";
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
 
-  const styles =
-    variant === "outline"
-      ? "border border-blue-200 text-blue-700 hover:bg-blue-50"
-      : "bg-blue-500 text-white hover:scale-105 hover:shadow-lg";
+const staggerWrap = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
 
-  return (
-    <button onClick={onClick} className={`${base} ${styles} ${className}`}>
-      {children}
-    </button>
-  );
+const floatAnim = {
+  animate: {
+    y: [0, -8, 0],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
 };
 
 export default function Home() {
@@ -29,174 +47,197 @@ export default function Home() {
         navigate("/auth-check");
       }
     });
-  }, []);
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-blue-50 text-gray-900 overflow-hidden">
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
+    <div className="relative min-h-screen overflow-hidden bg-white text-slate-900">
+      {/* Background accents */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
-            Speak your thoughts.
-            <br />
-            <span className="bg-blue-500 bg-clip-text text-transparent">
-              Let the answers flow.
-            </span>
-          </h1>
-
-          <p className="mt-6 text-lg text-gray-600 max-w-lg">
-            Voice-first surveys designed to capture real thoughts.
-          </p>
-
-          <div className="mt-8 flex gap-4">
-            <Button onClick={() => navigate("/auth-check")}>
-              Start Survey
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => navigate("/take-survey/demo")}
-            >
-              Try Demo
-            </Button>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Takes less than 30 seconds to try.
-          </p>
-        </motion.div>
-
-        {/* Animated Mic (Enhanced) */}
+          animate={{ x: [0, 40, 0], y: [0, -20, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-[-80px] top-[120px] h-72 w-72 rounded-full bg-[#0B4EA2]/10 blur-3xl"
+        />
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center"
-        >
-          <div className="relative">
-            {/* Pulsing rings */}
-            <div className="absolute inset-0 rounded-full border-4 border-green-300 animate-ping opacity-30" />
-            <div className="absolute inset-0 rounded-full border-4 border-blue-300 animate-ping opacity-20 delay-200" />
+          animate={{ x: [0, -30, 0], y: [0, 30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-[-60px] top-[220px] h-72 w-72 rounded-full bg-[#F56A00]/10 blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-80px] left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-sky-100/40 blur-3xl"
+        />
+      </div>
 
-            <motion.div
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-28 h-28 rounded-full bg-blue-500 to-orange-400 flex items-center justify-center shadow-xl text-white text-2xl"
-            >
-              🎤
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold">How it works</h2>
-
-          <div className="grid md:grid-cols-3 gap-8 mt-12">
-            {["Open Link", "Speak", "Submit"].map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="p-8 bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition"
-              >
-                <div className="text-3xl font-bold text-blue-600">{i + 1}</div>
-                <h3 className="mt-4 text-xl font-semibold">{step}</h3>
-                <p className="mt-2 text-gray-600">
-                  {i === 0 && "Open instantly in your browser"}
-                  {i === 1 && "Answer naturally with your voice"}
-                  {i === 2 && "Submit in seconds"}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* VALUE */}
-      <section className="bg-white py-20">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold">
-            Built for real human responses
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-10 mt-12">
-            {["Natural", "Fast", "Insightful"].map((item, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05 }}
-                className="p-6 rounded-xl"
-              >
-                <h3 className="text-xl font-semibold">{item}</h3>
-                <p className="mt-2 text-gray-600">
-                  {item === "Natural" && "People express better by speaking"}
-                  {item === "Fast" && "No forms. No friction."}
-                  {item === "Insightful" && "Capture emotion and tone"}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DEMO */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold">Experience it live</h2>
-
-          <div className="mt-10 bg-white p-8 rounded-2xl shadow-lg">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-green-500 via-blue-500 to-orange-400"
-                animate={{ width: ["0%", "100%"] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-3"
+          >
+            <motion.img
+              whileHover={{ scale: 1.08, rotate: -4 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18 }}
+              src="https://res.cloudinary.com/dvl2r3bdw/image/upload/v1775943825/ChatGPT_Image_Apr_10_2026_12_41_04_AM_cwispp.png"
+              alt="Survica"
+              className="h-10 w-10 rounded-xl object-contain shadow-sm"
+            />
+            <div>
+              <h1 className="text-lg font-semibold">Survica</h1>
+              <p className="text-xs text-slate-500">
+                Voice survey intelligence
+              </p>
             </div>
+          </motion.div>
 
-            <p className="mt-4 text-gray-500 text-sm">
-              Simulated voice playback
-            </p>
-          </div>
-
-          <Button
-            className="mt-8"
-            onClick={() => navigate("/take-survey/demo")}
+          <motion.div
+            initial={{ opacity: 0, y: -14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center gap-3"
           >
-            Try Demo Now
-          </Button>
+            <Link
+              to="/login"
+              className="text-sm font-medium text-slate-600 transition hover:text-slate-900"
+            >
+              Sign in
+            </Link>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                to="/signup"
+                className="rounded-xl bg-[#0B4EA2] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#093E81]"
+              >
+                Get started
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </header>
 
-      {/* CTA */}
-      <section className="bg-gradient-to-r from-green-500 via-blue-500 to-orange-400 text-white py-20 text-center">
-        <h2 className="text-3xl font-semibold">
-          Start collecting real responses today
-        </h2>
+      <section className="relative px-6 py-20 sm:py-28">
+        <motion.div
+          variants={staggerWrap}
+          initial="hidden"
+          animate="show"
+          className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2"
+        >
+          <motion.div variants={staggerWrap} className="space-y-8">
+            <motion.div
+              variants={fadeUp}
+              whileHover={{ scale: 1.03 }}
+              className="inline-flex items-center rounded-full bg-[#EAF2FF] px-4 py-2 text-sm font-medium text-[#0B4EA2] shadow-sm"
+            >
+              Voice-first feedback for modern teams
+            </motion.div>
 
-        <div className="mt-6 flex justify-center gap-4">
-          <Button
-            onClick={() => navigate("/auth-check")}
-            className="bg-white text-black"
+            <motion.div variants={staggerWrap} className="space-y-5">
+              <motion.h2
+                variants={fadeUp}
+                className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl"
+              >
+                Turn spoken feedback into clear decisions with{" "}
+                <span className="text-[#0B4EA2]">Survica</span>
+              </motion.h2>
+
+              <motion.p
+                variants={fadeUp}
+                className="max-w-xl text-base leading-7 text-slate-600 sm:text-lg"
+              >
+                Create voice surveys, collect responses in any language,
+                generate transcripts, and turn interviews into structured
+                reports your team can actually use.
+              </motion.p>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#0B4EA2] px-6 py-3 text-sm font-medium text-white shadow-lg shadow-[#0B4EA2]/20 transition hover:bg-[#093E81]"
+                >
+                  Create your first survey
+                  <motion.span
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  >
+                    <FaArrowRight className="h-4 w-4" />
+                  </motion.span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  Sign in
+                </Link>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            {...floatAnim}
+            className="rounded-[32px] border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.28)]"
           >
-            Create Survey
-          </Button>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <motion.div
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              >
+                <FaMicrophoneAlt className="h-6 w-6 text-[#F56A00]" />
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  Voice responses
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Let respondents speak naturally instead of filling rigid
+                  forms.
+                </p>
+              </motion.div>
 
-          <Button
-            variant="outline"
-            onClick={() => navigate("/login")}
-            className="border-white text-white"
-          >
-            Sign In
-          </Button>
-        </div>
+              <motion.div
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              >
+                <FaGlobe className="h-6 w-6 text-[#0B4EA2]" />
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  Multilingual ready
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Collect responses in different languages and normalize them
+                  for review.
+                </p>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ y: -8, scale: 1.01 }}
+                transition={{ type: "spring", stiffness: 240, damping: 18 }}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:col-span-2"
+              >
+                <FaChartLine className="h-6 w-6 text-[#0B4EA2]" />
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  AI-powered insight workflow
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Process transcripts, export structured CSVs, and turn raw
+                  audio into business-ready insight.
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
     </div>
   );

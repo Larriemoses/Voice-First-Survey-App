@@ -38,10 +38,10 @@ export default function DashboardShell({ children }: Props) {
     setMobileSidebarOpen(false);
   }
 
-  const desktopSidebarWidth = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
+  const desktopPadding = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar
         isMobile={isMobile}
         desktopCollapsed={desktopCollapsed}
@@ -60,14 +60,14 @@ export default function DashboardShell({ children }: Props) {
         <button
           aria-label="Close sidebar overlay"
           onClick={closeMobileSidebar}
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[1px]"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
         />
       ) : null}
 
       <main
         className={[
-          "min-h-[calc(100vh-64px)] pt-16 transition-all duration-300",
-          desktopSidebarWidth,
+          "min-h-screen pt-16 transition-all duration-300",
+          desktopPadding,
         ].join(" ")}
       >
         <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
