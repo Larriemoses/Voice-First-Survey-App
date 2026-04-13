@@ -423,7 +423,8 @@ export default function SurveyBuilder() {
     }
   }
 
-  const publicLink = `${window.location.origin}/take-survey/${surveyId}`;
+  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+  const publicLink = `${appUrl}/take-survey/${surveyId}`;
 
   const validGeneratedCount = useMemo(() => {
     return generatedDraft?.questions.filter((q) => q.prompt.trim()).length || 0;
