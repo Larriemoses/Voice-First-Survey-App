@@ -175,6 +175,26 @@ export async function generateSurveyDraftFromBrief(brief: string) {
 
   if (error) {
     console.error("generate-survey-draft invoke error:", error);
+
+    const maybeContext = (error as any)?.context;
+
+    if (maybeContext && typeof maybeContext.text === "function") {
+      const rawText = await maybeContext.text();
+      console.error("generate-survey-draft raw error response:", rawText);
+
+      try {
+        const parsed = JSON.parse(rawText);
+        throw new Error(
+          parsed?.error ||
+            parsed?.details?.error?.message ||
+            parsed?.details?.message ||
+            "Failed to generate survey draft.",
+        );
+      } catch {
+        throw new Error(rawText || "Failed to generate survey draft.");
+      }
+    }
+
     throw new Error(error.message || "Failed to generate survey draft.");
   }
 
