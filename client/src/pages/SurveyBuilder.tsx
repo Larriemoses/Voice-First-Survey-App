@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   FaMicrophoneAlt,
@@ -95,10 +95,14 @@ export default function SurveyBuilder() {
     loadData();
   }, [surveyId]);
 
-  async function handleAddQuestion(e: React.FormEvent) {
-    e.preventDefault();
+  function clearFeedback() {
     setError("");
     setSuccessMessage("");
+  }
+
+  async function handleAddQuestion(e: React.FormEvent) {
+    e.preventDefault();
+    clearFeedback();
 
     if (!surveyId) return;
 
@@ -130,8 +134,7 @@ export default function SurveyBuilder() {
   }
 
   async function handleGenerateSurvey() {
-    setError("");
-    setSuccessMessage("");
+    clearFeedback();
 
     if (!brief.trim()) {
       setError(
@@ -143,7 +146,13 @@ export default function SurveyBuilder() {
     try {
       setGenerating(true);
       const draft = await generateSurveyDraftFromBrief(brief.trim());
-      setGeneratedDraft(draft);
+
+      setGeneratedDraft({
+        title: draft.title || "",
+        description: draft.description || "",
+        questions: Array.isArray(draft.questions) ? draft.questions : [],
+      });
+
       setSuccessMessage("Survey draft generated. Review and edit it below.");
     } catch (err) {
       console.error("Generate survey draft error:", err);
@@ -154,11 +163,94 @@ export default function SurveyBuilder() {
       setGenerating(false);
     }
   }
+
+  function handleGeneratedQuestionChange(
+    index: number,
+    field: keyof GeneratedQuestion,
+    value: string,
+  ) {
+    setGeneratedDraft((prev) => {
+      if (!prev) return prev;
+
+      const updatedQuestions = [...prev.questions];
+      const current = updatedQuestions[index];
+
+      if (!current) return prev;
+
+      updatedQuestions[index] = {
+        ...current,
+        [field]:
+          field === "max_duration_seconds"
+            ? Math.max(10, Math.min(600, Number(value) || 120))
+            : value,
+      };
+
+      return {
+        ...prev,
+        questions: updatedQuestions,
+      };
+    });
+  }
+
+  function handleRemoveGeneratedQuestion(index: number) {
+    setGeneratedDraft((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        questions: prev.questions.filter((_, i) => i !== index),
+      };
+    });
+  }
+
+  async function handleAddGeneratedQuestions() {
+    if (!surveyId || !generatedDraft) return;
+
+    clearFeedback();
+
+    const validQuestions = generatedDraft.questions.filter((item) =>
+      item.prompt.trim(),
+    );
+
+    if (validQuestions.length === 0) {
+      setError("Add at least one valid generated question.");
+      return;
+    }
+
+    try {
+      setAddingGenerated(true);
+
+      for (let i = 0; i < validQuestions.length; i++) {
+        const item = validQuestions[i];
+
+        await addQuestion({
+          survey_id: surveyId,
+          prompt: item.prompt.trim(),
+          order_index: questions.length + i + 1,
+          max_duration_seconds: Number(item.max_duration_seconds) || 120,
+        });
+      }
+
+      setGeneratedDraft(null);
+      setBrief("");
+      setSuccessMessage("Generated questions added to the survey.");
+      await loadData();
+    } catch (err) {
+      console.error("Add generated questions error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to add generated questions.",
+      );
+    } finally {
+      setAddingGenerated(false);
+    }
+  }
+
   async function handlePublishSurvey() {
     if (!surveyId) return;
 
-    setError("");
-    setSuccessMessage("");
+    clearFeedback();
 
     if (questions.length === 0) {
       setError("Add at least one question before publishing.");
@@ -181,6 +273,8 @@ export default function SurveyBuilder() {
   }
 
   async function handleCopyLink() {
+    clearFeedback();
+
     try {
       setCopying(true);
       await navigator.clipboard.writeText(publicLink);
@@ -194,6 +288,10 @@ export default function SurveyBuilder() {
   }
 
   const publicLink = `${window.location.origin}/take-survey/${surveyId}`;
+
+  const validGeneratedCount = useMemo(() => {
+    return generatedDraft?.questions.filter((q) => q.prompt.trim()).length || 0;
+  }, [generatedDraft]);
 
   return (
     <DashboardShell>
@@ -340,7 +438,7 @@ export default function SurveyBuilder() {
                       <button
                         type="button"
                         onClick={handleAddGeneratedQuestions}
-                        disabled={addingGenerated}
+                        disabled={addingGenerated || validGeneratedCount === 0}
                         className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
                       >
                         <FaPlus className="h-4 w-4" />
