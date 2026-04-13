@@ -28,9 +28,15 @@ serve(async (req: Request): Promise<Response> => {
     const authHeader = req.headers.get("Authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return jsonResponse(
-        { error: "Missing or invalid Authorization header" },
-        401,
+      return new Response(
+        JSON.stringify({ error: "Missing or invalid Authorization header" }),
+        {
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
@@ -41,60 +47,80 @@ serve(async (req: Request): Promise<Response> => {
     const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 
     if (!supabaseUrl || !supabaseAnonKey || !openaiApiKey) {
-      return jsonResponse(
-        { error: "Missing required environment variables" },
-        500,
+      return new Response(
+        JSON.stringify({ error: "Missing required environment variables" }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
-    // Validate incoming JWT with anon client
+    // Validate incoming JWT manually
     const authClient = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data: userData, error: userError } =
       await authClient.auth.getUser(token);
 
     if (userError || !userData.user) {
-      return jsonResponse({ error: "Invalid JWT" }, 401);
+      return new Response(
+        JSON.stringify({ error: "Invalid JWT" }),
+        {
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
+      );
     }
 
     const body = await req.json().catch(() => null);
     const brief = body?.brief;
 
     if (!brief || typeof brief !== "string" || !brief.trim()) {
-      return jsonResponse(
-        { error: "brief is required and must be a non-empty string" },
-        400,
+      return new Response(
+        JSON.stringify({ error: "brief is required" }),
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
-
-    const trimmedBrief = brief.trim();
 
     const systemPrompt = `
 You are an expert survey strategist for a voice-first survey platform called Survica.
 
-Your job:
-- Read a user's pasted brand brief, research thought, customer problem, or survey plan.
-- Generate a practical survey draft for spoken-response interviews.
-- The output must be concise, useful, and realistic.
-- Questions should be designed for voice responses, not yes/no answers.
-- Keep questions open-ended, natural, and easy to answer verbally.
-- Avoid repetitive questions.
-- Focus on clarity, depth, and business usefulness.
+Return ONLY valid JSON with this exact structure:
+
+{
+  "title": "string",
+  "description": "string",
+  "questions": [
+    {
+      "prompt": "string",
+      "max_duration_seconds": 120
+    }
+  ]
+}
 
 Rules:
 - Return 4 to 8 questions.
-- Each question must be open-ended and suitable for voice recording.
-- Each max_duration_seconds should usually be between 60 and 180.
-- Title should be short and professional.
-- Description should explain what the survey is trying to learn.
+- Each question must use the key "prompt".
+- Each question must use the key "max_duration_seconds".
+- Questions must be open-ended and suitable for spoken answers.
+- Avoid yes/no questions.
+- Avoid repetition.
+- Title must be short and professional.
+- Description must explain what the survey is trying to learn.
 - Do not include markdown.
-- Do not include any text outside the JSON schema.
-`.trim();
-
-    const userPrompt = `
-Create a survey draft from this input:
-
-${trimmedBrief}
+- Do not include any text outside the JSON object.
 `.trim();
 
     const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -113,116 +139,144 @@ ${trimmedBrief}
           },
           {
             role: "user",
-            content: userPrompt,
+            content: `Create a survey draft from this input:\n\n${brief.trim()}`,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "generated_survey_draft",
-            strict: true,
-            schema: {
-              type: "object",
-              additionalProperties: false,
-              properties: {
-                title: {
-                  type: "string",
-                },
-                description: {
-                  type: "string",
-                },
-                questions: {
-                  type: "array",
-                  minItems: 4,
-                  maxItems: 8,
-                  items: {
-                    type: "object",
-                    additionalProperties: false,
-                    properties: {
-                      prompt: {
-                        type: "string",
-                      },
-                      max_duration_seconds: {
-                        type: "number",
-                      },
-                    },
-                    required: ["prompt", "max_duration_seconds"],
-                  },
-                },
-              },
-              required: ["title", "description", "questions"],
-            },
-          },
-        },
+        response_format: { type: "json_object" },
       }),
     });
 
-    const openaiResult = await openaiRes.json();
+    const result = await openaiRes.json();
 
     if (!openaiRes.ok) {
-      console.error("OpenAI generate-survey-draft error:", openaiResult);
+      console.error("OpenAI generation error:", result);
 
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({
           error: "Survey draft generation failed",
-          details: openaiResult,
+          details: result,
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
         },
-        500,
       );
     }
 
-    const rawContent =
-      openaiResult?.choices?.[0]?.message?.content;
+    const rawContent = result?.choices?.[0]?.message?.content;
+
+    console.log("RAW OPENAI CONTENT:", rawContent);
 
     if (!rawContent || typeof rawContent !== "string") {
-      console.error("Unexpected OpenAI response shape:", openaiResult);
-
-      return jsonResponse(
-        { error: "Invalid AI response format" },
-        500,
+      return new Response(
+        JSON.stringify({ error: "Invalid AI response format" }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
-    let parsed: GeneratedSurveyDraft;
+    let parsed: any;
 
     try {
-      parsed = JSON.parse(rawContent) as GeneratedSurveyDraft;
-    } catch (parseError) {
-      console.error("Failed to parse AI JSON:", rawContent, parseError);
+      parsed = JSON.parse(rawContent);
+    } catch (err) {
+      console.error("JSON parse error:", err, rawContent);
 
-      return jsonResponse(
-        { error: "Failed to parse generated survey draft" },
-        500,
+      return new Response(
+        JSON.stringify({
+          error: "Failed to parse generated survey draft",
+          rawContent,
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
-    // Final safety cleanup
+    const rawQuestions = Array.isArray(parsed.questions)
+      ? parsed.questions
+      : Array.isArray(parsed.items)
+        ? parsed.items
+        : Array.isArray(parsed.survey_questions)
+          ? parsed.survey_questions
+          : [];
+
+    const cleanedQuestions = rawQuestions
+      .map((q: any) => ({
+        prompt: sanitizeText(q?.prompt || q?.question || q?.text || "", 300),
+        max_duration_seconds: clampDuration(
+          q?.max_duration_seconds ?? q?.duration ?? 120,
+        ),
+      }))
+      .filter((q: any) => q.prompt);
+
     const cleaned: GeneratedSurveyDraft = {
-      title: sanitizeText(parsed.title, 120),
-      description: sanitizeText(parsed.description, 500),
-      questions: (parsed.questions || [])
-        .filter((q) => q?.prompt && typeof q.prompt === "string")
-        .slice(0, 8)
-        .map((q) => ({
-          prompt: sanitizeText(q.prompt, 300),
-          max_duration_seconds: clampDuration(q.max_duration_seconds),
-        })),
+      title: sanitizeText(
+        parsed.title || parsed.survey_title || "Generated Survey Draft",
+        120,
+      ),
+      description: sanitizeText(
+        parsed.description ||
+          parsed.summary ||
+          parsed.survey_description ||
+          "AI-generated survey draft.",
+        500,
+      ),
+      questions: cleanedQuestions.slice(0, 8),
     };
 
-    if (!cleaned.title || !cleaned.description || cleaned.questions.length === 0) {
-      return jsonResponse(
-        { error: "Generated survey draft was incomplete" },
-        500,
+    console.log("CLEANED DRAFT:", cleaned);
+
+    if (cleaned.questions.length === 0) {
+      return new Response(
+        JSON.stringify({
+          error: "Generated survey draft was incomplete",
+          debug: {
+            parsed,
+            cleaned,
+          },
+        }),
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
       );
     }
 
-    return jsonResponse(cleaned, 200);
+    return new Response(JSON.stringify(cleaned), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
   } catch (err) {
     console.error("FUNCTION ERROR:", err);
 
-    return jsonResponse(
-      { error: "Processing failed" },
-      500,
+    return new Response(
+      JSON.stringify({ error: "Processing failed" }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      },
     );
   }
 });
@@ -242,16 +296,5 @@ function clampDuration(value: unknown): number {
 
 function sanitizeText(value: unknown, maxLength: number): string {
   if (typeof value !== "string") return "";
-
   return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
-}
-
-function jsonResponse(payload: unknown, status = 200): Response {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-    },
-  });
 }

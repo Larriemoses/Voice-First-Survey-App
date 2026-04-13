@@ -8,6 +8,6 @@ entrypoint = "./functions/process-audio/index.ts"
 
 [functions.generate-survey-draft]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 entrypoint = "./functions/generate-survey-draft/index.ts"
 

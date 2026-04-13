@@ -12,14 +12,22 @@ import {
   FaCheckCircle,
   FaHandSparkles,
   FaTrash,
+  FaEdit,
+  FaSave,
+  FaTimes,
+  FaLock,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import {
   addQuestion,
+  closeSurvey,
+  deleteQuestion,
+  deleteSurvey,
   generateSurveyDraftFromBrief,
   getSurveyById,
   getSurveyQuestions,
   publishSurvey,
+  updateQuestion,
 } from "../lib/surveys";
 
 type Survey = {
@@ -60,12 +68,26 @@ export default function SurveyBuilder() {
   const [generatedDraft, setGeneratedDraft] =
     useState<GeneratedSurveyDraft | null>(null);
 
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
+    null,
+  );
+  const [editingPrompt, setEditingPrompt] = useState("");
+  const [editingDuration, setEditingDuration] = useState("120");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [copying, setCopying] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [addingGenerated, setAddingGenerated] = useState(false);
+  const [closingSurvey, setClosingSurvey] = useState(false);
+  const [deletingSurvey, setDeletingSurvey] = useState(false);
+  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
+    null,
+  );
+  const [updatingQuestionId, setUpdatingQuestionId] = useState<string | null>(
+    null,
+  );
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -174,7 +196,6 @@ export default function SurveyBuilder() {
 
       const updatedQuestions = [...prev.questions];
       const current = updatedQuestions[index];
-
       if (!current) return prev;
 
       updatedQuestions[index] = {
@@ -247,6 +268,76 @@ export default function SurveyBuilder() {
     }
   }
 
+  function startEditingQuestion(question: Question) {
+    setEditingQuestionId(question.id);
+    setEditingPrompt(question.prompt);
+    setEditingDuration(String(question.max_duration_seconds || 120));
+    clearFeedback();
+  }
+
+  function cancelEditingQuestion() {
+    setEditingQuestionId(null);
+    setEditingPrompt("");
+    setEditingDuration("120");
+  }
+
+  async function handleSaveQuestion(questionId: string) {
+    clearFeedback();
+
+    if (!editingPrompt.trim()) {
+      setError("Question prompt cannot be empty.");
+      return;
+    }
+
+    try {
+      setUpdatingQuestionId(questionId);
+
+      await updateQuestion(questionId, {
+        prompt: editingPrompt.trim(),
+        max_duration_seconds: Number(editingDuration) || 120,
+      });
+
+      cancelEditingQuestion();
+      setSuccessMessage("Question updated successfully.");
+      await loadData();
+    } catch (err) {
+      console.error("Update question error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to update question.",
+      );
+    } finally {
+      setUpdatingQuestionId(null);
+    }
+  }
+
+  async function handleDeleteQuestion(questionId: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this question?",
+    );
+    if (!confirmed) return;
+
+    clearFeedback();
+
+    try {
+      setDeletingQuestionId(questionId);
+      await deleteQuestion(questionId);
+
+      if (editingQuestionId === questionId) {
+        cancelEditingQuestion();
+      }
+
+      setSuccessMessage("Question deleted successfully.");
+      await loadData();
+    } catch (err) {
+      console.error("Delete question error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to delete question.",
+      );
+    } finally {
+      setDeletingQuestionId(null);
+    }
+  }
+
   async function handlePublishSurvey() {
     if (!surveyId) return;
 
@@ -269,6 +360,51 @@ export default function SurveyBuilder() {
       );
     } finally {
       setPublishing(false);
+    }
+  }
+
+  async function handleCloseSurvey() {
+    if (!surveyId) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to close this survey? Respondents will no longer be able to submit responses.",
+    );
+    if (!confirmed) return;
+
+    clearFeedback();
+
+    try {
+      setClosingSurvey(true);
+      const updated = await closeSurvey(surveyId);
+      setSurvey(updated);
+      setSuccessMessage("Survey closed successfully.");
+    } catch (err) {
+      console.error("Close survey error:", err);
+      setError(err instanceof Error ? err.message : "Failed to close survey.");
+    } finally {
+      setClosingSurvey(false);
+    }
+  }
+
+  async function handleDeleteSurvey() {
+    if (!surveyId) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this entire survey? This action cannot be undone.",
+    );
+    if (!confirmed) return;
+
+    clearFeedback();
+
+    try {
+      setDeletingSurvey(true);
+      await deleteSurvey(surveyId);
+      navigate("/surveys");
+    } catch (err) {
+      console.error("Delete survey error:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete survey.");
+    } finally {
+      setDeletingSurvey(false);
     }
   }
 
@@ -342,6 +478,16 @@ export default function SurveyBuilder() {
                       {copying ? "Copying..." : "Copy Link"}
                     </button>
 
+                    <button
+                      onClick={handleCloseSurvey}
+                      disabled={closingSurvey}
+                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
+                      type="button"
+                    >
+                      <FaLock className="h-4 w-4" />
+                      {closingSurvey ? "Closing..." : "Close Survey"}
+                    </button>
+
                     <a
                       href={publicLink}
                       target="_blank"
@@ -353,15 +499,27 @@ export default function SurveyBuilder() {
                     </a>
                   </>
                 ) : (
-                  <button
-                    onClick={handlePublishSurvey}
-                    disabled={publishing}
-                    className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
-                    type="button"
-                  >
-                    <FaRocket className="h-4 w-4" />
-                    {publishing ? "Publishing..." : "Publish Survey"}
-                  </button>
+                  <>
+                    <button
+                      onClick={handlePublishSurvey}
+                      disabled={publishing}
+                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                      type="button"
+                    >
+                      <FaRocket className="h-4 w-4" />
+                      {publishing ? "Publishing..." : "Publish Survey"}
+                    </button>
+
+                    <button
+                      onClick={handleDeleteSurvey}
+                      disabled={deletingSurvey}
+                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                      type="button"
+                    >
+                      <FaTrash className="h-4 w-4" />
+                      {deletingSurvey ? "Deleting..." : "Delete Survey"}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -668,35 +826,121 @@ export default function SurveyBuilder() {
                 </div>
               ) : (
                 <div className="grid gap-4">
-                  {questions.map((question) => (
-                    <div
-                      key={question.id}
-                      className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                          <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
-                        </div>
+                  {questions.map((question) => {
+                    const isEditing = editingQuestionId === question.id;
 
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                            Question {question.order_index}
-                          </p>
-                          <h4 className="mt-1 text-base font-semibold text-slate-900">
-                            {question.prompt}
-                          </h4>
+                    return (
+                      <div
+                        key={question.id}
+                        className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
+                            <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
+                          </div>
 
-                          <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-                            <FaClock className="h-4 w-4" />
-                            <span>
-                              Max Duration: {question.max_duration_seconds || 0}{" "}
-                              seconds
-                            </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                              Question {question.order_index}
+                            </p>
+
+                            {isEditing ? (
+                              <div className="mt-2 space-y-3">
+                                <textarea
+                                  value={editingPrompt}
+                                  onChange={(e) =>
+                                    setEditingPrompt(e.target.value)
+                                  }
+                                  className="min-h-[110px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                />
+
+                                <input
+                                  type="number"
+                                  min="10"
+                                  max="600"
+                                  value={editingDuration}
+                                  onChange={(e) =>
+                                    setEditingDuration(e.target.value)
+                                  }
+                                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                />
+
+                                <div className="flex flex-col gap-3 sm:flex-row">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleSaveQuestion(question.id)
+                                    }
+                                    disabled={
+                                      updatingQuestionId === question.id
+                                    }
+                                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                                  >
+                                    <FaSave className="h-4 w-4" />
+                                    {updatingQuestionId === question.id
+                                      ? "Saving..."
+                                      : "Save"}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditingQuestion}
+                                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                  >
+                                    <FaTimes className="h-4 w-4" />
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <h4 className="mt-1 text-base font-semibold text-slate-900">
+                                  {question.prompt}
+                                </h4>
+
+                                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                                  <FaClock className="h-4 w-4" />
+                                  <span>
+                                    Max Duration:{" "}
+                                    {question.max_duration_seconds || 0} seconds
+                                  </span>
+                                </div>
+
+                                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      startEditingQuestion(question)
+                                    }
+                                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                  >
+                                    <FaEdit className="h-4 w-4" />
+                                    Edit
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleDeleteQuestion(question.id)
+                                    }
+                                    disabled={
+                                      deletingQuestionId === question.id
+                                    }
+                                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-2xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                                  >
+                                    <FaTrash className="h-4 w-4" />
+                                    {deletingQuestionId === question.id
+                                      ? "Deleting..."
+                                      : "Delete"}
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

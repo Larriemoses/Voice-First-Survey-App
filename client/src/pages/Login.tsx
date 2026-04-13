@@ -5,31 +5,84 @@ import { signInWithGoogle, signInWithPassword } from "../lib/auth";
 
 export default function Login() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  function clearMessages() {
+    setError("");
+    setSuccessMessage("");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    clearMessages();
 
-    const { error } = await signInWithPassword(email, password);
+    const cleanEmail = email.trim().toLowerCase();
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
+    if (!cleanEmail || !password) {
+      setError("Please enter your email and password.");
       return;
     }
 
-    setLoading(false);
-    navigate("/auth-check");
+    try {
+      setLoading(true);
+
+      const { data, error } = await signInWithPassword(cleanEmail, password);
+
+      if (error) {
+        const lowered = error.message.toLowerCase();
+
+        if (
+          lowered.includes("invalid login credentials") ||
+          lowered.includes("invalid credentials")
+        ) {
+          setError("Invalid email or password.");
+        } else if (
+          lowered.includes("email not confirmed") ||
+          lowered.includes("email_not_confirmed")
+        ) {
+          setError(
+            "Your email is not confirmed yet. Please check your inbox and confirm your account first.",
+          );
+        } else {
+          setError(error.message);
+        }
+
+        return;
+      }
+
+      if (!data?.session) {
+        setError(
+          "Login could not be completed. Please confirm your email first or try again.",
+        );
+        return;
+      }
+
+      setSuccessMessage("Signed in successfully. Redirecting...");
+
+      window.setTimeout(() => {
+        navigate("/auth-check");
+      }, 700);
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err instanceof Error ? err.message : "Failed to sign in.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleGoogle() {
+    clearMessages();
+
     const { error } = await signInWithGoogle();
-    if (error) setError(error.message);
+    if (error) {
+      setError(error.message);
+    }
   }
 
   return (
@@ -42,7 +95,7 @@ export default function Login() {
           <button
             onClick={handleGoogle}
             type="button"
-            className="flex cursor-pointer w-full items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -72,6 +125,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
+                autoComplete="email"
               />
             </div>
 
@@ -85,12 +139,19 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                autoComplete="current-password"
               />
             </div>
 
             {error ? (
               <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
+              </div>
+            ) : null}
+
+            {successMessage ? (
+              <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">
+                {successMessage}
               </div>
             ) : null}
 

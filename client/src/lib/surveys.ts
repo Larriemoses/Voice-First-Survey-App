@@ -63,6 +63,45 @@ export async function getSurveyById(surveyId: string) {
   return data;
 }
 
+export async function updateSurvey(
+  surveyId: string,
+  input: {
+    title?: string;
+    description?: string | null;
+    status?: "draft" | "published" | "closed";
+  },
+) {
+  const payload: Record<string, unknown> = {};
+
+  if (input.title !== undefined) payload.title = input.title;
+  if (input.description !== undefined) payload.description = input.description;
+  if (input.status !== undefined) payload.status = input.status;
+
+  const { data, error } = await supabase
+    .from("surveys")
+    .update(payload)
+    .eq("id", surveyId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteSurvey(surveyId: string) {
+  // delete child questions first if your DB does not cascade automatically
+  const { error: questionsError } = await supabase
+    .from("questions")
+    .delete()
+    .eq("survey_id", surveyId);
+
+  if (questionsError) throw questionsError;
+
+  const { error } = await supabase.from("surveys").delete().eq("id", surveyId);
+
+  if (error) throw error;
+}
+
 export async function getSurveyQuestions(surveyId: string) {
   const { data, error } = await supabase
     .from("questions")
@@ -93,6 +132,42 @@ export async function addQuestion(input: {
 
   if (error) throw error;
   return data;
+}
+
+export async function updateQuestion(
+  questionId: string,
+  input: {
+    prompt?: string;
+    max_duration_seconds?: number | null;
+    order_index?: number;
+  },
+) {
+  const payload: Record<string, unknown> = {};
+
+  if (input.prompt !== undefined) payload.prompt = input.prompt;
+  if (input.max_duration_seconds !== undefined) {
+    payload.max_duration_seconds = input.max_duration_seconds;
+  }
+  if (input.order_index !== undefined) payload.order_index = input.order_index;
+
+  const { data, error } = await supabase
+    .from("questions")
+    .update(payload)
+    .eq("id", questionId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteQuestion(questionId: string) {
+  const { error } = await supabase
+    .from("questions")
+    .delete()
+    .eq("id", questionId);
+
+  if (error) throw error;
 }
 
 export async function publishSurvey(surveyId: string) {
@@ -186,9 +261,9 @@ export async function generateSurveyDraftFromBrief(brief: string) {
         const parsed = JSON.parse(rawText);
         throw new Error(
           parsed?.error ||
+            parsed?.message ||
             parsed?.details?.error?.message ||
-            parsed?.details?.message ||
-            "Failed to generate survey draft.",
+            rawText,
         );
       } catch {
         throw new Error(rawText || "Failed to generate survey draft.");
