@@ -1,22 +1,37 @@
 import { supabase } from "./supabase";
 
-export async function createRespondent(input: {
+export type CreateRespondentInput = {
   survey_id: string;
-  display_name?: string;
-  email?: string;
-  phone?: string;
-}) {
-  const { data, error } = await supabase
-    .from("respondents")
-    .insert({
-      survey_id: input.survey_id,
-      display_name: input.display_name || null,
-      email: input.email || null,
-      phone: input.phone || null,
-    })
-    .select()
-    .single();
+  display_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
 
-  if (error) throw error;
-  return data;
+export type Respondent = {
+  id: string;
+  survey_id: string;
+  display_name: string | null;
+  email: string | null;
+  phone: string | null;
+};
+
+export async function createRespondent(input: CreateRespondentInput) {
+  const respondentId = crypto.randomUUID();
+
+  const payload: Respondent = {
+    id: respondentId,
+    survey_id: input.survey_id,
+    display_name: input.display_name?.trim() || null,
+    email: input.email?.trim() || null,
+    phone: input.phone?.trim() || null,
+  };
+
+  const { error } = await supabase.from("respondents").insert(payload);
+
+  if (error) {
+    console.error("Respondent insert error:", error);
+    throw new Error(error.message || "Failed to create respondent.");
+  }
+
+  return payload;
 }
