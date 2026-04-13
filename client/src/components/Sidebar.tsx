@@ -33,19 +33,20 @@ export default function Sidebar({
         "fixed left-0 top-0 z-50 h-screen border-r border-slate-200 bg-white transition-all duration-300",
         isMobile
           ? mobileOpen
-            ? "w-[290px] translate-x-0 shadow-2xl"
-            : "w-[290px] -translate-x-full"
+            ? "w-[280px] translate-x-0 shadow-2xl"
+            : "w-[280px] -translate-x-full"
           : collapsed
             ? "w-24 translate-x-0"
             : "w-72 translate-x-0",
       ].join(" ")}
+      aria-hidden={isMobile ? !mobileOpen : false}
     >
       <div className="flex h-16 items-center border-b border-slate-200 px-4">
         <AppLogo collapsed={collapsed && !isMobile} />
       </div>
 
       <div className="flex h-[calc(100vh-64px)] flex-col">
-        <nav className="flex-1 space-y-2 p-3">
+        <nav className="flex-1 space-y-2 overflow-y-auto p-3">
           {navItems.map((item) => {
             const Icon = item.icon;
 
@@ -56,7 +57,7 @@ export default function Sidebar({
                 onClick={isMobile ? onCloseMobile : undefined}
                 className={({ isActive }) =>
                   [
-                    "group flex items-center rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200",
+                    "group flex min-h-[48px] items-center rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200",
                     isActive
                       ? "bg-[#EAF2FF] text-[#0B4EA2]"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",

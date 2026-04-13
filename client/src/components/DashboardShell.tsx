@@ -23,8 +23,21 @@ export default function DashboardShell({ children }: Props) {
 
     handleResize();
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (mobileSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileSidebarOpen]);
 
   function handleToggleSidebar() {
     if (isMobile) {
@@ -38,10 +51,14 @@ export default function DashboardShell({ children }: Props) {
     setMobileSidebarOpen(false);
   }
 
-  const desktopPadding = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
+  const desktopPadding = isMobile
+    ? ""
+    : desktopCollapsed
+      ? "lg:pl-24"
+      : "lg:pl-72";
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar
         isMobile={isMobile}
         desktopCollapsed={desktopCollapsed}
@@ -57,6 +74,7 @@ export default function DashboardShell({ children }: Props) {
 
       {isMobile && mobileSidebarOpen ? (
         <button
+          type="button"
           aria-label="Close sidebar overlay"
           onClick={closeMobileSidebar}
           className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
@@ -69,8 +87,8 @@ export default function DashboardShell({ children }: Props) {
           desktopPadding,
         ].join(" ")}
       >
-        <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-          {children}
+        <div className="mx-auto w-full max-w-[1600px] px-3 py-4 sm:px-4 sm:py-5 md:px-6 lg:px-8 lg:py-8">
+          <div className="w-full min-w-0">{children}</div>
         </div>
       </main>
     </div>

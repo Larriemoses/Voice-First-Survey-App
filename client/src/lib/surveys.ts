@@ -141,3 +141,46 @@ export async function getPublicSurveyQuestions(surveyId: string) {
   if (error) throw error;
   return data || [];
 }
+export type GeneratedSurveyDraft = {
+  title: string;
+  description: string;
+  questions: {
+    prompt: string;
+    max_duration_seconds: number;
+  }[];
+};
+
+
+
+export async function generateSurveyDraftFromBrief(brief: string) {
+  const { data: sessionData, error: sessionError } =
+    await supabase.auth.getSession();
+
+  if (sessionError) throw sessionError;
+
+  const token = sessionData.session?.access_token;
+
+  if (!token) {
+    throw new Error("You must be logged in.");
+  }
+
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-survey-draft`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ brief }),
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Failed to generate survey draft.");
+  }
+
+  return result as GeneratedSurveyDraft;
+}

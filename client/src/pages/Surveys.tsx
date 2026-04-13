@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaClipboardList, FaPlus, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaClipboardList,
+  FaPlus,
+  FaCalendarAlt,
+  FaArrowRight,
+} from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import { getMySurveys } from "../lib/surveys";
 
@@ -32,44 +37,121 @@ export default function Surveys() {
     load();
   }, []);
 
+  const summary = useMemo(() => {
+    const total = surveys.length;
+    const published = surveys.filter(
+      (survey) => survey.status === "published",
+    ).length;
+    const drafts = surveys.filter((survey) => survey.status === "draft").length;
+    const closed = surveys.filter(
+      (survey) => survey.status === "closed",
+    ).length;
+
+    return { total, published, drafts, closed };
+  }, [surveys]);
+
+  function getStatusClasses(status: Survey["status"]) {
+    switch (status) {
+      case "published":
+        return "bg-emerald-50 text-emerald-700 border border-emerald-100";
+      case "closed":
+        return "bg-slate-100 text-slate-700 border border-slate-200";
+      default:
+        return "bg-amber-50 text-amber-700 border border-amber-100";
+    }
+  }
+
   return (
     <DashboardShell>
-      <div className="space-y-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+      <div className="space-y-4 sm:space-y-5 lg:space-y-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <FaClipboardList className="h-7 w-7 text-indigo-600" />
-              <h2 className="text-2xl font-semibold text-gray-900">Surveys</h2>
+              <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                <FaClipboardList className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+                  Surveys
+                </h1>
+                <p className="mt-1 text-sm text-slate-500">
+                  Manage and build your organization’s voice surveys.
+                </p>
+              </div>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Manage and build your organization’s voice surveys.
-            </p>
           </div>
 
           <button
             onClick={() => navigate("/surveys/create")}
-            className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black"
+            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#093E81] sm:w-auto"
+            type="button"
           >
             <FaPlus className="h-4 w-4" />
             Create Survey
           </button>
         </div>
 
+        {!loading && surveys.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Total
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">
+                {summary.total}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Published
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">
+                {summary.published}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Drafts
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">
+                {summary.drafts}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Closed
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">
+                {summary.closed}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
         {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Loading surveys...</p>
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <p className="text-sm text-slate-500">Loading surveys...</p>
           </div>
         ) : surveys.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-6 text-center shadow-sm sm:p-10">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+              <FaClipboardList className="h-6 w-6" />
+            </div>
+
+            <h3 className="mt-4 text-lg font-semibold text-slate-900">
               No surveys yet
             </h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
               Create your first survey to begin collecting voice responses.
             </p>
+
             <button
               onClick={() => navigate("/surveys/create")}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white hover:bg-black"
+              type="button"
+              className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] sm:w-auto"
             >
               <FaPlus className="h-4 w-4" />
               Create your first survey
@@ -81,28 +163,43 @@ export default function Surveys() {
               <button
                 key={survey.id}
                 onClick={() => navigate(`/surveys/${survey.id}`)}
-                className="group rounded-2xl border border-gray-200 bg-white p-6 text-left shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-lg"
+                type="button"
+                className="group rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md sm:p-5 lg:p-6"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 transition-colors group-hover:text-indigo-600">
-                      {survey.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-500">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <h3 className="truncate text-base font-semibold text-slate-900 transition-colors group-hover:text-[#0B4EA2] sm:text-lg">
+                        {survey.title}
+                      </h3>
+
+                      <span
+                        className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusClasses(
+                          survey.status,
+                        )}`}
+                      >
+                        {survey.status}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
                       {survey.description || "No description provided."}
                     </p>
+
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-2 text-sm text-slate-400">
+                        <FaCalendarAlt className="h-4 w-4 shrink-0" />
+                        <span>
+                          {new Date(survey.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="inline-flex items-center gap-2 text-sm font-medium text-[#0B4EA2]">
+                        Open survey
+                        <FaArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
                   </div>
-
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-700">
-                    {survey.status}
-                  </span>
-                </div>
-
-                <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
-                  <FaCalendarAlt className="h-4 w-4" />
-                  <span>
-                    {new Date(survey.created_at).toLocaleDateString()}
-                  </span>
                 </div>
               </button>
             ))}
