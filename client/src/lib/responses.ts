@@ -38,6 +38,15 @@ function normalizeRelation<T>(value: RelationValue<T>): T | null {
   return value ?? null;
 }
 
+function buildResponseFilePath(input: {
+  surveyId: string;
+  respondentId: string;
+  questionId: string;
+}) {
+  const fileExt = "webm";
+  return `survey_${input.surveyId}/respondent_${input.respondentId}/question_${input.questionId}.${fileExt}`;
+}
+
 export async function uploadSurveyResponse(input: {
   surveyId: string;
   respondentId: string;
@@ -45,19 +54,24 @@ export async function uploadSurveyResponse(input: {
   audioBlob: Blob;
   durationSeconds: number;
 }) {
-  const fileExt = "webm";
-  const filePath = `survey_${input.surveyId}/respondent_${input.respondentId}/question_${input.questionId}.${fileExt}`;
+  const filePath = buildResponseFilePath({
+    surveyId: input.surveyId,
+    respondentId: input.respondentId,
+    questionId: input.questionId,
+  });
+
+  const mimeType = input.audioBlob.type || "audio/webm";
 
   const { error: uploadError } = await supabase.storage
     .from("voice-surveys")
     .upload(filePath, input.audioBlob, {
-      contentType: input.audioBlob.type || "audio/webm",
+      contentType: mimeType,
       upsert: true,
     });
 
   if (uploadError) {
     console.error("Storage upload error:", uploadError);
-    throw uploadError;
+    throw new Error(uploadError.message || "Failed to upload audio.");
   }
 
   const { error: responseError } = await supabase.from("responses").upsert(
@@ -66,7 +80,7 @@ export async function uploadSurveyResponse(input: {
       respondent_id: input.respondentId,
       question_id: input.questionId,
       audio_path: filePath,
-      mime_type: input.audioBlob.type || "audio/webm",
+      mime_type: mimeType,
       file_size_bytes: input.audioBlob.size,
       duration_seconds: input.durationSeconds,
     },
@@ -77,7 +91,7 @@ export async function uploadSurveyResponse(input: {
 
   if (responseError) {
     console.error("Response insert/upsert error:", responseError);
-    throw responseError;
+    throw new Error(responseError.message || "Failed to save response.");
   }
 
   return { success: true, audio_path: filePath };
@@ -154,7 +168,14 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
     created_at: item.created_at || "",
   }));
 
-  const headers = Object.keys(rows[0] || {});
+  if (rows.length === 0) {
+    return [
+      "respondent_name,respondent_email,respondent_phone,question_order,question_prompt,transcript,transcript_status,audio_path,audio_path_mp3,mime_type,file_size_bytes,duration_seconds,created_at",
+    ].join("\n");
+  }
+
+  const headers = Object.keys(rows[0]);
+
   const csv = [
     headers.join(","),
     ...rows.map((row) =>

@@ -33,19 +33,30 @@ export default function PublicSurvey() {
 
   useEffect(() => {
     async function load() {
-      if (!surveyId) return;
-
       try {
+        setLoading(true);
+        setError("");
+
+        if (!surveyId) {
+          setError("Survey link is invalid.");
+          return;
+        }
+
         const [surveyData, questionData] = await Promise.all([
           getPublicSurveyById(surveyId),
           getPublicSurveyQuestions(surveyId),
         ]);
 
+        if (!surveyData) {
+          setError("Survey not found or not available.");
+          return;
+        }
+
         setSurvey(surveyData);
         setQuestions(questionData);
       } catch (err) {
         console.error("Public survey load error:", err);
-        setError("Survey not found or not available.");
+        setError("Failed to load this survey.");
       } finally {
         setLoading(false);
       }
@@ -56,10 +67,13 @@ export default function PublicSurvey() {
 
   async function handleStartSurvey(e: React.FormEvent) {
     e.preventDefault();
-    if (!surveyId) return;
+
+    if (!surveyId || !survey) return;
 
     try {
       setStarting(true);
+      setError("");
+
       const respondent = await createRespondent({
         survey_id: surveyId,
         display_name: displayName,
@@ -78,7 +92,7 @@ export default function PublicSurvey() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <p className="text-sm text-gray-500">Loading survey...</p>
       </div>
     );
@@ -149,6 +163,7 @@ export default function PublicSurvey() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
                 placeholder="you@example.com"
+                type="email"
               />
             </div>
 
@@ -172,7 +187,7 @@ export default function PublicSurvey() {
 
             <button
               type="submit"
-              disabled={starting}
+              disabled={starting || !survey}
               className="inline-flex w-fit items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
             >
               <FaArrowRight className="h-4 w-4" />

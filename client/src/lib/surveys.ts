@@ -89,7 +89,6 @@ export async function updateSurvey(
 }
 
 export async function deleteSurvey(surveyId: string) {
-  // delete child questions first if your DB does not cascade automatically
   const { error: questionsError } = await supabase
     .from("questions")
     .delete()
@@ -200,7 +199,7 @@ export async function getPublicSurveyById(surveyId: string) {
     .select("*")
     .eq("id", surveyId)
     .eq("status", "published")
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data;
