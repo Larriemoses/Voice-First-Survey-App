@@ -150,8 +150,6 @@ export type GeneratedSurveyDraft = {
   }[];
 };
 
-
-
 export async function generateSurveyDraftFromBrief(brief: string) {
   const { data: sessionData, error: sessionError } =
     await supabase.auth.getSession();
@@ -176,10 +174,35 @@ export async function generateSurveyDraftFromBrief(brief: string) {
     },
   );
 
-  const result = await response.json();
+  const rawText = await response.text();
+  console.log("generate-survey-draft raw response:", rawText);
+
+  let result: any = null;
+
+  try {
+    result = rawText ? JSON.parse(rawText) : null;
+  } catch {
+    throw new Error(
+      `Function returned invalid JSON. Raw response: ${rawText || "empty response"}`
+    );
+  }
 
   if (!response.ok) {
-    throw new Error(result.error || "Failed to generate survey draft.");
+    throw new Error(
+      result?.error ||
+        result?.details?.error?.message ||
+        result?.details?.message ||
+        `Function failed with status ${response.status}`
+    );
+  }
+
+  if (
+    !result ||
+    typeof result.title !== "string" ||
+    typeof result.description !== "string" ||
+    !Array.isArray(result.questions)
+  ) {
+    throw new Error("Generated survey draft has an invalid shape.");
   }
 
   return result as GeneratedSurveyDraft;
