@@ -141,6 +141,7 @@ export async function getPublicSurveyQuestions(surveyId: string) {
   if (error) throw error;
   return data || [];
 }
+
 export type GeneratedSurveyDraft = {
   title: string;
   description: string;
@@ -156,54 +157,36 @@ export async function generateSurveyDraftFromBrief(brief: string) {
 
   if (sessionError) throw sessionError;
 
-  const token = sessionData.session?.access_token;
+  const session = sessionData.session;
 
-  if (!token) {
+  if (!session?.access_token) {
     throw new Error("You must be logged in.");
   }
 
-  const response = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-survey-draft`,
+  const { data, error } = await supabase.functions.invoke(
+    "generate-survey-draft",
     {
-      method: "POST",
+      body: { brief },
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ brief }),
     },
   );
 
-  const rawText = await response.text();
-  console.log("generate-survey-draft raw response:", rawText);
-
-  let result: any = null;
-
-  try {
-    result = rawText ? JSON.parse(rawText) : null;
-  } catch {
-    throw new Error(
-      `Function returned invalid JSON. Raw response: ${rawText || "empty response"}`
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      result?.error ||
-        result?.details?.error?.message ||
-        result?.details?.message ||
-        `Function failed with status ${response.status}`
-    );
+  if (error) {
+    console.error("generate-survey-draft invoke error:", error);
+    throw new Error(error.message || "Failed to generate survey draft.");
   }
 
   if (
-    !result ||
-    typeof result.title !== "string" ||
-    typeof result.description !== "string" ||
-    !Array.isArray(result.questions)
+    !data ||
+    typeof data.title !== "string" ||
+    typeof data.description !== "string" ||
+    !Array.isArray(data.questions)
   ) {
+    console.error("Invalid AI response:", data);
     throw new Error("Generated survey draft has an invalid shape.");
   }
 
-  return result as GeneratedSurveyDraft;
+  return data as GeneratedSurveyDraft;
 }
