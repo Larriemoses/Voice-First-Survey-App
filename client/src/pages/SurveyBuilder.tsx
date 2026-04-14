@@ -960,6 +960,142 @@ export default function SurveyBuilder() {
                     </form>
                   ) : null}
                 </div>
+
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-3">
+                    <FaClipboardList className="h-5 w-5 text-[#0B4EA2]" />
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      Survey Questions
+                    </h3>
+                  </div>
+
+                  {questions.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+                      <p className="text-sm text-slate-500">
+                        No questions added yet.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3">
+                      {questions.map((question) => {
+                        const isEditing = editingQuestionId === question.id;
+
+                        return (
+                          <div
+                            key={question.id}
+                            className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
+                                <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                  Question {question.order_index}
+                                </p>
+
+                                {isEditing ? (
+                                  <div className="mt-2 space-y-3">
+                                    <textarea
+                                      value={editingPrompt}
+                                      onChange={(e) =>
+                                        setEditingPrompt(e.target.value)
+                                      }
+                                      className="min-h-[100px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                    />
+
+                                    <input
+                                      type="number"
+                                      min="10"
+                                      max="600"
+                                      value={editingDuration}
+                                      onChange={(e) =>
+                                        setEditingDuration(e.target.value)
+                                      }
+                                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                    />
+
+                                    <div className="flex flex-wrap gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleSaveQuestion(question.id)
+                                        }
+                                        disabled={
+                                          updatingQuestionId === question.id
+                                        }
+                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                                      >
+                                        <FaSave className="h-4 w-4" />
+                                        {updatingQuestionId === question.id
+                                          ? "Saving..."
+                                          : "Save"}
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={cancelEditingQuestion}
+                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                      >
+                                        <FaTimes className="h-4 w-4" />
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <h4 className="mt-1 text-base font-semibold text-slate-900">
+                                      {question.prompt}
+                                    </h4>
+
+                                    <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+                                      <FaClock className="h-4 w-4" />
+                                      <span>
+                                        Max Duration:{" "}
+                                        {question.max_duration_seconds || 0}{" "}
+                                        seconds
+                                      </span>
+                                    </div>
+
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          startEditingQuestion(question)
+                                        }
+                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                      >
+                                        <FaEdit className="h-4 w-4" />
+                                        Edit
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleDeleteQuestion(question.id)
+                                        }
+                                        disabled={
+                                          deletingQuestionId === question.id
+                                        }
+                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                                      >
+                                        <FaTrash className="h-4 w-4" />
+                                        {deletingQuestionId === question.id
+                                          ? "Deleting..."
+                                          : "Delete"}
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -1051,141 +1187,6 @@ export default function SurveyBuilder() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <FaClipboardList className="h-5 w-5 text-[#0B4EA2]" />
-                <h3 className="text-lg font-semibold text-slate-900">
-                  Survey Questions
-                </h3>
-              </div>
-
-              {questions.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-                  <p className="text-sm text-slate-500">
-                    No questions added yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-3">
-                  {questions.map((question) => {
-                    const isEditing = editingQuestionId === question.id;
-
-                    return (
-                      <div
-                        key={question.id}
-                        className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                            <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                              Question {question.order_index}
-                            </p>
-
-                            {isEditing ? (
-                              <div className="mt-2 space-y-3">
-                                <textarea
-                                  value={editingPrompt}
-                                  onChange={(e) =>
-                                    setEditingPrompt(e.target.value)
-                                  }
-                                  className="min-h-[100px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                                />
-
-                                <input
-                                  type="number"
-                                  min="10"
-                                  max="600"
-                                  value={editingDuration}
-                                  onChange={(e) =>
-                                    setEditingDuration(e.target.value)
-                                  }
-                                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                                />
-
-                                <div className="flex flex-wrap gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleSaveQuestion(question.id)
-                                    }
-                                    disabled={
-                                      updatingQuestionId === question.id
-                                    }
-                                    className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
-                                  >
-                                    <FaSave className="h-4 w-4" />
-                                    {updatingQuestionId === question.id
-                                      ? "Saving..."
-                                      : "Save"}
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={cancelEditingQuestion}
-                                    className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                                  >
-                                    <FaTimes className="h-4 w-4" />
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <h4 className="mt-1 text-base font-semibold text-slate-900">
-                                  {question.prompt}
-                                </h4>
-
-                                <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-                                  <FaClock className="h-4 w-4" />
-                                  <span>
-                                    Max Duration:{" "}
-                                    {question.max_duration_seconds || 0} seconds
-                                  </span>
-                                </div>
-
-                                <div className="mt-3 flex flex-wrap gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      startEditingQuestion(question)
-                                    }
-                                    className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                                  >
-                                    <FaEdit className="h-4 w-4" />
-                                    Edit
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeleteQuestion(question.id)
-                                    }
-                                    disabled={
-                                      deletingQuestionId === question.id
-                                    }
-                                    className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
-                                  >
-                                    <FaTrash className="h-4 w-4" />
-                                    {deletingQuestionId === question.id
-                                      ? "Deleting..."
-                                      : "Delete"}
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </>
         )}

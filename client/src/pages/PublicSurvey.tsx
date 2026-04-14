@@ -112,7 +112,7 @@ export default function PublicSurvey() {
           description="This survey could not be loaded."
         />
         <div className="flex min-h-screen items-center justify-center bg-white px-4">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+          <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
             <h1 className="text-lg font-semibold text-slate-900">
               Survey unavailable
             </h1>
@@ -133,31 +133,31 @@ export default function PublicSurvey() {
         }
       />
 
-      <div className="min-h-screen bg-white px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mx-auto max-w-2xl space-y-4">
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="bg-gradient-to-br from-slate-50 via-white to-[#EAF2FF]/40 px-5 py-6 sm:px-6 sm:py-7">
+      <div className="min-h-screen bg-white px-3 py-4 sm:px-5 sm:py-6">
+        <div className="mx-auto max-w-xl space-y-3 sm:space-y-4">
+          <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+            <div className="bg-gradient-to-br from-slate-50 via-white to-[#EAF2FF]/30 px-4 py-5 sm:px-5 sm:py-6">
               {survey?.logo_url ? (
-                <div className="mb-4 flex justify-center sm:justify-start">
+                <div className="mb-3 flex justify-center sm:justify-start">
                   <img
                     src={survey.logo_url}
                     alt={survey.title}
-                    className="h-10 w-auto max-w-[140px] object-contain"
+                    className="h-9 w-auto max-w-[120px] object-contain"
                   />
                 </div>
               ) : null}
 
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                  <FaMicrophoneAlt className="h-5 w-5 text-[#0B4EA2]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
+                  <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-500">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                     {survey?.title || "Voice Survey"}
                   </p>
 
-                  <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+                  <h1 className="mt-1 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
                     {survey?.header_text || "We’d love to hear your response"}
                   </h1>
 
@@ -168,49 +168,49 @@ export default function PublicSurvey() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3 rounded-2xl bg-white/80 p-4 sm:grid-cols-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-white/80 p-3">
+                <div className="rounded-xl bg-slate-50 px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     Questions
                   </p>
-                  <p className="mt-1 text-lg font-semibold text-slate-900">
+                  <p className="mt-1 text-base font-semibold text-slate-900">
                     {questions.length}
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <div className="rounded-xl bg-slate-50 px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     Format
                   </p>
-                  <p className="mt-1 text-lg font-semibold text-slate-900">
+                  <p className="mt-1 text-base font-semibold text-slate-900">
                     Voice
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                <div className="rounded-xl bg-slate-50 px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     Language
                   </p>
-                  <div className="mt-1 flex items-center gap-2 text-lg font-semibold text-slate-900">
-                    <FaGlobe className="h-3.5 w-3.5 text-[#F56A00]" />
-                    Any language
+                  <div className="mt-1 flex items-center gap-1.5 text-base font-semibold text-slate-900">
+                    <FaGlobe className="h-3 w-3 text-[#F56A00]" />
+                    Any
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
             <div className="space-y-1">
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 sm:text-base">
                 Before you begin
               </h2>
               <p className="text-sm leading-6 text-slate-500">
-                Enter a few details so your responses can be linked correctly.
+                Add your details so your responses can be linked correctly.
               </p>
             </div>
 
-            <form onSubmit={handleStartSurvey} className="mt-5 grid gap-3">
+            <form onSubmit={handleStartSurvey} className="mt-4 grid gap-3">
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">
                   Full name
@@ -218,7 +218,7 @@ export default function PublicSurvey() {
                 <input
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
                   placeholder="Your name"
                 />
               </div>
@@ -230,7 +230,7 @@ export default function PublicSurvey() {
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
                   placeholder="you@example.com"
                   type="email"
                 />
@@ -243,7 +243,7 @@ export default function PublicSurvey() {
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
                   placeholder="+234..."
                 />
               </div>
@@ -258,7 +258,7 @@ export default function PublicSurvey() {
                 <button
                   type="submit"
                   disabled={starting || !survey}
-                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                  className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
                 >
                   <FaArrowRight className="h-4 w-4" />
                   {starting ? "Starting..." : "Start Survey"}
