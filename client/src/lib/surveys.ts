@@ -1,6 +1,33 @@
 import { supabase } from "./supabase";
 import { getMyOrganizationMembership } from "./organization";
 
+export type SurveyStatus = "draft" | "published" | "closed";
+
+export type SurveyRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: SurveyStatus;
+  organization_id?: string;
+  created_by?: string;
+  created_at?: string;
+  logo_url?: string | null;
+  header_text?: string | null;
+};
+
+export type GeneratedSurveyDraft = {
+  title: string;
+  description: string;
+  questions: {
+    prompt: string;
+    max_duration_seconds: number;
+  }[];
+};
+
+function sanitizeFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9-_]/g, "_");
+}
+
 export async function getMySurveys() {
   const membership = await getMyOrganizationMembership();
 
@@ -60,7 +87,7 @@ export async function getSurveyById(surveyId: string) {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as SurveyRecord;
 }
 
 export async function updateSurvey(
@@ -68,7 +95,9 @@ export async function updateSurvey(
   input: {
     title?: string;
     description?: string | null;
-    status?: "draft" | "published" | "closed";
+    status?: SurveyStatus;
+    logo_url?: string | null;
+    header_text?: string | null;
   },
 ) {
   const payload: Record<string, unknown> = {};
@@ -76,6 +105,8 @@ export async function updateSurvey(
   if (input.title !== undefined) payload.title = input.title;
   if (input.description !== undefined) payload.description = input.description;
   if (input.status !== undefined) payload.status = input.status;
+  if (input.logo_url !== undefined) payload.logo_url = input.logo_url;
+  if (input.header_text !== undefined) payload.header_text = input.header_text;
 
   const { data, error } = await supabase
     .from("surveys")
@@ -85,7 +116,34 @@ export async function updateSurvey(
     .single();
 
   if (error) throw error;
-  return data;
+  return data as SurveyRecord;
+}
+
+export async function uploadSurveyLogo(surveyId: string, file: File) {
+  const fileExt = file.name.split(".").pop() || "png";
+  const filePath = `survey-branding/${surveyId}/${Date.now()}-${sanitizeFileName(
+    file.name.replace(`.${fileExt}`, ""),
+  )}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("voice-surveys")
+    .upload(filePath, file, {
+      contentType: file.type || "image/png",
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data, error: signedUrlError } = await supabase.storage
+    .from("voice-surveys")
+    .createSignedUrl(filePath, 60 * 60 * 24 * 365);
+
+  if (signedUrlError) throw signedUrlError;
+
+  return {
+    path: filePath,
+    signedUrl: data.signedUrl,
+  };
 }
 
 export async function deleteSurvey(surveyId: string) {
@@ -178,7 +236,7 @@ export async function publishSurvey(surveyId: string) {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as SurveyRecord;
 }
 
 export async function closeSurvey(surveyId: string) {
@@ -190,7 +248,7 @@ export async function closeSurvey(surveyId: string) {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as SurveyRecord;
 }
 
 export async function getPublicSurveyById(surveyId: string) {
@@ -202,7 +260,7 @@ export async function getPublicSurveyById(surveyId: string) {
     .maybeSingle();
 
   if (error) throw error;
-  return data;
+  return data as SurveyRecord | null;
 }
 
 export async function getPublicSurveyQuestions(surveyId: string) {
@@ -215,15 +273,6 @@ export async function getPublicSurveyQuestions(surveyId: string) {
   if (error) throw error;
   return data || [];
 }
-
-export type GeneratedSurveyDraft = {
-  title: string;
-  description: string;
-  questions: {
-    prompt: string;
-    max_duration_seconds: number;
-  }[];
-};
 
 export async function generateSurveyDraftFromBrief(brief: string) {
   const { data: sessionData, error: sessionError } =

@@ -16,6 +16,8 @@ import {
   FaSave,
   FaTimes,
   FaLock,
+  FaImage,
+  FaPalette,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import {
@@ -28,6 +30,8 @@ import {
   getSurveyQuestions,
   publishSurvey,
   updateQuestion,
+  updateSurvey,
+  uploadSurveyLogo,
 } from "../lib/surveys";
 
 type Survey = {
@@ -35,6 +39,8 @@ type Survey = {
   title: string;
   description: string | null;
   status: "draft" | "published" | "closed";
+  logo_url?: string | null;
+  header_text?: string | null;
 };
 
 type Question = {
@@ -67,6 +73,13 @@ export default function SurveyBuilder() {
   const [brief, setBrief] = useState("");
   const [generatedDraft, setGeneratedDraft] =
     useState<GeneratedSurveyDraft | null>(null);
+
+  const [surveyTitle, setSurveyTitle] = useState("");
+  const [surveyDescription, setSurveyDescription] = useState("");
+  const [headerText, setHeaderText] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [savingBranding, setSavingBranding] = useState(false);
 
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
     null,
@@ -104,6 +117,10 @@ export default function SurveyBuilder() {
       ]);
 
       setSurvey(surveyData);
+      setSurveyTitle(surveyData.title || "");
+      setSurveyDescription(surveyData.description || "");
+      setHeaderText(surveyData.header_text || "");
+      setLogoUrl(surveyData.logo_url || "");
       setQuestions(questionData);
     } catch (err) {
       console.error("Survey builder load error:", err);
@@ -120,6 +137,58 @@ export default function SurveyBuilder() {
   function clearFeedback() {
     setError("");
     setSuccessMessage("");
+  }
+
+  async function handleSaveBranding() {
+    if (!surveyId) return;
+
+    clearFeedback();
+
+    if (!surveyTitle.trim()) {
+      setError("Survey title is required.");
+      return;
+    }
+
+    try {
+      setSavingBranding(true);
+
+      const updated = await updateSurvey(surveyId, {
+        title: surveyTitle.trim(),
+        description: surveyDescription.trim() || null,
+        header_text: headerText.trim() || null,
+        logo_url: logoUrl || null,
+      });
+
+      setSurvey(updated);
+      setSuccessMessage("Survey branding updated successfully.");
+    } catch (err) {
+      console.error("Save branding error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to save survey branding.",
+      );
+    } finally {
+      setSavingBranding(false);
+    }
+  }
+
+  async function handleLogoUpload(file: File | null) {
+    if (!file || !surveyId) return;
+
+    clearFeedback();
+
+    try {
+      setLogoUploading(true);
+      const uploaded = await uploadSurveyLogo(surveyId, file);
+      setLogoUrl(uploaded.signedUrl);
+      setSuccessMessage(
+        "Logo uploaded successfully. Save branding to apply it.",
+      );
+    } catch (err) {
+      console.error("Logo upload error:", err);
+      setError(err instanceof Error ? err.message : "Failed to upload logo.");
+    } finally {
+      setLogoUploading(false);
+    }
   }
 
   async function handleAddQuestion(e: React.FormEvent) {
@@ -175,6 +244,8 @@ export default function SurveyBuilder() {
         questions: Array.isArray(draft.questions) ? draft.questions : [],
       });
 
+      setSurveyTitle(draft.title || surveyTitle);
+      setSurveyDescription(draft.description || surveyDescription);
       setSuccessMessage("Survey draft generated. Review and edit it below.");
     } catch (err) {
       console.error("Generate survey draft error:", err);
@@ -240,6 +311,13 @@ export default function SurveyBuilder() {
 
     try {
       setAddingGenerated(true);
+
+      await updateSurvey(surveyId, {
+        title: surveyTitle.trim() || generatedDraft.title,
+        description: surveyDescription.trim() || generatedDraft.description,
+        header_text: headerText.trim() || null,
+        logo_url: logoUrl || null,
+      });
 
       for (let i = 0; i < validQuestions.length; i++) {
         const item = validQuestions[i];
@@ -343,6 +421,11 @@ export default function SurveyBuilder() {
 
     clearFeedback();
 
+    if (!surveyTitle.trim()) {
+      setError("Survey title is required before publishing.");
+      return;
+    }
+
     if (questions.length === 0) {
       setError("Add at least one question before publishing.");
       return;
@@ -350,6 +433,14 @@ export default function SurveyBuilder() {
 
     try {
       setPublishing(true);
+
+      await updateSurvey(surveyId, {
+        title: surveyTitle.trim(),
+        description: surveyDescription.trim() || null,
+        header_text: headerText.trim() || null,
+        logo_url: logoUrl || null,
+      });
+
       const updated = await publishSurvey(surveyId);
       setSurvey(updated);
       setSuccessMessage("Survey published successfully.");
@@ -447,11 +538,10 @@ export default function SurveyBuilder() {
                   </div>
                   <div className="min-w-0">
                     <h2 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">
-                      {survey?.title || "Survey Builder"}
+                      Survey Builder
                     </h2>
                     <p className="mt-1 text-sm text-slate-500">
-                      {survey?.description ||
-                        "Build your voice survey questions here."}
+                      Build, brand, and publish your voice survey.
                     </p>
                   </div>
                 </div>
@@ -542,6 +632,104 @@ export default function SurveyBuilder() {
               <div className="space-y-6">
                 <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                   <div className="flex items-center gap-3">
+                    <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                      <FaPalette className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        Survey Branding
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Add your logo, title, and survey header to make the
+                        public form feel branded and trustworthy.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Survey Title
+                      </label>
+                      <input
+                        value={surveyTitle}
+                        onChange={(e) => setSurveyTitle(e.target.value)}
+                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                        placeholder="Customer Experience Survey"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Survey Description
+                      </label>
+                      <textarea
+                        value={surveyDescription}
+                        onChange={(e) => setSurveyDescription(e.target.value)}
+                        className="min-h-[100px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                        placeholder="Tell respondents what this survey is about."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Header Text
+                      </label>
+                      <input
+                        value={headerText}
+                        onChange={(e) => setHeaderText(e.target.value)}
+                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                        placeholder="We value your honest feedback."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Company Logo
+                      </label>
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                          <FaImage className="h-4 w-4" />
+                          {logoUploading ? "Uploading..." : "Upload Logo"}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) =>
+                              handleLogoUpload(e.target.files?.[0] || null)
+                            }
+                          />
+                        </label>
+
+                        {logoUrl ? (
+                          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                            <img
+                              src={logoUrl}
+                              alt="Survey logo"
+                              className="h-10 w-auto max-w-[120px] object-contain"
+                            />
+                            <span className="text-xs text-slate-500">
+                              Logo ready
+                            </span>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveBranding}
+                      disabled={savingBranding}
+                      className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                    >
+                      <FaSave className="h-4 w-4" />
+                      {savingBranding ? "Saving..." : "Save Branding"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="flex items-center gap-3">
                     <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
                       <FaHandSparkles className="h-5 w-5" />
                     </div>
@@ -606,38 +794,6 @@ export default function SurveyBuilder() {
                     </div>
 
                     <div className="mt-5 space-y-4">
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-slate-700">
-                          Suggested Title
-                        </label>
-                        <input
-                          value={generatedDraft.title}
-                          onChange={(e) =>
-                            setGeneratedDraft({
-                              ...generatedDraft,
-                              title: e.target.value,
-                            })
-                          }
-                          className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-2 block text-sm font-medium text-slate-700">
-                          Suggested Description
-                        </label>
-                        <textarea
-                          value={generatedDraft.description}
-                          onChange={(e) =>
-                            setGeneratedDraft({
-                              ...generatedDraft,
-                              description: e.target.value,
-                            })
-                          }
-                          className="min-h-[110px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        />
-                      </div>
-
                       <div className="space-y-4">
                         {generatedDraft.questions.map((item, index) => (
                           <div
@@ -754,6 +910,37 @@ export default function SurveyBuilder() {
               <div className="space-y-6">
                 <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                   <h3 className="text-lg font-semibold text-slate-900">
+                    Survey Preview
+                  </h3>
+
+                  <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                    {logoUrl ? (
+                      <div className="mb-4 flex justify-center sm:justify-start">
+                        <img
+                          src={logoUrl}
+                          alt="Survey logo preview"
+                          className="h-10 w-auto max-w-[140px] object-contain"
+                        />
+                      </div>
+                    ) : null}
+
+                    <p className="text-sm font-medium text-slate-500">
+                      {surveyTitle || "Survey Title"}
+                    </p>
+
+                    <h4 className="mt-2 text-lg font-semibold text-slate-900">
+                      {headerText || "Your survey header will appear here."}
+                    </h4>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      {surveyDescription ||
+                        "Your survey description will appear here."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <h3 className="text-lg font-semibold text-slate-900">
                     Survey Summary
                   </h3>
 
@@ -798,13 +985,13 @@ export default function SurveyBuilder() {
                   </h3>
 
                   <div className="mt-4 space-y-3 text-sm text-slate-600">
-                    <p>Paste enough context for better generation:</p>
+                    <p>For a stronger branded survey:</p>
                     <ul className="list-disc space-y-2 pl-5">
-                      <li>Who the respondents are</li>
-                      <li>What you want to learn</li>
-                      <li>Brand or product context</li>
-                      <li>Research goals or strategic concerns</li>
-                      <li>The kind of answers you want to hear</li>
+                      <li>Add a recognizable company logo</li>
+                      <li>Use a clear survey title</li>
+                      <li>Write a short welcoming header</li>
+                      <li>Keep questions simple and voice-friendly</li>
+                      <li>Make the survey feel trustworthy and easy</li>
                     </ul>
                   </div>
                 </div>
