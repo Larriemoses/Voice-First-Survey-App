@@ -61,6 +61,25 @@ type GeneratedSurveyDraft = {
   questions: GeneratedQuestion[];
 };
 
+function SectionToggleButton({
+  open,
+  onClick,
+}: {
+  open: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+    >
+      {open ? <FaTimes className="h-4 w-4" /> : <FaPlus className="h-4 w-4" />}
+      <span>{open ? "Close" : "Open"}</span>
+    </button>
+  );
+}
+
 export default function SurveyBuilder() {
   const { surveyId } = useParams();
   const navigate = useNavigate();
@@ -635,34 +654,24 @@ export default function SurveyBuilder() {
               <div className="space-y-4">
                 <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
                       <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
                         <FaPalette className="h-5 w-5" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-lg font-semibold text-slate-900">
                           Survey Branding
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500">
                           Make the survey feel branded and trustworthy.
                         </p>
                       </div>
                     </div>
 
-                    <button
-                      type="button"
+                    <SectionToggleButton
+                      open={showBrandingPanel}
                       onClick={() => setShowBrandingPanel((s) => !s)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
-                    >
-                      {showBrandingPanel ? (
-                        <FaTimes className="h-4 w-4" />
-                      ) : (
-                        <FaEdit className="h-4 w-4" />
-                      )}
-                      <span className="hidden sm:inline">
-                        {showBrandingPanel ? "Close" : "Open"}
-                      </span>
-                    </button>
+                    />
                   </div>
 
                   {showBrandingPanel ? (
@@ -707,7 +716,7 @@ export default function SurveyBuilder() {
                         <label className="mb-1.5 block text-sm font-medium text-slate-700">
                           Company Logo
                         </label>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="flex flex-wrap items-center gap-3">
                           <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                             <FaImage className="h-4 w-4" />
                             {logoUploading ? "Uploading..." : "Upload Logo"}
@@ -751,34 +760,24 @@ export default function SurveyBuilder() {
 
                 <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
                       <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
                         <FaHandSparkles className="h-5 w-5" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-lg font-semibold text-slate-900">
                           AI Survey Generator
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="truncate text-sm text-slate-500">
                           Generate draft questions from your survey brief.
                         </p>
                       </div>
                     </div>
 
-                    <button
-                      type="button"
+                    <SectionToggleButton
+                      open={showGeneratorPanel}
                       onClick={() => setShowGeneratorPanel((s) => !s)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
-                    >
-                      {showGeneratorPanel ? (
-                        <FaTimes className="h-4 w-4" />
-                      ) : (
-                        <FaRocket className="h-4 w-4" />
-                      )}
-                      <span className="hidden sm:inline">
-                        {showGeneratorPanel ? "Close" : "Open"}
-                      </span>
-                    </button>
+                    />
                   </div>
 
                   {showGeneratorPanel ? (
@@ -805,6 +804,71 @@ export default function SurveyBuilder() {
                         {generating ? "Generating..." : "Generate Draft"}
                       </button>
                     </div>
+                  ) : null}
+                </div>
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                        <FaMicrophoneAlt className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-lg font-semibold text-slate-900">
+                          Add Question Manually
+                        </h3>
+                        <p className="truncate text-sm text-slate-500">
+                          Create one question at a time.
+                        </p>
+                      </div>
+                    </div>
+
+                    <SectionToggleButton
+                      open={showAddQuestionPanel}
+                      onClick={() => setShowAddQuestionPanel((s) => !s)}
+                    />
+                  </div>
+
+                  {showAddQuestionPanel ? (
+                    <form
+                      onSubmit={handleAddQuestion}
+                      className="mt-4 grid gap-3"
+                    >
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                          Question Prompt
+                        </label>
+                        <textarea
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                          className="min-h-[96px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="What would you like respondents to answer by voice?"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                          Max Duration (seconds)
+                        </label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="600"
+                          value={maxDuration}
+                          onChange={(e) => setMaxDuration(e.target.value)}
+                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                      >
+                        <FaPlus className="h-4 w-4" />
+                        {saving ? "Adding..." : "Add Question"}
+                      </button>
+                    </form>
                   ) : null}
                 </div>
 
@@ -892,74 +956,6 @@ export default function SurveyBuilder() {
                     </div>
                   </div>
                 ) : null}
-
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <FaMicrophoneAlt className="h-5 w-5 text-[#F56A00]" />
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        Add Question Manually
-                      </h3>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowAddQuestionPanel((s) => !s)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
-                    >
-                      {showAddQuestionPanel ? (
-                        <FaTimes className="h-4 w-4" />
-                      ) : (
-                        <FaPlus className="h-4 w-4" />
-                      )}
-                      <span className="hidden sm:inline">
-                        {showAddQuestionPanel ? "Close" : "Open"}
-                      </span>
-                    </button>
-                  </div>
-
-                  {showAddQuestionPanel ? (
-                    <form
-                      onSubmit={handleAddQuestion}
-                      className="mt-4 grid gap-3"
-                    >
-                      <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                          Question Prompt
-                        </label>
-                        <textarea
-                          value={prompt}
-                          onChange={(e) => setPrompt(e.target.value)}
-                          className="min-h-[96px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                          placeholder="What would you like respondents to answer by voice?"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                          Max Duration (seconds)
-                        </label>
-                        <input
-                          type="number"
-                          min="10"
-                          max="600"
-                          value={maxDuration}
-                          onChange={(e) => setMaxDuration(e.target.value)}
-                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={saving}
-                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
-                      >
-                        <FaPlus className="h-4 w-4" />
-                        {saving ? "Adding..." : "Add Question"}
-                      </button>
-                    </form>
-                  ) : null}
-                </div>
 
                 <div className="space-y-3 pt-1">
                   <div className="flex items-center gap-3">
