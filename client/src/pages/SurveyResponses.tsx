@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import {
   FaDownload,
   FaFileExcel,
-  FaEnvelope,
   FaPlay,
   FaBolt,
   FaUser,
