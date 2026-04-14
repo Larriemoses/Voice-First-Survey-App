@@ -103,6 +103,9 @@ export default function SurveyBuilder() {
   );
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [showBrandingPanel, setShowBrandingPanel] = useState(false);
+  const [showGeneratorPanel, setShowGeneratorPanel] = useState(false);
+  const [showAddQuestionPanel, setShowAddQuestionPanel] = useState(false);
 
   async function loadData() {
     if (!surveyId) return;
@@ -523,7 +526,7 @@ export default function SurveyBuilder() {
 
   return (
     <DashboardShell>
-      <div className="space-y-5 sm:space-y-6 lg:space-y-8">
+      <div className="space-y-4 sm:space-y-5 lg:space-y-6">
         {loading ? (
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-sm text-slate-500">Loading survey builder...</p>
@@ -550,7 +553,7 @@ export default function SurveyBuilder() {
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button
                   onClick={() => navigate(`/surveys/${surveyId}/responses`)}
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                   type="button"
                 >
                   <FaEye className="h-4 w-4" />
@@ -562,7 +565,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handleCopyLink}
                       disabled={copying}
-                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                       type="button"
                     >
                       <FaCopy className="h-4 w-4" />
@@ -572,7 +575,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handleCloseSurvey}
                       disabled={closingSurvey}
-                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
                       type="button"
                     >
                       <FaLock className="h-4 w-4" />
@@ -583,7 +586,7 @@ export default function SurveyBuilder() {
                       href={publicLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81]"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81]"
                     >
                       <FaLink className="h-4 w-4" />
                       Open Public Survey
@@ -630,147 +633,199 @@ export default function SurveyBuilder() {
 
             <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
               <div className="space-y-6">
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
-                      <FaPalette className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        Survey Branding
-                      </h3>
-                      <p className="text-sm text-slate-500">
-                        Add your logo, title, and survey header to make the
-                        public form feel branded and trustworthy.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid gap-4">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Survey Title
-                      </label>
-                      <input
-                        value={surveyTitle}
-                        onChange={(e) => setSurveyTitle(e.target.value)}
-                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        placeholder="Customer Experience Survey"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Survey Description
-                      </label>
-                      <textarea
-                        value={surveyDescription}
-                        onChange={(e) => setSurveyDescription(e.target.value)}
-                        className="min-h-[100px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        placeholder="Tell respondents what this survey is about."
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Header Text
-                      </label>
-                      <input
-                        value={headerText}
-                        onChange={(e) => setHeaderText(e.target.value)}
-                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        placeholder="We value your honest feedback."
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Company Logo
-                      </label>
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                          <FaImage className="h-4 w-4" />
-                          {logoUploading ? "Uploading..." : "Upload Logo"}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) =>
-                              handleLogoUpload(e.target.files?.[0] || null)
-                            }
-                          />
-                        </label>
-
-                        {logoUrl ? (
-                          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                            <img
-                              src={logoUrl}
-                              alt="Survey logo"
-                              className="h-10 w-auto max-w-[120px] object-contain"
-                            />
-                            <span className="text-xs text-slate-500">
-                              Logo ready
-                            </span>
-                          </div>
-                        ) : null}
+                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                        <FaPalette className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900">
+                          Survey Branding
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          Add your logo, title, and survey header to make the
+                          public form feel branded and trustworthy.
+                        </p>
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={handleSaveBranding}
-                      disabled={savingBranding}
-                      className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                      onClick={() => setShowBrandingPanel((s) => !s)}
+                      aria-expanded={showBrandingPanel}
+                      title={
+                        showBrandingPanel ? "Hide branding" : "Show branding"
+                      }
+                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
                     >
-                      <FaSave className="h-4 w-4" />
-                      {savingBranding ? "Saving..." : "Save Branding"}
+                      {showBrandingPanel ? (
+                        <FaTimes className="h-4 w-4" />
+                      ) : (
+                        <FaEdit className="h-4 w-4" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {showBrandingPanel ? "Close" : "Open"}
+                      </span>
                     </button>
                   </div>
+
+                  {showBrandingPanel ? (
+                    <div className="mt-5 grid gap-4">
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Survey Title
+                        </label>
+                        <input
+                          value={surveyTitle}
+                          onChange={(e) => setSurveyTitle(e.target.value)}
+                          className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="Customer Experience Survey"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Survey Description
+                        </label>
+                        <textarea
+                          value={surveyDescription}
+                          onChange={(e) => setSurveyDescription(e.target.value)}
+                          className="min-h-[100px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="Tell respondents what this survey is about."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Header Text
+                        </label>
+                        <input
+                          value={headerText}
+                          onChange={(e) => setHeaderText(e.target.value)}
+                          className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="We value your honest feedback."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Company Logo
+                        </label>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                          <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                            <FaImage className="h-4 w-4" />
+                            {logoUploading ? "Uploading..." : "Upload Logo"}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) =>
+                                handleLogoUpload(e.target.files?.[0] || null)
+                              }
+                            />
+                          </label>
+
+                          {logoUrl ? (
+                            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                              <img
+                                src={logoUrl}
+                                alt="Survey logo"
+                                className="h-10 w-auto max-w-[120px] object-contain"
+                              />
+                              <span className="text-xs text-slate-500">
+                                Logo ready
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveBranding}
+                        disabled={savingBranding}
+                        title="Save branding"
+                        aria-label="Save branding"
+                        className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                      >
+                        <FaSave className="h-4 w-4" />
+                        {savingBranding ? "Saving..." : "Save Branding"}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
-                      <FaHandSparkles className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        Generate Survey from Brief
-                      </h3>
-                      <p className="text-sm text-slate-500">
-                        Paste your brand thoughts, research direction, or survey
-                        plan and generate a draft you can edit.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 space-y-4">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Brand / Research / Survey Brief
-                      </label>
-                      <textarea
-                        value={brief}
-                        onChange={(e) => setBrief(e.target.value)}
-                        className="min-h-[180px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        placeholder="Paste your brand brief, research goal, audience context, market thought, product problem, or survey direction here..."
-                      />
+                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                        <FaHandSparkles className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900">
+                          AI Survey Generator
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          Paste your brand thoughts, research direction, or
+                          survey plan and generate a draft you can edit.
+                        </p>
+                      </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={handleGenerateSurvey}
-                      disabled={generating}
-                      className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-auto"
+                      onClick={() => setShowGeneratorPanel((s) => !s)}
+                      aria-expanded={showGeneratorPanel}
+                      title={
+                        showGeneratorPanel
+                          ? "Hide generator"
+                          : "Open AI Survey Generator"
+                      }
+                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
                     >
-                      <FaHandSparkles className="h-4 w-4" />
-                      {generating ? "Generating..." : "Generate Survey Draft"}
+                      {showGeneratorPanel ? (
+                        <FaTimes className="h-4 w-4" />
+                      ) : (
+                        <FaRocket className="h-4 w-4" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {showGeneratorPanel ? "Close" : "Open"}
+                      </span>
                     </button>
                   </div>
+
+                  {showGeneratorPanel ? (
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Brand / Research / Survey Brief
+                        </label>
+                        <textarea
+                          value={brief}
+                          onChange={(e) => setBrief(e.target.value)}
+                          className="min-h-[120px] w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="Paste your brand brief, research goal, audience context, market thought, product problem, or survey direction here..."
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleGenerateSurvey}
+                        disabled={generating}
+                        title="AI Survey Generator"
+                        aria-label="AI Survey Generator"
+                        className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-auto"
+                      >
+                        <FaHandSparkles className="h-4 w-4" />
+                        {generating ? "Generating..." : "AI Survey Generator"}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
 
                 {generatedDraft ? (
-                  <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">
@@ -786,14 +841,14 @@ export default function SurveyBuilder() {
                         type="button"
                         onClick={handleAddGeneratedQuestions}
                         disabled={addingGenerated || validGeneratedCount === 0}
-                        className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
                       >
                         <FaPlus className="h-4 w-4" />
                         {addingGenerated ? "Adding..." : "Add All to Survey"}
                       </button>
                     </div>
 
-                    <div className="mt-5 space-y-4">
+                    <div className="mt-4 space-y-3">
                       <div className="space-y-4">
                         {generatedDraft.questions.map((item, index) => (
                           <div
@@ -827,7 +882,7 @@ export default function SurveyBuilder() {
                                     e.target.value,
                                   )
                                 }
-                                className="min-h-[110px] w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                className="min-h-[90px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0B4EA2]"
                               />
 
                               <div>
@@ -846,7 +901,7 @@ export default function SurveyBuilder() {
                                       e.target.value,
                                     )
                                   }
-                                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0B4EA2]"
                                 />
                               </div>
                             </div>
@@ -857,53 +912,78 @@ export default function SurveyBuilder() {
                   </div>
                 ) : null}
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                  <div className="flex items-center gap-3">
-                    <FaMicrophoneAlt className="h-5 w-5 text-[#F56A00]" />
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      Add Question Manually
-                    </h3>
-                  </div>
-
-                  <form
-                    onSubmit={handleAddQuestion}
-                    className="mt-5 grid gap-4"
-                  >
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Question Prompt
-                      </label>
-                      <textarea
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        className="min-h-[120px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                        placeholder="What would you like respondents to answer by voice?"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Max Duration (seconds)
-                      </label>
-                      <input
-                        type="number"
-                        min="10"
-                        max="600"
-                        value={maxDuration}
-                        onChange={(e) => setMaxDuration(e.target.value)}
-                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
-                      />
+                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FaMicrophoneAlt className="h-5 w-5 text-[#F56A00]" />
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        Add Question Manually
+                      </h3>
                     </div>
 
                     <button
-                      type="submit"
-                      disabled={saving}
-                      className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                      type="button"
+                      onClick={() => setShowAddQuestionPanel((s) => !s)}
+                      aria-expanded={showAddQuestionPanel}
+                      title={
+                        showAddQuestionPanel
+                          ? "Hide add question"
+                          : "Open add question"
+                      }
+                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
                     >
-                      <FaPlus className="h-4 w-4" />
-                      {saving ? "Adding..." : "Add Question"}
+                      {showAddQuestionPanel ? (
+                        <FaTimes className="h-4 w-4" />
+                      ) : (
+                        <FaPlus className="h-4 w-4" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {showAddQuestionPanel ? "Close" : "Open"}
+                      </span>
                     </button>
-                  </form>
+                  </div>
+
+                  {showAddQuestionPanel ? (
+                    <form
+                      onSubmit={handleAddQuestion}
+                      className="mt-4 grid gap-4"
+                    >
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Question Prompt
+                        </label>
+                        <textarea
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                          className="min-h-[100px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          placeholder="What would you like respondents to answer by voice?"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
+                          Max Duration (seconds)
+                        </label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="600"
+                          value={maxDuration}
+                          onChange={(e) => setMaxDuration(e.target.value)}
+                          className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
+                      >
+                        <FaPlus className="h-4 w-4" />
+                        {saving ? "Adding..." : "Add Question"}
+                      </button>
+                    </form>
+                  ) : null}
                 </div>
               </div>
 

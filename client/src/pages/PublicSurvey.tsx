@@ -41,7 +41,7 @@ export default function PublicSurvey() {
         setError("");
 
         if (!surveyId) {
-          setError("Survey link is invalid.");
+          setError("Invalid survey link.");
           return;
         }
 
@@ -51,15 +51,15 @@ export default function PublicSurvey() {
         ]);
 
         if (!surveyData) {
-          setError("Survey not found or not available.");
+          setError("Survey not found.");
           return;
         }
 
         setSurvey(surveyData);
         setQuestions(questionData);
       } catch (err) {
-        console.error("Public survey load error:", err);
-        setError("Failed to load this survey.");
+        console.error(err);
+        setError("Failed to load survey.");
       } finally {
         setLoading(false);
       }
@@ -86,20 +86,23 @@ export default function PublicSurvey() {
 
       navigate(`/take-survey/${surveyId}/respond/${respondent.id}`);
     } catch (err) {
-      console.error("Create respondent error:", err);
-      setError(err instanceof Error ? err.message : "Failed to start survey.");
+      console.error(err);
+      setError("Failed to start survey.");
     } finally {
       setStarting(false);
     }
   }
 
+  // =========================
+  // STATES
+  // =========================
+
   if (loading) {
     return (
       <>
         <PageMeta title="Survey" description="Loading survey..." />
-
-        <div className="flex min-h-screen items-center justify-center bg-white px-4">
-          <p className="text-sm text-slate-500">Loading survey...</p>
+        <div className="flex min-h-screen items-center justify-center bg-white">
+          <p className="text-sm text-slate-500">Loading...</p>
         </div>
       </>
     );
@@ -108,17 +111,13 @@ export default function PublicSurvey() {
   if (error && !survey) {
     return (
       <>
-        <PageMeta
-          title="Survey unavailable"
-          description="This survey could not be loaded."
-        />
-
+        <PageMeta title="Survey unavailable" />
         <div className="flex min-h-screen items-center justify-center bg-white px-4">
-          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <h1 className="text-xl font-semibold text-slate-900">
+          <div className="w-full max-w-md rounded-2xl border p-6 text-center">
+            <h1 className="text-lg font-semibold text-slate-900">
               Survey unavailable
             </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-500">{error}</p>
+            <p className="mt-2 text-sm text-slate-500">{error}</p>
           </div>
         </div>
       </>
@@ -129,140 +128,82 @@ export default function PublicSurvey() {
     <>
       <PageMeta
         title={survey?.title || "Survey"}
-        description={
-          survey?.description ||
-          "You have been invited to respond to this survey."
-        }
+        description={survey?.description || ""}
       />
 
-      <div className="min-h-screen bg-white px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mx-auto max-w-3xl space-y-6">
-          <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-            <div className="bg-gradient-to-br from-slate-50 via-white to-[#EAF2FF]/50 px-6 py-8 sm:px-8">
-              {survey?.logo_url ? (
-                <div className="mb-5 flex justify-center sm:justify-start">
-                  <img
-                    src={survey.logo_url}
-                    alt={survey.title}
-                    className="h-12 w-auto max-w-[160px] object-contain"
-                  />
-                </div>
-              ) : null}
+      <div className="min-h-screen bg-white px-4 py-6 sm:py-8">
+        <div className="mx-auto w-full max-w-xl space-y-5">
+          {/* HEADER */}
+          <div className="rounded-2xl border p-5 sm:p-6">
+            {survey?.logo_url && (
+              <img
+                src={survey.logo_url}
+                alt=""
+                className="mb-4 h-10 object-contain"
+              />
+            )}
 
-              <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                  <FaMicrophoneAlt className="h-6 w-6 text-[#0B4EA2]" />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-500">
-                    {survey?.title || "Voice Survey"}
-                  </p>
-
-                  <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-                    {survey?.header_text || "We’d love to hear your response"}
-                  </h1>
-
-                  <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
-                    {survey?.description ||
-                      "Please answer the following questions by voice."}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#EAF2FF]">
+                <FaMicrophoneAlt className="text-[#0B4EA2]" />
               </div>
 
-              <div className="mt-6 grid gap-4 rounded-2xl bg-white/80 p-5 sm:grid-cols-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Questions
-                  </p>
-                  <p className="mt-2 text-xl font-semibold text-slate-900">
-                    {questions.length}
-                  </p>
-                </div>
+              <div>
+                <h1 className="text-lg font-semibold text-slate-900 sm:text-xl">
+                  {survey?.header_text || "Share your response"}
+                </h1>
 
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Format
-                  </p>
-                  <p className="mt-2 text-xl font-semibold text-slate-900">
-                    Voice
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Language
-                  </p>
-                  <div className="mt-2 flex items-center gap-2 text-xl font-semibold text-slate-900">
-                    <FaGlobe className="h-4 w-4 text-[#F56A00]" />
-                    Any language
-                  </div>
-                </div>
+                <p className="mt-1 text-sm text-slate-500">
+                  {survey?.description ||
+                    "Answer a few questions using your voice."}
+                </p>
               </div>
+            </div>
+
+            <div className="mt-4 flex items-center gap-6 text-xs text-slate-500">
+              <span>{questions.length} questions</span>
+              <span>Voice</span>
+              <span className="flex items-center gap-1">
+                <FaGlobe className="text-[#F56A00]" />
+                Any language
+              </span>
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-slate-900">
-                Before you begin
-              </h2>
-              <p className="text-sm leading-6 text-slate-500">
-                Enter a few details so your responses can be linked correctly.
-              </p>
-            </div>
+          {/* FORM */}
+          <div className="rounded-2xl border p-5 sm:p-6">
+            <form onSubmit={handleStartSurvey} className="space-y-4">
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Full name"
+                className="w-full rounded-lg border px-3 py-3 text-sm outline-none focus:border-[#0B4EA2]"
+              />
 
-            <form onSubmit={handleStartSurvey} className="mt-6 grid gap-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Full name
-                </label>
-                <input
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#0B4EA2]"
-                  placeholder="Your name"
-                />
-              </div>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                type="email"
+                className="w-full rounded-lg border px-3 py-3 text-sm outline-none focus:border-[#0B4EA2]"
+              />
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Email
-                </label>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#0B4EA2]"
-                  placeholder="you@example.com"
-                  type="email"
-                />
-              </div>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Phone"
+                className="w-full rounded-lg border px-3 py-3 text-sm outline-none focus:border-[#0B4EA2]"
+              />
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
-                  Phone
-                </label>
-                <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#0B4EA2]"
-                  placeholder="+234..."
-                />
-              </div>
-
-              {error ? (
-                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {error}
-                </div>
-              ) : null}
+              {error && <div className="text-sm text-red-500">{error}</div>}
 
               <button
                 type="submit"
-                disabled={starting || !survey}
-                className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60 sm:w-fit"
+                disabled={starting}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0B4EA2] py-3 text-sm font-medium text-white hover:bg-[#093E81] disabled:opacity-60"
               >
-                <FaArrowRight className="h-4 w-4" />
-                {starting ? "Starting..." : "Start Survey"}
+                <FaArrowRight />
+                {starting ? "Starting..." : "Start"}
               </button>
             </form>
           </div>

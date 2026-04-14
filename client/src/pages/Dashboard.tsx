@@ -8,6 +8,7 @@ import {
   FaArrowRight,
   FaBolt,
   FaWaveSquare,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 import DashboardShell from "../components/DashboardShell";
@@ -34,6 +35,7 @@ type MetricsState = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
   const [membership, setMembership] = useState<OrgState>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -115,27 +117,27 @@ export default function Dashboard() {
     if (metrics.totalSurveys === 0) {
       return {
         title: "You’re ready to launch your first survey",
-        text: "Create a survey to start collecting voice responses and building useful business insight.",
+        text: "Create your first voice survey and start collecting real spoken feedback from your audience.",
       };
     }
 
     if (metrics.publishedSurveys === 0) {
       return {
         title: "You have surveys, but none are live yet",
-        text: "Publish a survey to begin collecting voice responses from your audience.",
+        text: "Publish a survey so respondents can start sending voice responses into your workspace.",
       };
     }
 
     if (metrics.totalResponses === 0) {
       return {
-        title: "Your surveys are live",
-        text: "Now share them and start collecting your first responses.",
+        title: "Your survey is live",
+        text: "Now it’s time to share it and collect your first set of responses.",
       };
     }
 
     return {
       title: "Your workspace is active",
-      text: "Track responses, review survey performance, and keep improving your voice feedback workflow.",
+      text: "Track performance, review incoming responses, and keep improving how your team collects insight.",
     };
   }, [metrics]);
 
@@ -154,42 +156,51 @@ export default function Dashboard() {
     },
   ];
 
+  const completionPercent = useMemo(() => {
+    const completed = progressItems.filter((item) => item.done).length;
+    return Math.round((completed / progressItems.length) * 100);
+  }, [progressItems]);
+
   const metricCards = [
     {
       label: "Surveys",
       value: metrics.totalSurveys,
       icon: <FaClipboardList className="h-5 w-5" />,
       tone: "text-[#0B4EA2] bg-[#EAF2FF]",
+      note: "Created surveys",
     },
     {
       label: "Published",
       value: metrics.publishedSurveys,
       icon: <FaRocket className="h-5 w-5" />,
       tone: "text-[#F56A00] bg-[#FFF1E7]",
+      note: "Currently live",
     },
     {
       label: "Responses",
       value: metrics.totalResponses,
       icon: <FaChartBar className="h-5 w-5" />,
       tone: "text-emerald-600 bg-emerald-50",
+      note: "Collected so far",
     },
     {
       label: "Team",
       value: metrics.teamMembers,
       icon: <FaUsers className="h-5 w-5" />,
       tone: "text-cyan-600 bg-cyan-50",
+      note: "Workspace members",
     },
   ];
 
   return (
     <DashboardShell>
-      <div className="space-y-4 sm:space-y-5 lg:space-y-6">
+      <div className="space-y-5 sm:space-y-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
             Dashboard
           </h1>
           <p className="text-sm text-slate-500">
-            A focused view of your Survica workspace.
+            A clear view of your Survica workspace, progress, and next steps.
           </p>
         </div>
 
@@ -203,9 +214,9 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            <div className="grid gap-4 lg:gap-5 xl:grid-cols-[1.35fr_0.65fr]">
+            <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
               <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
-                <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-[#0B4EA2]/5 blur-3xl sm:h-32 sm:w-32" />
+                <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#0B4EA2]/5 blur-3xl sm:h-36 sm:w-36" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#F56A00]/5 blur-3xl sm:h-28 sm:w-28" />
 
                 <div className="relative">
@@ -223,7 +234,7 @@ export default function Dashboard() {
                     </p>
                   </div>
 
-                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <button
                       onClick={() => navigate("/surveys/create")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#093E81] sm:w-auto"
@@ -249,11 +260,29 @@ export default function Dashboard() {
                   </div>
                   <div className="min-w-0">
                     <h2 className="text-lg font-semibold text-slate-900">
-                      Next steps
+                      Workspace progress
                     </h2>
                     <p className="text-sm text-slate-500">
-                      What to complete next
+                      What’s been completed so far
                     </p>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center justify-between text-sm">
+                    <span className="font-medium text-slate-700">
+                      Completion
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {completionPercent}%
+                    </span>
+                  </div>
+
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-[#0B4EA2] transition-all duration-300"
+                      style={{ width: `${completionPercent}%` }}
+                    />
                   </div>
                 </div>
 
@@ -263,9 +292,21 @@ export default function Dashboard() {
                       key={item.label}
                       className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
                     >
-                      <span className="text-sm font-medium text-slate-700">
-                        {item.label}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                            item.done
+                              ? "bg-emerald-50 text-emerald-600"
+                              : "bg-slate-200 text-slate-500"
+                          }`}
+                        >
+                          <FaCheckCircle className="h-3.5 w-3.5" />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700">
+                          {item.label}
+                        </span>
+                      </div>
+
                       <span
                         className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
                           item.done
@@ -307,20 +348,21 @@ export default function Dashboard() {
                   <h3 className="mt-4 text-2xl font-semibold text-slate-900 sm:text-3xl">
                     {card.value}
                   </h3>
+                  <p className="mt-1 text-xs text-slate-500">{card.note}</p>
                 </div>
               ))}
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-2 lg:gap-5">
+            <div className="grid gap-4 lg:grid-cols-2">
               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
-                  Workflow status
+                  Workspace overview
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  A quick view of where your workspace stands
+                  A quick summary of what is happening in your workspace
                 </p>
 
-                <div className="mt-5 space-y-3 sm:space-y-4">
+                <div className="mt-5 space-y-3">
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p className="text-sm font-semibold text-slate-900">
                       Surveys created
@@ -344,7 +386,7 @@ export default function Dashboard() {
                         {metrics.publishedSurveys}
                       </span>{" "}
                       survey{metrics.publishedSurveys === 1 ? "" : "s"} are live
-                      and ready to collect responses.
+                      and collecting responses.
                     </p>
                   </div>
 
