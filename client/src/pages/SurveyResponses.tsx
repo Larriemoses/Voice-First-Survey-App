@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   FaDownload,
-  FaFileCsv,
+  FaFileExcel,
   FaEnvelope,
   FaPlay,
   FaBolt,
@@ -14,11 +14,12 @@ import {
   FaChevronUp,
   FaChartBar,
 } from "react-icons/fa";
+import * as XLSX from "xlsx";
 import DashboardShell from "../components/DashboardShell";
 import { supabase } from "../lib/supabase";
 import {
+  buildSurveyWorkbook,
   downloadResponseAudio,
-  exportSurveyResponsesAsCSV,
   getSurveyResponsesForAdmin,
   type ResponseItem,
 } from "../lib/responses";
@@ -184,24 +185,18 @@ export default function SurveyResponses() {
     }
   }
 
-  async function handleExportCSV() {
-    if (!surveyId) return;
-
+  async function handleExportExcel() {
     try {
       setExporting(true);
-      const csv = await exportSurveyResponsesAsCSV(surveyId);
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
+      const { workbook, fileName } = buildSurveyWorkbook({
+        surveyTitle: `Survey ${surveyId || "Responses"}`,
+        responses,
+      });
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `survica-survey-${surveyId}.csv`;
-      link.click();
-
-      URL.revokeObjectURL(url);
+      XLSX.writeFile(workbook, fileName);
     } catch (err) {
-      console.error("Export CSV error:", err);
+      console.error("Export Excel error:", err);
     } finally {
       setExporting(false);
     }
@@ -280,15 +275,9 @@ export default function SurveyResponses() {
   }
 
   function getTranscriptStatusClass(status?: string | null) {
-    if (status === "completed") {
-      return "bg-green-50 text-green-700";
-    }
-    if (status === "processing") {
-      return "bg-blue-50 text-blue-700";
-    }
-    if (status === "failed") {
-      return "bg-red-50 text-red-700";
-    }
+    if (status === "completed") return "bg-green-50 text-green-700";
+    if (status === "processing") return "bg-blue-50 text-blue-700";
+    if (status === "failed") return "bg-red-50 text-red-700";
     return "bg-gray-100 text-gray-600";
   }
 
@@ -324,12 +313,12 @@ export default function SurveyResponses() {
             </button>
 
             <button
-              onClick={handleExportCSV}
+              onClick={handleExportExcel}
               disabled={exporting}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
             >
-              <FaFileCsv className="h-4 w-4" />
-              {exporting ? "Exporting..." : "Export CSV"}
+              <FaFileExcel className="h-4 w-4" />
+              {exporting ? "Exporting..." : "Export Excel"}
             </button>
           </div>
         </div>
@@ -430,11 +419,9 @@ export default function SurveyResponses() {
                     {groupedResponses.map((group) => {
                       const isExpanded =
                         !!expandedRespondents[group.respondentId];
-
                       const completedCount = group.answers.filter(
                         (item) => item.transcript_status === "completed",
                       ).length;
-
                       const averageDuration =
                         group.answers.length > 0
                           ? Math.round(

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import * as XLSX from "xlsx";
 
 export type ResponseItem = {
   id: string;
@@ -45,6 +46,14 @@ function buildResponseFilePath(input: {
 }) {
   const fileExt = "webm";
   return `survey_${input.surveyId}/respondent_${input.respondentId}/question_${input.questionId}.${fileExt}`;
+}
+
+function sanitizeSheetName(name: string) {
+  return name.replace(/[\\/*[\]:?]/g, "").slice(0, 31) || "Survey";
+}
+
+function sanitizeFileName(name: string) {
+  return name.replace(/[<>:"/\\|?*]+/g, "").trim() || "survey-export";
 }
 
 export async function uploadSurveyResponse(input: {
@@ -159,18 +168,11 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
     question_order: item.question?.order_index || "",
     question_prompt: item.question?.prompt || "",
     transcript: item.transcript || "",
-    transcript_status: item.transcript_status || "",
-    audio_path: item.audio_path || "",
-    audio_path_mp3: item.audio_path_mp3 || "",
-    mime_type: item.mime_type || "",
-    file_size_bytes: item.file_size_bytes || "",
-    duration_seconds: item.duration_seconds || "",
-    created_at: item.created_at || "",
   }));
 
   if (rows.length === 0) {
     return [
-      "respondent_name,respondent_email,respondent_phone,question_order,question_prompt,transcript,transcript_status,audio_path,audio_path_mp3,mime_type,file_size_bytes,duration_seconds,created_at",
+      "respondent_name,respondent_email,respondent_phone,question_order,question_prompt,transcript",
     ].join("\n");
   }
 
@@ -189,4 +191,127 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
   ].join("\n");
 
   return csv;
+}
+
+export function buildSurveyWorkbook(params: {
+  surveyTitle: string;
+  responses: ResponseItem[];
+}) {
+  const { surveyTitle, responses } = params;
+
+  const grouped = new Map<
+    string,
+    {
+      serial: number;
+      name: string;
+      email: string;
+      phone: string;
+      answers: Record<string, string>;
+      durations: number[];
+    }
+  >();
+
+  const orderedQuestions = Array.from(
+    new Map(
+      responses
+        .filter((item) => item.question?.id)
+        .map((item) => [
+          item.question!.id,
+          {
+            id: item.question!.id,
+            prompt: item.question?.prompt || "",
+            order_index: item.question?.order_index || 0,
+          },
+        ]),
+    ).values(),
+  ).sort((a, b) => a.order_index - b.order_index);
+
+  let serialCounter = 1;
+
+  for (const item of responses) {
+    const respondentKey = item.respondent?.id || `unknown-${item.id}`;
+
+    if (!grouped.has(respondentKey)) {
+      grouped.set(respondentKey, {
+        serial: serialCounter++,
+        name: item.respondent?.display_name || "Anonymous Respondent",
+        email: item.respondent?.email || "",
+        phone: item.respondent?.phone || "",
+        answers: {},
+        durations: [],
+      });
+    }
+
+    const current = grouped.get(respondentKey)!;
+    const questionPrompt = item.question?.prompt || "Untitled Question";
+
+    current.answers[questionPrompt] = item.transcript || "";
+    current.durations.push(item.duration_seconds || 0);
+  }
+
+  const responseRows = Array.from(grouped.values()).map((entry) => {
+    const row: Record<string, string | number> = {
+      "S/N": entry.serial,
+      Name: entry.name,
+      Email: entry.email,
+      Phone: entry.phone,
+    };
+
+    orderedQuestions.forEach((question) => {
+      row[question.prompt] = entry.answers[question.prompt] || "";
+    });
+
+    return row;
+  });
+
+  const totalResponses = responses.length;
+  const totalRespondents = grouped.size;
+  const completedTranscripts = responses.filter(
+    (item) => item.transcript_status === "completed",
+  ).length;
+  const processingTranscripts = responses.filter(
+    (item) => item.transcript_status === "processing",
+  ).length;
+  const failedTranscripts = responses.filter(
+    (item) => item.transcript_status === "failed",
+  ).length;
+  const averageDuration =
+    responses.length > 0
+      ? Math.round(
+          responses.reduce((sum, item) => sum + (item.duration_seconds || 0), 0) /
+            responses.length,
+        )
+      : 0;
+
+  const analyticsRows = [
+    { Metric: "Survey Title", Value: surveyTitle },
+    { Metric: "Total Respondents", Value: totalRespondents },
+    { Metric: "Total Responses", Value: totalResponses },
+    { Metric: "Completed Transcripts", Value: completedTranscripts },
+    { Metric: "Processing Transcripts", Value: processingTranscripts },
+    { Metric: "Failed Transcripts", Value: failedTranscripts },
+    { Metric: "Average Response Duration (seconds)", Value: averageDuration },
+    { Metric: "Total Questions", Value: orderedQuestions.length },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+
+  const responsesSheet = XLSX.utils.json_to_sheet(responseRows);
+  const analyticsSheet = XLSX.utils.json_to_sheet(analyticsRows);
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    responsesSheet,
+    sanitizeSheetName("Responses"),
+  );
+  XLSX.utils.book_append_sheet(
+    workbook,
+    analyticsSheet,
+    sanitizeSheetName("Analytics"),
+  );
+
+  return {
+    workbook,
+    fileName: `${sanitizeFileName(surveyTitle)}.xlsx`,
+  };
 }
