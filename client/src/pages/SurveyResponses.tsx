@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   FaDownload,
@@ -47,6 +47,10 @@ export default function SurveyResponses() {
   const [expandedRespondents, setExpandedRespondents] = useState<
     Record<string, boolean>
   >({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "completed" | "processing" | "failed" | "pending"
+  >("all");
 
   async function loadResponses() {
     if (!surveyId) return;
@@ -259,6 +263,43 @@ export default function SurveyResponses() {
     };
   }, [responses, groupedResponses]);
 
+  const filteredGroupedResponses = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+
+    return groupedResponses
+      .map((group) => {
+        const filteredAnswers =
+          statusFilter === "all"
+            ? group.answers
+            : group.answers.filter((answer) => {
+                const status = (answer.transcript_status || "pending") as
+                  | "completed"
+                  | "processing"
+                  | "failed"
+                  | "pending";
+                return status === statusFilter;
+              });
+
+        const matchesSearch =
+          !term ||
+          (group.respondent?.display_name || "")
+            .toLowerCase()
+            .includes(term) ||
+          (group.respondent?.email || "").toLowerCase().includes(term) ||
+          (group.respondent?.phone || "").toLowerCase().includes(term);
+
+        if (!matchesSearch || filteredAnswers.length === 0) {
+          return null;
+        }
+
+        return {
+          ...group,
+          answers: filteredAnswers,
+        };
+      })
+      .filter(Boolean) as GroupedResponseRow[];
+  }, [groupedResponses, searchTerm, statusFilter]);
+
   function toggleExpanded(respondentId: string) {
     setExpandedRespondents((prev) => ({
       ...prev,
@@ -282,11 +323,11 @@ export default function SurveyResponses() {
 
   return (
     <DashboardShell>
-      <div className="space-y-5 sm:space-y-6">
+      <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EAF2FF] text-[#0B4EA2]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#eef2ff] text-[#4f46e5]">
                 <FaWaveSquare className="h-5 w-5" />
               </div>
               <div>
@@ -305,7 +346,7 @@ export default function SurveyResponses() {
             <button
               onClick={handleProcessAll}
               disabled={processingAll || responses.length === 0}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 sm:w-auto"
             >
               <FaBolt className="h-4 w-4" />
               {processingAll ? "Processing All..." : "Transcribe All"}
@@ -314,7 +355,7 @@ export default function SurveyResponses() {
             <button
               onClick={handleExportExcel}
               disabled={exporting}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-auto"
             >
               <FaFileExcel className="h-4 w-4" />
               {exporting ? "Exporting..." : "Export Excel"}
@@ -323,7 +364,7 @@ export default function SurveyResponses() {
         </div>
 
         {loading ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="brand-card p-8">
             <p className="text-sm text-slate-500">Loading responses...</p>
           </div>
         ) : loadError ? (
@@ -331,15 +372,56 @@ export default function SurveyResponses() {
             <p className="text-sm text-red-600">{loadError}</p>
           </div>
         ) : groupedResponses.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+          <div className="brand-card border-dashed border-slate-300 p-10 text-center">
             <p className="text-sm text-slate-500">No responses yet.</p>
           </div>
         ) : (
           <>
+            <div className="brand-card p-4 sm:p-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Search respondent
+                  </label>
+                  <input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="brand-input py-2.5"
+                    placeholder="Name, email, or phone"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Transcript status
+                  </label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) =>
+                      setStatusFilter(
+                        e.target.value as
+                          | "all"
+                          | "completed"
+                          | "processing"
+                          | "failed"
+                          | "pending",
+                      )
+                    }
+                    className="brand-input py-2.5"
+                  >
+                    <option value="all">All statuses</option>
+                    <option value="completed">Completed</option>
+                    <option value="processing">Processing</option>
+                    <option value="failed">Failed</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="brand-card rounded-2xl p-5">
                 <div className="flex items-center gap-3">
-                  <FaUsers className="h-4 w-4 text-[#0B4EA2]" />
+                  <FaUsers className="h-4 w-4 text-[#4f46e5]" />
                   <p className="text-sm text-slate-500">Respondents</p>
                 </div>
                 <p className="mt-3 text-2xl font-semibold text-slate-900">
@@ -347,9 +429,9 @@ export default function SurveyResponses() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="brand-card rounded-2xl p-5">
                 <div className="flex items-center gap-3">
-                  <FaWaveSquare className="h-4 w-4 text-[#F56A00]" />
+                  <FaWaveSquare className="h-4 w-4 text-[#0891b2]" />
                   <p className="text-sm text-slate-500">Responses</p>
                 </div>
                 <p className="mt-3 text-2xl font-semibold text-slate-900">
@@ -357,7 +439,7 @@ export default function SurveyResponses() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="brand-card rounded-2xl p-5">
                 <div className="flex items-center gap-3">
                   <FaBolt className="h-4 w-4 text-green-600" />
                   <p className="text-sm text-slate-500">Transcribed</p>
@@ -367,7 +449,7 @@ export default function SurveyResponses() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="brand-card rounded-2xl p-5">
                 <div className="flex items-center gap-3">
                   <FaChartBar className="h-4 w-4 text-blue-600" />
                   <p className="text-sm text-slate-500">Processing</p>
@@ -377,7 +459,7 @@ export default function SurveyResponses() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="brand-card rounded-2xl p-5">
                 <div className="flex items-center gap-3">
                   <FaClock className="h-4 w-4 text-slate-600" />
                   <p className="text-sm text-slate-500">Avg Duration</p>
@@ -388,7 +470,64 @@ export default function SurveyResponses() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="space-y-3 md:hidden">
+              {filteredGroupedResponses.map((group) => {
+                const isExpanded = !!expandedRespondents[group.respondentId];
+                const completedCount = group.answers.filter(
+                  (item) => item.transcript_status === "completed",
+                ).length;
+
+                return (
+                  <div key={group.respondentId} className="brand-card p-4">
+                    <button
+                      onClick={() => toggleExpanded(group.respondentId)}
+                      className="flex w-full items-start justify-between gap-3 text-left"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {group.respondent?.display_name || "Anonymous Respondent"}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {group.respondent?.email || "No email"}
+                        </p>
+                        <p className="mt-2 text-xs text-slate-500">
+                          {group.answers.length} answers • {completedCount} completed
+                        </p>
+                      </div>
+                      {isExpanded ? (
+                        <FaChevronUp className="mt-1 h-4 w-4 text-slate-500" />
+                      ) : (
+                        <FaChevronDown className="mt-1 h-4 w-4 text-slate-500" />
+                      )}
+                    </button>
+
+                    {isExpanded ? (
+                      <div className="mt-4 space-y-3">
+                        {group.answers.map((item) => (
+                          <div
+                            key={item.id}
+                            className="rounded-xl border border-slate-200 bg-slate-50 p-3"
+                          >
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                              Q{item.question?.order_index || "—"}
+                            </p>
+                            <p className="mt-1 text-sm font-medium text-slate-900">
+                              {item.question?.prompt || "No question found"}
+                            </p>
+                            <p className="mt-2 text-xs text-slate-500">
+                              {item.duration_seconds || 0}s •{" "}
+                              {getTranscriptStatusLabel(item.transcript_status)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50">
@@ -415,7 +554,7 @@ export default function SurveyResponses() {
                   </thead>
 
                   <tbody className="divide-y divide-slate-100 bg-white">
-                    {groupedResponses.map((group) => {
+                    {filteredGroupedResponses.map((group) => {
                       const isExpanded =
                         !!expandedRespondents[group.respondentId];
                       const completedCount = group.answers.filter(
@@ -433,14 +572,13 @@ export default function SurveyResponses() {
                           : 0;
 
                       return (
-                        <>
+                        <Fragment key={group.respondentId}>
                           <tr
-                            key={group.respondentId}
                             className="align-top transition hover:bg-slate-50"
                           >
                             <td className="px-4 py-4">
                               <div className="flex items-start gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#0B4EA2]">
+                                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-[#eef2ff] text-[#4f46e5]">
                                   <FaUser className="h-4 w-4" />
                                 </div>
                                 <div>
@@ -574,7 +712,7 @@ export default function SurveyResponses() {
                                                 transcriptStatus ===
                                                   "processing"
                                               }
-                                              className="inline-flex items-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                                              className="inline-flex items-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                                             >
                                               <FaBolt className="h-4 w-4" />
                                               {isProcessing
@@ -643,7 +781,7 @@ export default function SurveyResponses() {
                               </td>
                             </tr>
                           ) : null}
-                        </>
+                        </Fragment>
                       );
                     })}
                   </tbody>

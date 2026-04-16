@@ -299,7 +299,8 @@ export async function generateSurveyDraftFromBrief(brief: string) {
   if (error) {
     console.error("generate-survey-draft invoke error:", error);
 
-    const maybeContext = (error as any)?.context;
+    const maybeContext = (error as { context?: { text?: () => Promise<string> } })
+      ?.context;
 
     if (maybeContext && typeof maybeContext.text === "function") {
       const rawText = await maybeContext.text();

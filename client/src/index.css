@@ -1,1 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@600;700&display=swap");
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --color-primary: #4f46e5;
+    --color-primary-hover: #4338ca;
+    --color-primary-foreground: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-raised: #f8fafc;
+    --color-surface-overlay: #f1f5f9;
+    --color-border: #cbd5e1;
+    --color-border-subtle: #e2e8f0;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-text-disabled: #94a3b8;
+    --color-success: #16a34a;
+    --color-warning: #d97706;
+    --color-danger: #e11d48;
+    --color-info: #0284c7;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: "Manrope", system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Sora", system-ui, sans-serif;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-indigo-500/60 ring-offset-2 ring-offset-white;
+  }
+}
+
+@layer components {
+  .brand-card {
+    @apply rounded-3xl border border-slate-200/90 bg-white/90 shadow-[0_24px_70px_-30px_rgba(15,23,42,0.45)] backdrop-blur-sm;
+  }
+
+  .brand-input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500;
+  }
+
+  .brand-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .brand-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50;
+  }
+}

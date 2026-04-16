@@ -37,37 +37,37 @@ export default function CreateSurvey() {
         <div className="flex items-center gap-3">
           <FaClipboardList className="h-7 w-7 text-indigo-600" />
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <h2 className="text-2xl font-semibold text-slate-900">
               Create Survey
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-slate-500">
               Start a new voice survey for your organization.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="brand-card p-6">
           <form onSubmit={handleSubmit} className="grid gap-5">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Survey Title
               </label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+                className="brand-input"
                 placeholder="Customer Experience Feedback"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Description
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[120px] w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+                className="brand-input min-h-[120px]"
                 placeholder="Add a short description for this survey..."
               />
             </div>
@@ -82,7 +82,7 @@ export default function CreateSurvey() {
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-xl bg-gray-900 px-5 py-3 text-sm font-medium text-white hover:bg-black disabled:opacity-60"
+                className="brand-btn-primary px-5 py-3"
               >
                 {loading ? "Creating..." : "Create Survey"}
               </button>
@@ -90,7 +90,7 @@ export default function CreateSurvey() {
               <button
                 type="button"
                 onClick={() => navigate("/surveys")}
-                className="rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="brand-btn-secondary px-5 py-3"
               >
                 Cancel
               </button>
