@@ -35,7 +35,7 @@ export default function Home() {
         description="Create voice-first surveys, collect spoken feedback in any language, generate transcripts, and turn responses into structured reports."
       />
 
-      <div className="min-h-screen bg-white text-slate-900">
+      <div className="min-h-screen text-slate-900">
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <Link to="/" className="flex min-w-0 items-center gap-3">
@@ -67,7 +67,7 @@ export default function Home() {
 
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-[#0B4EA2] px-3.5 py-2 text-sm font-medium text-white transition hover:bg-[#093E81] sm:px-4"
+                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:px-4"
               >
                 Get started
               </Link>
@@ -80,13 +80,13 @@ export default function Home() {
             <div className="grid items-center gap-8 md:gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
               <div className="order-2 lg:order-1">
                 <div className="mx-auto flex max-w-2xl flex-col text-center lg:mx-0 lg:text-left">
-                  <div className="inline-flex w-fit self-center rounded-full bg-[#EAF2FF] px-4 py-2 text-xs font-medium text-[#0B4EA2] lg:self-start">
+                  <div className="inline-flex w-fit self-center rounded-full bg-indigo-50 px-4 py-2 text-xs font-medium text-indigo-700 lg:self-start">
                     Built for modern feedback workflows
                   </div>
 
                   <h1 className="mt-5 max-w-[14ch] text-balance text-3xl font-semibold leading-tight tracking-tight sm:max-w-none sm:text-4xl md:text-[2.6rem] md:leading-[1.1] lg:text-[3rem] xl:text-[3.35rem]">
                     Turn real human voice into{" "}
-                    <span className="text-[#0B4EA2]">
+                    <span className="text-indigo-700">
                       decisions your team can act on
                     </span>
                   </h1>
@@ -100,7 +100,7 @@ export default function Home() {
                   <div className="mt-6 flex flex-col gap-3 sm:mt-7 sm:flex-row sm:justify-center lg:justify-start">
                     <Link
                       to="/signup"
-                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] sm:w-auto"
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto"
                     >
                       Start collecting voice feedback
                       <FaArrowRight className="h-4 w-4 shrink-0" />
@@ -116,17 +116,17 @@ export default function Home() {
 
                   <div className="mt-4 flex flex-wrap justify-center gap-2.5 lg:justify-start">
                     <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
-                      <FaLock className="h-3.5 w-3.5 shrink-0 text-[#0B4EA2]" />
+                      <FaLock className="h-3.5 w-3.5 shrink-0 text-indigo-700" />
                       <span>Secure voice data</span>
                     </div>
 
                     <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
-                      <FaGlobe className="h-3.5 w-3.5 shrink-0 text-[#0B4EA2]" />
+                      <FaGlobe className="h-3.5 w-3.5 shrink-0 text-indigo-700" />
                       <span>Multi-language ready</span>
                     </div>
 
                     <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
-                      <FaChartLine className="h-3.5 w-3.5 shrink-0 text-[#F56A00]" />
+                      <FaChartLine className="h-3.5 w-3.5 shrink-0 text-cyan-600" />
                       <span>Fast reporting</span>
                     </div>
                   </div>
@@ -134,7 +134,7 @@ export default function Home() {
                   <div className="mt-6 grid gap-3 sm:mt-7 sm:grid-cols-2">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <div className="flex items-start gap-3">
-                        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0B4EA2]/10 text-[#0B4EA2]">
+                        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
                           <FaMicrophone className="h-4 w-4" />
                         </div>
 
@@ -152,7 +152,7 @@ export default function Home() {
 
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <div className="flex items-start gap-3">
-                        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F56A00]/10 text-[#F56A00]">
+                        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
                           <FaCheckCircle className="h-4 w-4" />
                         </div>
 

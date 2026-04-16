@@ -286,7 +286,7 @@ export default function SurveyResponses() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EAF2FF] text-[#0B4EA2]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#eef2ff] text-[#4f46e5]">
                 <FaWaveSquare className="h-5 w-5" />
               </div>
               <div>
@@ -339,7 +339,7 @@ export default function SurveyResponses() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FaUsers className="h-4 w-4 text-[#0B4EA2]" />
+                  <FaUsers className="h-4 w-4 text-[#4f46e5]" />
                   <p className="text-sm text-slate-500">Respondents</p>
                 </div>
                 <p className="mt-3 text-2xl font-semibold text-slate-900">
@@ -349,7 +349,7 @@ export default function SurveyResponses() {
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <FaWaveSquare className="h-4 w-4 text-[#F56A00]" />
+                  <FaWaveSquare className="h-4 w-4 text-[#0891b2]" />
                   <p className="text-sm text-slate-500">Responses</p>
                 </div>
                 <p className="mt-3 text-2xl font-semibold text-slate-900">
@@ -440,7 +440,7 @@ export default function SurveyResponses() {
                           >
                             <td className="px-4 py-4">
                               <div className="flex items-start gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#0B4EA2]">
+                                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-[#eef2ff] text-[#4f46e5]">
                                   <FaUser className="h-4 w-4" />
                                 </div>
                                 <div>
@@ -574,7 +574,7 @@ export default function SurveyResponses() {
                                                 transcriptStatus ===
                                                   "processing"
                                               }
-                                              className="inline-flex items-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                                              className="inline-flex items-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                                             >
                                               <FaBolt className="h-4 w-4" />
                                               {isProcessing

@@ -30,7 +30,7 @@ export default function Sidebar({
   return (
     <aside
       className={[
-        "fixed left-0 top-0 z-50 h-screen border-r border-slate-200 bg-white transition-all duration-300",
+        "fixed left-0 top-0 z-50 h-screen border-r border-slate-200/80 bg-white/90 backdrop-blur transition-all duration-300",
         isMobile
           ? mobileOpen
             ? "w-[280px] translate-x-0 shadow-2xl"
@@ -59,7 +59,7 @@ export default function Sidebar({
                   [
                     "group flex min-h-[48px] items-center rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-[#EAF2FF] text-[#0B4EA2]"
+                      ? "bg-indigo-50 text-indigo-700"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                     collapsed && !isMobile ? "justify-center" : "gap-3",
                   ].join(" ")
@@ -75,9 +75,9 @@ export default function Sidebar({
         </nav>
 
         <div className="border-t border-slate-200 p-3">
-          <div className="rounded-2xl bg-[#FFF1E7] p-4">
+          <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-cyan-50 p-4">
             {collapsed && !isMobile ? (
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-semibold text-[#F56A00] shadow-sm">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xs font-semibold text-indigo-600 shadow-sm">
                 AI
               </div>
             ) : (

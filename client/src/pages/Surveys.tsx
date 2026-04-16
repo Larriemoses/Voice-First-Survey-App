@@ -67,7 +67,7 @@ export default function Surveys() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+              <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
                 <FaClipboardList className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div className="min-w-0">
@@ -83,7 +83,7 @@ export default function Surveys() {
 
           <button
             onClick={() => navigate("/surveys/create")}
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#093E81] sm:w-auto"
+            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#4338ca] sm:w-auto"
             type="button"
           >
             <FaPlus className="h-4 w-4" />
@@ -151,7 +151,7 @@ export default function Surveys() {
             <button
               onClick={() => navigate("/surveys/create")}
               type="button"
-              className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] sm:w-auto"
+              className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#4338ca] sm:w-auto"
             >
               <FaPlus className="h-4 w-4" />
               Create your first survey
@@ -164,12 +164,12 @@ export default function Surveys() {
                 key={survey.id}
                 onClick={() => navigate(`/surveys/${survey.id}`)}
                 type="button"
-                className="group rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md sm:p-5 lg:p-6"
+                className="group rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md sm:p-5 lg:p-6"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <h3 className="truncate text-base font-semibold text-slate-900 transition-colors group-hover:text-[#0B4EA2] sm:text-lg">
+                      <h3 className="truncate text-base font-semibold text-slate-900 transition-colors group-hover:text-[#4f46e5] sm:text-lg">
                         {survey.title}
                       </h3>
 
@@ -194,7 +194,7 @@ export default function Surveys() {
                         </span>
                       </div>
 
-                      <div className="inline-flex items-center gap-2 text-sm font-medium text-[#0B4EA2]">
+                      <div className="inline-flex items-center gap-2 text-sm font-medium text-[#4f46e5]">
                         Open survey
                         <FaArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                       </div>

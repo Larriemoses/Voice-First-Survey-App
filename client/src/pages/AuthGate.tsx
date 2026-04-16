@@ -36,8 +36,8 @@ export default function AuthGate() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <div className="rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="brand-card border-red-200 p-6">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function AuthGate() {
 
   if (!destination) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500">
+      <div className="flex min-h-screen items-center justify-center text-sm text-slate-500">
         Checking your workspace...
       </div>
     );

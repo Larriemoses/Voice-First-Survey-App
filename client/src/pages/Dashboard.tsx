@@ -166,14 +166,14 @@ export default function Dashboard() {
       label: "Surveys",
       value: metrics.totalSurveys,
       icon: <FaClipboardList className="h-5 w-5" />,
-      tone: "text-[#0B4EA2] bg-[#EAF2FF]",
+      tone: "text-[#4f46e5] bg-[#eef2ff]",
       note: "Created surveys",
     },
     {
       label: "Published",
       value: metrics.publishedSurveys,
       icon: <FaRocket className="h-5 w-5" />,
-      tone: "text-[#F56A00] bg-[#FFF1E7]",
+      tone: "text-[#0891b2] bg-[#ecfeff]",
       note: "Currently live",
     },
     {
@@ -216,11 +216,11 @@ export default function Dashboard() {
           <>
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
               <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
-                <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#0B4EA2]/5 blur-3xl sm:h-36 sm:w-36" />
-                <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#F56A00]/5 blur-3xl sm:h-28 sm:w-28" />
+                <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
+                <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
 
                 <div className="relative">
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-[#EAF2FF] px-3 py-1 text-xs font-semibold text-[#0B4EA2]">
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-semibold text-[#4f46e5]">
                     <FaWaveSquare className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{orgName}</span>
                   </div>
@@ -237,7 +237,7 @@ export default function Dashboard() {
                   <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <button
                       onClick={() => navigate("/surveys/create")}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#093E81] sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#4338ca] sm:w-auto"
                     >
                       Create Survey
                       <FaArrowRight className="h-4 w-4" />
@@ -280,7 +280,7 @@ export default function Dashboard() {
 
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-[#0B4EA2] transition-all duration-300"
+                      className="h-full rounded-full bg-[#4f46e5] transition-all duration-300"
                       style={{ width: `${completionPercent}%` }}
                     />
                   </div>
@@ -322,7 +322,7 @@ export default function Dashboard() {
 
                 <button
                   onClick={() => navigate("/surveys/create")}
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[#0B4EA2] transition hover:text-[#093E81]"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[#4f46e5] transition hover:text-[#4338ca]"
                 >
                   Continue setup
                   <FaArrowRight className="h-3.5 w-3.5" />
@@ -416,7 +416,7 @@ export default function Dashboard() {
                 <div className="mt-5 grid gap-3">
                   <button
                     onClick={() => navigate("/surveys/create")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -426,12 +426,12 @@ export default function Dashboard() {
                         Start a new voice survey workflow
                       </p>
                     </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
                   </button>
 
                   <button
                     onClick={() => navigate("/surveys")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -441,12 +441,12 @@ export default function Dashboard() {
                         Review, edit, and organize surveys
                       </p>
                     </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
                   </button>
 
                   <button
                     onClick={() => navigate("/profile")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#0B4EA2]/30 hover:bg-[#EAF2FF]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -456,7 +456,7 @@ export default function Dashboard() {
                         Update your account and workspace preferences
                       </p>
                     </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#0B4EA2]" />
+                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
                   </button>
                 </div>
               </div>
