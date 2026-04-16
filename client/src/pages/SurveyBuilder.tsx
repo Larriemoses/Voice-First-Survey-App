@@ -547,7 +547,7 @@ export default function SurveyBuilder() {
     <DashboardShell>
       <div className="mx-auto w-full max-w-7xl space-y-4 sm:space-y-5">
         {loading ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading survey builder...</p>
           </div>
         ) : (
@@ -569,10 +569,10 @@ export default function SurveyBuilder() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                 <button
                   onClick={() => navigate(`/surveys/${surveyId}/responses`)}
-                  className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
                   type="button"
                 >
                   <FaEye className="h-4 w-4" />
@@ -584,7 +584,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handleCopyLink}
                       disabled={copying}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 sm:w-auto"
                       type="button"
                     >
                       <FaCopy className="h-4 w-4" />
@@ -594,7 +594,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handleCloseSurvey}
                       disabled={closingSurvey}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
+                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 sm:w-auto"
                       type="button"
                     >
                       <FaLock className="h-4 w-4" />
@@ -605,7 +605,7 @@ export default function SurveyBuilder() {
                       href={publicLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca]"
+                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] sm:w-auto"
                     >
                       <FaLink className="h-4 w-4" />
                       Open Public Survey
@@ -616,7 +616,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handlePublishSurvey}
                       disabled={publishing}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
+                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60 sm:w-auto"
                       type="button"
                     >
                       <FaRocket className="h-4 w-4" />
@@ -626,7 +626,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handleDeleteSurvey}
                       disabled={deletingSurvey}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60 sm:w-auto"
                       type="button"
                     >
                       <FaTrash className="h-4 w-4" />
@@ -651,8 +651,8 @@ export default function SurveyBuilder() {
             ) : null}
 
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+                <div className="brand-card p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
@@ -758,7 +758,7 @@ export default function SurveyBuilder() {
                   ) : null}
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="brand-card p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
@@ -807,7 +807,7 @@ export default function SurveyBuilder() {
                   ) : null}
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="brand-card p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
@@ -873,7 +873,7 @@ export default function SurveyBuilder() {
                 </div>
 
                 {generatedDraft ? (
-                  <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="brand-card p-4 sm:p-5">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">
@@ -966,7 +966,7 @@ export default function SurveyBuilder() {
                   </div>
 
                   {questions.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+                    <div className="brand-card border-dashed border-slate-300 p-8 text-center">
                       <p className="text-sm text-slate-500">
                         No questions added yet.
                       </p>
@@ -979,7 +979,7 @@ export default function SurveyBuilder() {
                         return (
                           <div
                             key={question.id}
-                            className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md"
+                            className="brand-card p-4 transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md"
                           >
                             <div className="flex items-start gap-3">
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff]">
@@ -1012,7 +1012,7 @@ export default function SurveyBuilder() {
                                       className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                                     />
 
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                                       <button
                                         type="button"
                                         onClick={() =>
@@ -1095,12 +1095,12 @@ export default function SurveyBuilder() {
               </div>
 
               <div className="space-y-4">
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="brand-card p-5 sm:p-6">
                   <h3 className="text-lg font-semibold text-slate-900">
                     Survey Preview
                   </h3>
 
-                  <div className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
                     {logoUrl ? (
                       <div className="mb-3 flex justify-center sm:justify-start">
                         <img
@@ -1126,7 +1126,7 @@ export default function SurveyBuilder() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="brand-card p-5 sm:p-6">
                   <h3 className="text-lg font-semibold text-slate-900">
                     Survey Summary
                   </h3>
@@ -1166,7 +1166,7 @@ export default function SurveyBuilder() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="brand-card p-5 sm:p-6">
                   <h3 className="text-lg font-semibold text-slate-900">
                     Builder Guidance
                   </h3>
