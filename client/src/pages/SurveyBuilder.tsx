@@ -18,6 +18,7 @@ import {
   FaLock,
   FaImage,
   FaPalette,
+  FaChevronDown,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import {
@@ -61,21 +62,139 @@ type GeneratedSurveyDraft = {
   questions: GeneratedQuestion[];
 };
 
-function SectionToggleButton({
+const STATUS_CONFIG = {
+  draft:     { label: "Draft",     dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
+  published: { label: "Published", dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+  closed:    { label: "Closed",    dot: "bg-slate-400",   text: "text-slate-600",   bg: "bg-slate-100 border-slate-200" },
+};
+
+function StatusBadge({ status }: { status: Survey["status"] }) {
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.draft;
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+      {cfg.label}
+    </span>
+  );
+}
+
+function Accordion({
+  icon,
+  title,
+  subtitle,
+  iconBg,
+  iconColor,
   open,
-  onClick,
+  onToggle,
+  children,
 }: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  iconBg: string;
+  iconColor: string;
   open: boolean;
-  onClick: () => void;
+  onToggle: () => void;
+  children: React.ReactNode;
 }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center gap-4 px-5 py-4 text-left"
+      >
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <span className={iconColor}>{icon}</span>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-slate-900">{title}</p>
+          <p className="text-xs text-slate-400">{subtitle}</p>
+        </div>
+        <FaChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 px-5 pb-5 pt-4">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+      {children}
+    </label>
+  );
+}
+
+function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 ${props.className ?? ""}`}
+    />
+  );
+}
+
+function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      {...props}
+      className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 ${props.className ?? ""}`}
+    />
+  );
+}
+
+function PrimaryBtn({
+  children,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+      {...props}
+      className={`inline-flex min-h-[38px] items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
-      {open ? <FaTimes className="h-4 w-4" /> : <FaPlus className="h-4 w-4" />}
-      <span>{open ? "Close" : "Open"}</span>
+      {children}
+    </button>
+  );
+}
+
+function GhostBtn({
+  children,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className={`inline-flex min-h-[38px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 active:scale-[0.98] disabled:opacity-50 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DangerBtn({
+  children,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className={`inline-flex min-h-[38px] items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 active:scale-[0.98] disabled:opacity-50 ${className}`}
+    >
+      {children}
     </button>
   );
 }
@@ -90,8 +209,7 @@ export default function SurveyBuilder() {
   const [maxDuration, setMaxDuration] = useState("120");
 
   const [brief, setBrief] = useState("");
-  const [generatedDraft, setGeneratedDraft] =
-    useState<GeneratedSurveyDraft | null>(null);
+  const [generatedDraft, setGeneratedDraft] = useState<GeneratedSurveyDraft | null>(null);
 
   const [surveyTitle, setSurveyTitle] = useState("");
   const [surveyDescription, setSurveyDescription] = useState("");
@@ -100,9 +218,7 @@ export default function SurveyBuilder() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [savingBranding, setSavingBranding] = useState(false);
 
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
-    null,
-  );
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [editingPrompt, setEditingPrompt] = useState("");
   const [editingDuration, setEditingDuration] = useState("120");
 
@@ -114,30 +230,24 @@ export default function SurveyBuilder() {
   const [addingGenerated, setAddingGenerated] = useState(false);
   const [closingSurvey, setClosingSurvey] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState(false);
-  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
-    null,
-  );
-  const [updatingQuestionId, setUpdatingQuestionId] = useState<string | null>(
-    null,
-  );
+  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(null);
+  const [updatingQuestionId, setUpdatingQuestionId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
   const [showBrandingPanel, setShowBrandingPanel] = useState(false);
   const [showGeneratorPanel, setShowGeneratorPanel] = useState(false);
   const [showAddQuestionPanel, setShowAddQuestionPanel] = useState(false);
 
   async function loadData() {
     if (!surveyId) return;
-
     try {
       setLoading(true);
       setError("");
-
       const [surveyData, questionData] = await Promise.all([
         getSurveyById(surveyId),
         getSurveyQuestions(surveyId),
       ]);
-
       setSurvey(surveyData);
       setSurveyTitle(surveyData.title || "");
       setSurveyDescription(surveyData.description || "");
@@ -145,49 +255,33 @@ export default function SurveyBuilder() {
       setLogoUrl(surveyData.logo_url || "");
       setQuestions(questionData);
     } catch (err) {
-      console.error("Survey builder load error:", err);
+      console.error(err);
       setError("Failed to load survey data.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    loadData();
-  }, [surveyId]);
+  useEffect(() => { loadData(); }, [surveyId]);
 
-  function clearFeedback() {
-    setError("");
-    setSuccessMessage("");
-  }
+  function clearFeedback() { setError(""); setSuccessMessage(""); }
 
   async function handleSaveBranding() {
     if (!surveyId) return;
-
     clearFeedback();
-
-    if (!surveyTitle.trim()) {
-      setError("Survey title is required.");
-      return;
-    }
-
+    if (!surveyTitle.trim()) { setError("Survey title is required."); return; }
     try {
       setSavingBranding(true);
-
       const updated = await updateSurvey(surveyId, {
         title: surveyTitle.trim(),
         description: surveyDescription.trim() || null,
         header_text: headerText.trim() || null,
         logo_url: logoUrl || null,
       });
-
       setSurvey(updated);
-      setSuccessMessage("Survey branding updated successfully.");
+      setSuccessMessage("Branding saved.");
     } catch (err) {
-      console.error("Save branding error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to save survey branding.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to save branding.");
     } finally {
       setSavingBranding(false);
     }
@@ -195,18 +289,13 @@ export default function SurveyBuilder() {
 
   async function handleLogoUpload(file: File | null) {
     if (!file || !surveyId) return;
-
     clearFeedback();
-
     try {
       setLogoUploading(true);
       const uploaded = await uploadSurveyLogo(surveyId, file);
       setLogoUrl(uploaded.signedUrl);
-      setSuccessMessage(
-        "Logo uploaded successfully. Save branding to apply it.",
-      );
+      setSuccessMessage("Logo uploaded. Save branding to apply.");
     } catch (err) {
-      console.error("Logo upload error:", err);
       setError(err instanceof Error ? err.message : "Failed to upload logo.");
     } finally {
       setLogoUploading(false);
@@ -216,30 +305,20 @@ export default function SurveyBuilder() {
   async function handleAddQuestion(e: React.FormEvent) {
     e.preventDefault();
     clearFeedback();
-
-    if (!surveyId) return;
-
-    if (!prompt.trim()) {
-      setError("Question prompt is required.");
-      return;
-    }
-
+    if (!surveyId || !prompt.trim()) { setError("Question prompt is required."); return; }
     try {
       setSaving(true);
-
       await addQuestion({
         survey_id: surveyId,
         prompt: prompt.trim(),
         order_index: questions.length + 1,
         max_duration_seconds: Number(maxDuration) || 120,
       });
-
       setPrompt("");
       setMaxDuration("120");
-      setSuccessMessage("Question added successfully.");
+      setSuccessMessage("Question added.");
       await loadData();
     } catch (err) {
-      console.error("Add question error:", err);
       setError(err instanceof Error ? err.message : "Failed to add question.");
     } finally {
       setSaving(false);
@@ -248,130 +327,77 @@ export default function SurveyBuilder() {
 
   async function handleGenerateSurvey() {
     clearFeedback();
-
-    if (!brief.trim()) {
-      setError(
-        "Paste your brand brief, research thought, or survey plan first.",
-      );
-      return;
-    }
-
+    if (!brief.trim()) { setError("Paste your brief first."); return; }
     try {
       setGenerating(true);
       const draft = await generateSurveyDraftFromBrief(brief.trim());
-
       setGeneratedDraft({
         title: draft.title || "",
         description: draft.description || "",
         questions: Array.isArray(draft.questions) ? draft.questions : [],
       });
-
       setSurveyTitle(draft.title || surveyTitle);
       setSurveyDescription(draft.description || surveyDescription);
-      setSuccessMessage("Survey draft generated. Review and edit it below.");
+      setSuccessMessage("Draft generated. Review below.");
     } catch (err) {
-      console.error("Generate survey draft error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to generate survey draft.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to generate draft.");
     } finally {
       setGenerating(false);
     }
   }
 
-  function handleGeneratedQuestionChange(
-    index: number,
-    field: keyof GeneratedQuestion,
-    value: string,
-  ) {
+  function handleGeneratedQuestionChange(index: number, field: keyof GeneratedQuestion, value: string) {
     setGeneratedDraft((prev) => {
       if (!prev) return prev;
-
-      const updatedQuestions = [...prev.questions];
-      const current = updatedQuestions[index];
-      if (!current) return prev;
-
-      updatedQuestions[index] = {
-        ...current,
-        [field]:
-          field === "max_duration_seconds"
-            ? Math.max(10, Math.min(600, Number(value) || 120))
-            : value,
+      const updated = [...prev.questions];
+      updated[index] = {
+        ...updated[index],
+        [field]: field === "max_duration_seconds" ? Math.max(10, Math.min(600, Number(value) || 120)) : value,
       };
-
-      return {
-        ...prev,
-        questions: updatedQuestions,
-      };
+      return { ...prev, questions: updated };
     });
   }
 
   function handleRemoveGeneratedQuestion(index: number) {
-    setGeneratedDraft((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        questions: prev.questions.filter((_, i) => i !== index),
-      };
-    });
+    setGeneratedDraft((prev) => prev ? { ...prev, questions: prev.questions.filter((_, i) => i !== index) } : prev);
   }
 
   async function handleAddGeneratedQuestions() {
     if (!surveyId || !generatedDraft) return;
-
     clearFeedback();
-
-    const validQuestions = generatedDraft.questions.filter((item) =>
-      item.prompt.trim(),
-    );
-
-    if (validQuestions.length === 0) {
-      setError("Add at least one valid generated question.");
-      return;
-    }
-
+    const valid = generatedDraft.questions.filter((q) => q.prompt.trim());
+    if (!valid.length) { setError("Add at least one valid question."); return; }
     try {
       setAddingGenerated(true);
-
       await updateSurvey(surveyId, {
         title: surveyTitle.trim() || generatedDraft.title,
         description: surveyDescription.trim() || generatedDraft.description,
         header_text: headerText.trim() || null,
         logo_url: logoUrl || null,
       });
-
-      for (let i = 0; i < validQuestions.length; i++) {
-        const item = validQuestions[i];
-
+      for (let i = 0; i < valid.length; i++) {
         await addQuestion({
           survey_id: surveyId,
-          prompt: item.prompt.trim(),
+          prompt: valid[i].prompt.trim(),
           order_index: questions.length + i + 1,
-          max_duration_seconds: Number(item.max_duration_seconds) || 120,
+          max_duration_seconds: Number(valid[i].max_duration_seconds) || 120,
         });
       }
-
       setGeneratedDraft(null);
       setBrief("");
-      setSuccessMessage("Generated questions added to the survey.");
+      setSuccessMessage("Generated questions added.");
       await loadData();
     } catch (err) {
-      console.error("Add generated questions error:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to add generated questions.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to add questions.");
     } finally {
       setAddingGenerated(false);
     }
   }
 
-  function startEditingQuestion(question: Question) {
-    setEditingQuestionId(question.id);
-    setEditingPrompt(question.prompt);
-    setEditingDuration(String(question.max_duration_seconds || 120));
+  function startEditingQuestion(q: Question) {
+    setEditingQuestionId(q.id);
+    setEditingPrompt(q.prompt);
+    setEditingDuration(String(q.max_duration_seconds || 120));
     clearFeedback();
   }
 
@@ -383,56 +409,34 @@ export default function SurveyBuilder() {
 
   async function handleSaveQuestion(questionId: string) {
     clearFeedback();
-
-    if (!editingPrompt.trim()) {
-      setError("Question prompt cannot be empty.");
-      return;
-    }
-
+    if (!editingPrompt.trim()) { setError("Prompt cannot be empty."); return; }
     try {
       setUpdatingQuestionId(questionId);
-
       await updateQuestion(questionId, {
         prompt: editingPrompt.trim(),
         max_duration_seconds: Number(editingDuration) || 120,
       });
-
       cancelEditingQuestion();
-      setSuccessMessage("Question updated successfully.");
+      setSuccessMessage("Question updated.");
       await loadData();
     } catch (err) {
-      console.error("Update question error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to update question.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to update question.");
     } finally {
       setUpdatingQuestionId(null);
     }
   }
 
   async function handleDeleteQuestion(questionId: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this question?",
-    );
-    if (!confirmed) return;
-
+    if (!window.confirm("Delete this question?")) return;
     clearFeedback();
-
     try {
       setDeletingQuestionId(questionId);
       await deleteQuestion(questionId);
-
-      if (editingQuestionId === questionId) {
-        cancelEditingQuestion();
-      }
-
-      setSuccessMessage("Question deleted successfully.");
+      if (editingQuestionId === questionId) cancelEditingQuestion();
+      setSuccessMessage("Question deleted.");
       await loadData();
     } catch (err) {
-      console.error("Delete question error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to delete question.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to delete question.");
     } finally {
       setDeletingQuestionId(null);
     }
@@ -440,59 +444,36 @@ export default function SurveyBuilder() {
 
   async function handlePublishSurvey() {
     if (!surveyId) return;
-
     clearFeedback();
-
-    if (!surveyTitle.trim()) {
-      setError("Survey title is required before publishing.");
-      return;
-    }
-
-    if (questions.length === 0) {
-      setError("Add at least one question before publishing.");
-      return;
-    }
-
+    if (!surveyTitle.trim()) { setError("Survey title required before publishing."); return; }
+    if (!questions.length) { setError("Add at least one question before publishing."); return; }
     try {
       setPublishing(true);
-
       await updateSurvey(surveyId, {
         title: surveyTitle.trim(),
         description: surveyDescription.trim() || null,
         header_text: headerText.trim() || null,
         logo_url: logoUrl || null,
       });
-
       const updated = await publishSurvey(surveyId);
       setSurvey(updated);
-      setSuccessMessage("Survey published successfully.");
+      setSuccessMessage("Survey published.");
     } catch (err) {
-      console.error("Publish survey error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to publish survey.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to publish.");
     } finally {
       setPublishing(false);
     }
   }
 
   async function handleCloseSurvey() {
-    if (!surveyId) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to close this survey? Respondents will no longer be able to submit responses.",
-    );
-    if (!confirmed) return;
-
+    if (!surveyId || !window.confirm("Close this survey? Respondents won't be able to submit.")) return;
     clearFeedback();
-
     try {
       setClosingSurvey(true);
       const updated = await closeSurvey(surveyId);
       setSurvey(updated);
-      setSuccessMessage("Survey closed successfully.");
+      setSuccessMessage("Survey closed.");
     } catch (err) {
-      console.error("Close survey error:", err);
       setError(err instanceof Error ? err.message : "Failed to close survey.");
     } finally {
       setClosingSurvey(false);
@@ -500,21 +481,13 @@ export default function SurveyBuilder() {
   }
 
   async function handleDeleteSurvey() {
-    if (!surveyId) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this entire survey? This action cannot be undone.",
-    );
-    if (!confirmed) return;
-
+    if (!surveyId || !window.confirm("Delete this entire survey? This cannot be undone.")) return;
     clearFeedback();
-
     try {
       setDeletingSurvey(true);
       await deleteSurvey(surveyId);
       navigate("/surveys");
     } catch (err) {
-      console.error("Delete survey error:", err);
       setError(err instanceof Error ? err.message : "Failed to delete survey.");
     } finally {
       setDeletingSurvey(false);
@@ -523,13 +496,11 @@ export default function SurveyBuilder() {
 
   async function handleCopyLink() {
     clearFeedback();
-
     try {
       setCopying(true);
       await navigator.clipboard.writeText(publicLink);
-      setSuccessMessage("Public survey link copied.");
-    } catch (err) {
-      console.error("Copy link error:", err);
+      setSuccessMessage("Link copied.");
+    } catch {
       setError("Failed to copy link.");
     } finally {
       setCopying(false);
@@ -539,661 +510,459 @@ export default function SurveyBuilder() {
   const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
   const publicLink = `${appUrl}/take-survey/${surveyId}`;
 
-  const validGeneratedCount = useMemo(() => {
-    return generatedDraft?.questions.filter((q) => q.prompt.trim()).length || 0;
-  }, [generatedDraft]);
+  const validGeneratedCount = useMemo(
+    () => generatedDraft?.questions.filter((q) => q.prompt.trim()).length || 0,
+    [generatedDraft],
+  );
+
+  if (loading) {
+    return (
+      <DashboardShell>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="space-y-2 text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+            <p className="text-sm text-slate-400">Loading builder…</p>
+          </div>
+        </div>
+      </DashboardShell>
+    );
+  }
 
   return (
     <DashboardShell>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mx-auto w-full max-w-7xl space-y-4 sm:space-y-5">
-          {loading ? (
-            <div className="brand-card p-5 sm:p-6">
-              <p className="text-sm text-slate-500">Loading survey builder...</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
-                      <FaClipboardList className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <h2 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">
-                        Survey Builder
-                      </h2>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Build, brand, and publish your voice survey.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+      <div className="min-h-screen bg-slate-50 pb-16">
 
-                <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-                  <button
-                    onClick={() => navigate(`/surveys/${surveyId}/responses`)}
-                    className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-                    type="button"
-                  >
-                    <FaEye className="h-4 w-4" />
-                    View Responses
-                  </button>
-
-                  {survey?.status === "published" ? (
-                    <>
-                      <button
-                        onClick={handleCopyLink}
-                        disabled={copying}
-                        className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 sm:w-auto"
-                        type="button"
-                      >
-                        <FaCopy className="h-4 w-4" />
-                        {copying ? "Copying..." : "Copy Link"}
-                      </button>
-
-                      <button
-                        onClick={handleCloseSurvey}
-                        disabled={closingSurvey}
-                        className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-60 sm:w-auto"
-                        type="button"
-                      >
-                        <FaLock className="h-4 w-4" />
-                        {closingSurvey ? "Closing..." : "Close Survey"}
-                      </button>
-
-                      <a
-                        href={publicLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca]"
-                      >
-                        <FaLink className="h-4 w-4" />
-                        Open Public Survey
-                      </a>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={handlePublishSurvey}
-                        disabled={publishing}
-                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
-                        type="button"
-                      >
-                        <FaRocket className="h-4 w-4" />
-                        {publishing ? "Publishing..." : "Publish Survey"}
-                      </button>
-
-                      <button
-                        onClick={handleDeleteSurvey}
-                        disabled={deletingSurvey}
-                        className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60 sm:w-auto"
-                        type="button"
-                      >
-                        <FaTrash className="h-4 w-4" />
-                        {deletingSurvey ? "Deleting..." : "Delete Survey"}
-                      </button>
-                    </>
-                  )}
-                </div>
+        {/* ── Top Bar ── */}
+        <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md sm:px-6">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/surveys")}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div className="min-w-0">
+                <h1 className="truncate text-sm font-semibold text-slate-900">
+                  {surveyTitle || "Untitled Survey"}
+                </h1>
+                <p className="text-xs text-slate-400">Survey Builder</p>
               </div>
+              {survey?.status && <StatusBadge status={survey.status} />}
+            </div>
 
-              {error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {error}
-                </div>
-              ) : null}
+            {/* Action buttons */}
+            <div className="flex shrink-0 items-center gap-2">
+              <GhostBtn onClick={() => navigate(`/surveys/${surveyId}/responses`)} className="hidden sm:inline-flex">
+                <FaEye className="h-3.5 w-3.5" />
+                <span>Responses</span>
+              </GhostBtn>
 
-              {successMessage ? (
-                <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                  <FaCheckCircle className="h-4 w-4 shrink-0" />
-                  <span>{successMessage}</span>
-                </div>
-              ) : null}
+              {survey?.status === "published" ? (
+                <>
+                  <GhostBtn onClick={handleCopyLink} disabled={copying}>
+                    <FaCopy className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{copying ? "Copying…" : "Copy Link"}</span>
+                  </GhostBtn>
+                  <button
+                    type="button"
+                    onClick={handleCloseSurvey}
+                    disabled={closingSurvey}
+                    className="inline-flex min-h-[38px] items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-50"
+                  >
+                    <FaLock className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{closingSurvey ? "Closing…" : "Close"}</span>
+                  </button>
+                  <a
+                    href={publicLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                  >
+                    <FaLink className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Open Survey</span>
+                  </a>
+                </>
+              ) : (
+                <>
+                  <DangerBtn onClick={handleDeleteSurvey} disabled={deletingSurvey} className="hidden sm:inline-flex">
+                    <FaTrash className="h-3.5 w-3.5" />
+                    <span>{deletingSurvey ? "Deleting…" : "Delete"}</span>
+                  </DangerBtn>
+                  <PrimaryBtn onClick={handlePublishSurvey} disabled={publishing}>
+                    <FaRocket className="h-3.5 w-3.5" />
+                    <span>{publishing ? "Publishing…" : "Publish"}</span>
+                  </PrimaryBtn>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
 
-              <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-                <div className="space-y-4">
-                  {/* Survey Branding Section */}
-                  <div className="brand-card p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
-                          <FaPalette className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="truncate text-lg font-semibold text-slate-900">
-                            Survey Branding
-                          </h3>
-                          <p className="truncate text-sm text-slate-500">
-                            Make the survey feel branded and trustworthy.
-                          </p>
-                        </div>
-                      </div>
+        {/* ── Feedback banners ── */}
+        {(error || successMessage) && (
+          <div className="mx-auto max-w-5xl px-4 pt-4 sm:px-6">
+            {error && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <svg className="mt-0.5 h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                <FaCheckCircle className="h-4 w-4 shrink-0" />
+                {successMessage}
+              </div>
+            )}
+          </div>
+        )}
 
-                      <SectionToggleButton
-                        open={showBrandingPanel}
-                        onClick={() => setShowBrandingPanel((s) => !s)}
-                      />
-                    </div>
+        {/* ── Main content ── */}
+        <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
 
-                    {showBrandingPanel ? (
-                      <div className="mt-4 grid gap-3">
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Survey Title
-                          </label>
-                          <input
-                            value={surveyTitle}
-                            onChange={(e) => setSurveyTitle(e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                            placeholder="Customer Experience Survey"
-                          />
-                        </div>
+            {/* Left column */}
+            <div className="space-y-3">
 
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Survey Description
-                          </label>
-                          <textarea
-                            value={surveyDescription}
-                            onChange={(e) => setSurveyDescription(e.target.value)}
-                            className="min-h-[90px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                            placeholder="Tell respondents what this survey is about."
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Header Text
-                          </label>
-                          <input
-                            value={headerText}
-                            onChange={(e) => setHeaderText(e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                            placeholder="We value your honest feedback."
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Company Logo
-                          </label>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                              <FaImage className="h-4 w-4" />
-                              {logoUploading ? "Uploading..." : "Upload Logo"}
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) =>
-                                  handleLogoUpload(e.target.files?.[0] || null)
-                                }
-                              />
-                            </label>
-
-                            {logoUrl ? (
-                              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-                                <img
-                                  src={logoUrl}
-                                  alt="Survey logo"
-                                  className="h-9 w-auto max-w-[110px] object-contain"
-                                />
-                                <span className="text-xs text-slate-500">
-                                  Ready
-                                </span>
-                              </div>
-                            ) : null}
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleSaveBranding}
-                          disabled={savingBranding}
-                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
-                        >
-                          <FaSave className="h-4 w-4" />
-                          {savingBranding ? "Saving..." : "Save Branding"}
-                        </button>
-                      </div>
-                    ) : null}
+              {/* Branding */}
+              <Accordion
+                icon={<FaPalette className="h-4 w-4" />}
+                iconBg="bg-violet-100"
+                iconColor="text-violet-600"
+                title="Survey Branding"
+                subtitle="Logo, title, header & description"
+                open={showBrandingPanel}
+                onToggle={() => setShowBrandingPanel((s) => !s)}
+              >
+                <div className="space-y-3">
+                  <div>
+                    <Label>Survey Title</Label>
+                    <Input value={surveyTitle} onChange={(e) => setSurveyTitle(e.target.value)} placeholder="e.g. Customer Experience Survey" />
                   </div>
-
-                  {/* AI Survey Generator Section */}
-                  <div className="brand-card p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
-                          <FaHandSparkles className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="truncate text-lg font-semibold text-slate-900">
-                            AI Survey Generator
-                          </h3>
-                          <p className="truncate text-sm text-slate-500">
-                            Generate draft questions from your survey brief.
-                          </p>
-                        </div>
-                      </div>
-
-                      <SectionToggleButton
-                        open={showGeneratorPanel}
-                        onClick={() => setShowGeneratorPanel((s) => !s)}
-                      />
-                    </div>
-
-                    {showGeneratorPanel ? (
-                      <div className="mt-4 space-y-3">
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Brand / Research / Survey Brief
-                          </label>
-                          <textarea
-                            value={brief}
-                            onChange={(e) => setBrief(e.target.value)}
-                            className="min-h-[110px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                            placeholder="Paste your brand brief, audience context, research goals, or product direction..."
-                          />
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleGenerateSurvey}
-                          disabled={generating}
-                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
-                        >
-                          <FaHandSparkles className="h-4 w-4" />
-                          {generating ? "Generating..." : "Generate Draft"}
-                        </button>
-                      </div>
-                    ) : null}
+                  <div>
+                    <Label>Description</Label>
+                    <Textarea value={surveyDescription} onChange={(e) => setSurveyDescription(e.target.value)} placeholder="What this survey is about…" rows={3} />
                   </div>
-
-                  {/* Add Question Manually Section */}
-                  <div className="brand-card p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
-                          <FaMicrophoneAlt className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="truncate text-lg font-semibold text-slate-900">
-                            Add Question Manually
-                          </h3>
-                          <p className="truncate text-sm text-slate-500">
-                            Create one question at a time.
-                          </p>
-                        </div>
-                      </div>
-
-                      <SectionToggleButton
-                        open={showAddQuestionPanel}
-                        onClick={() => setShowAddQuestionPanel((s) => !s)}
-                      />
-                    </div>
-
-                    {showAddQuestionPanel ? (
-                      <form
-                        onSubmit={handleAddQuestion}
-                        className="mt-4 grid gap-3"
-                      >
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Question Prompt
-                          </label>
-                          <textarea
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            className="min-h-[96px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                            placeholder="What would you like respondents to answer by voice?"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                            Max Duration (seconds)
-                          </label>
-                          <input
-                            type="number"
-                            min="10"
-                            max="600"
-                            value={maxDuration}
-                            onChange={(e) => setMaxDuration(e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                          />
-                        </div>
-
-                        <button
-                          type="submit"
-                          disabled={saving}
-                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-fit"
-                        >
-                          <FaPlus className="h-4 w-4" />
-                          {saving ? "Adding..." : "Add Question"}
-                        </button>
-                      </form>
-                    ) : null}
+                  <div>
+                    <Label>Header Text</Label>
+                    <Input value={headerText} onChange={(e) => setHeaderText(e.target.value)} placeholder="e.g. We value your honest feedback." />
                   </div>
-
-                  {/* Generated Draft Section */}
-                  {generatedDraft ? (
-                    <div className="brand-card p-4 sm:p-5">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900">
-                            Generated Draft
-                          </h3>
-                          <p className="mt-1 text-sm text-slate-500">
-                            Review and add these generated questions.
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleAddGeneratedQuestions}
-                          disabled={addingGenerated || validGeneratedCount === 0}
-                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
-                        >
-                          <FaPlus className="h-4 w-4" />
-                          {addingGenerated ? "Adding..." : "Add All"}
-                        </button>
-                      </div>
-
-                      <div className="mt-3 space-y-3">
-                        {generatedDraft.questions.map((item, index) => (
-                          <div
-                            key={index}
-                            className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-sm font-semibold text-slate-900">
-                                Generated Question {index + 1}
-                              </p>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveGeneratedQuestion(index)
-                                }
-                                className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
-                              >
-                                <FaTrash className="h-3.5 w-3.5" />
-                                Remove
-                              </button>
-                            </div>
-
-                            <div className="mt-3 space-y-3">
-                              <textarea
-                                value={item.prompt}
-                                onChange={(e) =>
-                                  handleGeneratedQuestionChange(
-                                    index,
-                                    "prompt",
-                                    e.target.value,
-                                  )
-                                }
-                                className="min-h-[84px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#4f46e5]"
-                              />
-
-                              <div>
-                                <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                                  Max Duration (seconds)
-                                </label>
-                                <input
-                                  type="number"
-                                  min="10"
-                                  max="600"
-                                  value={item.max_duration_seconds}
-                                  onChange={(e) =>
-                                    handleGeneratedQuestionChange(
-                                      index,
-                                      "max_duration_seconds",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#4f46e5]"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {/* Survey Questions Section */}
-                  <div className="space-y-3 pt-1">
-                    <div className="flex items-center gap-3">
-                      <FaClipboardList className="h-5 w-5 text-[#4f46e5]" />
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        Survey Questions
-                      </h3>
-                    </div>
-
-                    {questions.length === 0 ? (
-                      <div className="brand-card border-dashed border-slate-300 p-8 text-center">
-                        <p className="text-sm text-slate-500">
-                          No questions added yet.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="grid gap-3">
-                        {questions.map((question) => {
-                          const isEditing = editingQuestionId === question.id;
-
-                          return (
-                            <div
-                              key={question.id}
-                              className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md sm:p-5"
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff]">
-                                  <FaMicrophoneAlt className="h-4 w-4 text-[#4f46e5]" />
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                    Question {question.order_index}
-                                  </p>
-
-                                  {isEditing ? (
-                                    <div className="mt-2 space-y-3">
-                                      <textarea
-                                        value={editingPrompt}
-                                        onChange={(e) =>
-                                          setEditingPrompt(e.target.value)
-                                        }
-                                        className="min-h-[100px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                                      />
-
-                                      <input
-                                        type="number"
-                                        min="10"
-                                        max="600"
-                                        value={editingDuration}
-                                        onChange={(e) =>
-                                          setEditingDuration(e.target.value)
-                                        }
-                                        className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
-                                      />
-
-                                      <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleSaveQuestion(question.id)
-                                          }
-                                          disabled={
-                                            updatingQuestionId === question.id
-                                          }
-                                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
-                                        >
-                                          <FaSave className="h-4 w-4" />
-                                          {updatingQuestionId === question.id
-                                            ? "Saving..."
-                                            : "Save"}
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={cancelEditingQuestion}
-                                          className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                                        >
-                                          <FaTimes className="h-4 w-4" />
-                                          Cancel
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <h4 className="mt-1 break-words text-base font-semibold text-slate-900">
-                                        {question.prompt}
-                                      </h4>
-
-                                      <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-                                        <FaClock className="h-4 w-4" />
-                                        <span>
-                                          Max Duration:{" "}
-                                          {question.max_duration_seconds || 0}{" "}
-                                          seconds
-                                        </span>
-                                      </div>
-
-                                      <div className="mt-3 flex flex-wrap gap-2">
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            startEditingQuestion(question)
-                                          }
-                                          className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-                                        >
-                                          <FaEdit className="h-4 w-4" />
-                                          Edit
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleDeleteQuestion(question.id)
-                                          }
-                                          disabled={
-                                            deletingQuestionId === question.id
-                                          }
-                                          className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60 sm:w-auto"
-                                        >
-                                          <FaTrash className="h-4 w-4" />
-                                          {deletingQuestionId === question.id
-                                            ? "Deleting..."
-                                            : "Delete"}
-                                        </button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
-                  <div className="brand-card p-4 sm:p-5">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      Survey Preview
-                    </h3>
-
-                    <div className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-                      {logoUrl ? (
-                        <div className="mb-3 flex justify-center sm:justify-start">
-                          <img
-                            src={logoUrl}
-                            alt="Survey logo preview"
-                            className="h-10 w-auto max-w-[140px] object-contain"
-                          />
-                        </div>
-                      ) : null}
-
-                      <p className="text-sm font-medium text-slate-500">
-                        {surveyTitle || "Survey Title"}
-                      </p>
-
-                      <h4 className="mt-1 text-base font-semibold text-slate-900">
-                        {headerText ||
-                          "Your survey header will appear here."}
-                      </h4>
-
-                      <p className="mt-2 text-sm leading-6 text-slate-600">
-                        {surveyDescription ||
-                          "Your survey description will appear here."}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="brand-card p-4 sm:p-5">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      Survey Summary
-                    </h3>
-
-                    <div className="mt-3 space-y-3 text-sm">
-                      <div>
-                        <p className="text-slate-500">Status</p>
-                        <p className="mt-1 font-medium capitalize text-slate-900">
-                          {survey?.status || "draft"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-slate-500">Total Questions</p>
-                        <p className="mt-1 font-medium text-slate-900">
-                          {questions.length}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-slate-500">
-                          Generated Draft Questions
-                        </p>
-                        <p className="mt-1 font-medium text-slate-900">
-                          {generatedDraft?.questions.length || 0}
-                        </p>
-                      </div>
-
-                      {survey?.status === "published" && (
-                        <div>
-                          <p className="text-slate-500 text-xs">Public Link</p>
-                          <p className="mt-1 break-all font-mono text-xs text-slate-900">
-                            {publicLink}
-                          </p>
+                  <div>
+                    <Label>Logo</Label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                        <FaImage className="h-3.5 w-3.5 text-slate-400" />
+                        {logoUploading ? "Uploading…" : "Upload Logo"}
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e.target.files?.[0] || null)} />
+                      </label>
+                      {logoUrl && (
+                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                          <img src={logoUrl} alt="Logo" className="h-7 w-auto max-w-[100px] object-contain" />
+                          <span className="text-xs text-slate-400">Ready</span>
                         </div>
                       )}
                     </div>
                   </div>
+                  <PrimaryBtn onClick={handleSaveBranding} disabled={savingBranding}>
+                    <FaSave className="h-3.5 w-3.5" />
+                    {savingBranding ? "Saving…" : "Save Branding"}
+                  </PrimaryBtn>
+                </div>
+              </Accordion>
 
-                  <div className="brand-card p-4 sm:p-5">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      Builder Tips
-                    </h3>
+              {/* AI Generator */}
+              <Accordion
+                icon={<FaHandSparkles className="h-4 w-4" />}
+                iconBg="bg-cyan-100"
+                iconColor="text-cyan-600"
+                title="AI Survey Generator"
+                subtitle="Generate questions from your brief"
+                open={showGeneratorPanel}
+                onToggle={() => setShowGeneratorPanel((s) => !s)}
+              >
+                <div className="space-y-3">
+                  <div>
+                    <Label>Brand / Research Brief</Label>
+                    <Textarea
+                      value={brief}
+                      onChange={(e) => setBrief(e.target.value)}
+                      placeholder="Paste your brand brief, audience context, research goals…"
+                      rows={4}
+                    />
+                  </div>
+                  <PrimaryBtn onClick={handleGenerateSurvey} disabled={generating}>
+                    <FaHandSparkles className="h-3.5 w-3.5" />
+                    {generating ? "Generating…" : "Generate Draft"}
+                  </PrimaryBtn>
+                </div>
+              </Accordion>
 
-                    <div className="mt-3 space-y-2 text-sm text-slate-600">
-                      <p className="font-medium">For a stronger survey:</p>
-                      <ul className="list-disc space-y-1.5 pl-5 text-xs">
-                        <li>Add a recognizable logo</li>
-                        <li>Use a clear title</li>
-                        <li>Write a welcoming header</li>
-                        <li>Keep questions simple</li>
-                        <li>Make it trustworthy</li>
-                      </ul>
+              {/* Add Question */}
+              <Accordion
+                icon={<FaPlus className="h-4 w-4" />}
+                iconBg="bg-emerald-100"
+                iconColor="text-emerald-600"
+                title="Add Question"
+                subtitle="Create a question manually"
+                open={showAddQuestionPanel}
+                onToggle={() => setShowAddQuestionPanel((s) => !s)}
+              >
+                <form onSubmit={handleAddQuestion} className="space-y-3">
+                  <div>
+                    <Label>Question Prompt</Label>
+                    <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="What would you like respondents to answer by voice?" rows={3} />
+                  </div>
+                  <div>
+                    <Label>Max Duration (seconds)</Label>
+                    <Input type="number" min="10" max="600" value={maxDuration} onChange={(e) => setMaxDuration(e.target.value)} />
+                  </div>
+                  <PrimaryBtn type="submit" disabled={saving}>
+                    <FaPlus className="h-3.5 w-3.5" />
+                    {saving ? "Adding…" : "Add Question"}
+                  </PrimaryBtn>
+                </form>
+              </Accordion>
+
+              {/* Generated Draft */}
+              {generatedDraft && (
+                <div className="overflow-hidden rounded-2xl border border-indigo-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-between gap-3 border-b border-indigo-100 bg-indigo-50 px-5 py-4">
+                    <div>
+                      <p className="text-sm font-semibold text-indigo-900">Generated Draft</p>
+                      <p className="text-xs text-indigo-500">{validGeneratedCount} question{validGeneratedCount !== 1 ? "s" : ""} ready</p>
                     </div>
+                    <PrimaryBtn onClick={handleAddGeneratedQuestions} disabled={addingGenerated || validGeneratedCount === 0}>
+                      <FaPlus className="h-3.5 w-3.5" />
+                      {addingGenerated ? "Adding…" : "Add All"}
+                    </PrimaryBtn>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {generatedDraft.questions.map((item, index) => (
+                      <div key={index} className="px-5 py-4">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Q{index + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveGeneratedQuestion(index)}
+                            className="text-xs text-slate-400 hover:text-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <Textarea
+                          value={item.prompt}
+                          onChange={(e) => handleGeneratedQuestionChange(index, "prompt", e.target.value)}
+                          rows={2}
+                          className="mb-2"
+                        />
+                        <div className="flex items-center gap-2">
+                          <FaClock className="h-3 w-3 text-slate-400" />
+                          <Input
+                            type="number"
+                            min="10"
+                            max="600"
+                            value={item.max_duration_seconds}
+                            onChange={(e) => handleGeneratedQuestionChange(index, "max_duration_seconds", e.target.value)}
+                            className="w-28"
+                          />
+                          <span className="text-xs text-slate-400">seconds</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              )}
+
+              {/* Questions List */}
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    <FaClipboardList className="h-4 w-4 text-indigo-500" />
+                    Questions
+                    <span className="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                      {questions.length}
+                    </span>
+                  </h2>
+                </div>
+
+                {questions.length === 0 ? (
+                  <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white py-12 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
+                      <FaMicrophoneAlt className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <p className="text-sm font-medium text-slate-500">No questions yet</p>
+                    <p className="mt-1 text-xs text-slate-400">Add questions above or generate with AI.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {questions.map((question) => {
+                      const isEditing = editingQuestionId === question.id;
+                      return (
+                        <div
+                          key={question.id}
+                          className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500">
+                              {question.order_index}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              {isEditing ? (
+                                <div className="space-y-3">
+                                  <Textarea
+                                    value={editingPrompt}
+                                    onChange={(e) => setEditingPrompt(e.target.value)}
+                                    rows={3}
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <FaClock className="h-3 w-3 text-slate-400" />
+                                    <Input
+                                      type="number"
+                                      min="10"
+                                      max="600"
+                                      value={editingDuration}
+                                      onChange={(e) => setEditingDuration(e.target.value)}
+                                      className="w-28"
+                                    />
+                                    <span className="text-xs text-slate-400">seconds</span>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <PrimaryBtn
+                                      onClick={() => handleSaveQuestion(question.id)}
+                                      disabled={updatingQuestionId === question.id}
+                                    >
+                                      <FaSave className="h-3.5 w-3.5" />
+                                      {updatingQuestionId === question.id ? "Saving…" : "Save"}
+                                    </PrimaryBtn>
+                                    <GhostBtn onClick={cancelEditingQuestion}>
+                                      <FaTimes className="h-3.5 w-3.5" />
+                                      Cancel
+                                    </GhostBtn>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-medium leading-relaxed text-slate-900">{question.prompt}</p>
+                                  <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
+                                    <FaClock className="h-3 w-3" />
+                                    {question.max_duration_seconds || 0}s max
+                                  </div>
+                                  <div className="mt-3 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                                    <GhostBtn onClick={() => startEditingQuestion(question)} className="h-8 px-3 text-xs">
+                                      <FaEdit className="h-3 w-3" />
+                                      Edit
+                                    </GhostBtn>
+                                    <DangerBtn
+                                      onClick={() => handleDeleteQuestion(question.id)}
+                                      disabled={deletingQuestionId === question.id}
+                                      className="h-8 px-3 text-xs"
+                                    >
+                                      <FaTrash className="h-3 w-3" />
+                                      {deletingQuestionId === question.id ? "Deleting…" : "Delete"}
+                                    </DangerBtn>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </>
-          )}
+            </div>
+
+            {/* Right sidebar */}
+            <div className="space-y-4 lg:sticky lg:top-20 lg:h-fit">
+
+              {/* Preview */}
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="border-b border-slate-100 px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Preview</p>
+                </div>
+                <div className="p-4">
+                  {logoUrl && (
+                    <img src={logoUrl} alt="Logo" className="mb-3 h-8 w-auto max-w-[120px] object-contain" />
+                  )}
+                  <p className="text-xs font-semibold text-slate-500">{surveyTitle || "Survey Title"}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">
+                    {headerText || "Your header will appear here."}
+                  </p>
+                  <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                    {surveyDescription || "Your description will appear here."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="border-b border-slate-100 px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Summary</p>
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {[
+                    { label: "Status", value: survey?.status || "draft", isStatus: true },
+                    { label: "Questions", value: String(questions.length), isStatus: false },
+                    { label: "Draft Queue", value: String(generatedDraft?.questions.length || 0), isStatus: false },
+                  ].map(({ label, value, isStatus }) => (
+                    <div key={label} className="flex items-center justify-between px-4 py-3">
+                      <span className="text-xs text-slate-500">{label}</span>
+                      {isStatus && survey?.status ? (
+                        <StatusBadge status={survey.status} />
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-900">{value}</span>
+                      )}
+                    </div>
+                  ))}
+                  {survey?.status === "published" && (
+                    <div className="px-4 py-3">
+                      <p className="mb-1 text-xs text-slate-500">Public Link</p>
+                      <p className="break-all font-mono text-xs text-indigo-600">{publicLink}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Builder Tips</p>
+                <ul className="space-y-1.5 text-xs text-slate-500">
+                  {[
+                    "Add a recognizable logo",
+                    "Use a clear, descriptive title",
+                    "Write a welcoming header",
+                    "Keep questions concise",
+                    "Publish when ready",
+                  ].map((tip) => (
+                    <li key={tip} className="flex items-center gap-2">
+                      <span className="h-1 w-1 shrink-0 rounded-full bg-slate-300" />
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Mobile-only delete (for draft surveys) */}
+              {survey?.status !== "published" && (
+                <DangerBtn onClick={handleDeleteSurvey} disabled={deletingSurvey} className="w-full sm:hidden">
+                  <FaTrash className="h-3.5 w-3.5" />
+                  {deletingSurvey ? "Deleting…" : "Delete Survey"}
+                </DangerBtn>
+              )}
+
+              {/* Mobile-only responses */}
+              <GhostBtn onClick={() => navigate(`/surveys/${surveyId}/responses`)} className="w-full sm:hidden">
+                <FaEye className="h-3.5 w-3.5" />
+                View Responses
+              </GhostBtn>
+            </div>
+          </div>
         </div>
       </div>
     </DashboardShell>
