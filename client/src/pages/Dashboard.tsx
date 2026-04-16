@@ -120,7 +120,7 @@ export default function Dashboard() {
   const insightMessage = useMemo(() => {
     if (metrics.totalSurveys === 0) {
       return {
-        title: "You’re ready to launch your first survey",
+        title: "You're ready to launch your first survey",
         text: "Create your first voice survey and start collecting real spoken feedback from your audience.",
       };
     }
@@ -135,7 +135,7 @@ export default function Dashboard() {
     if (metrics.totalResponses === 0) {
       return {
         title: "Your survey is live",
-        text: "Now it’s time to share it and collect your first set of responses.",
+        text: "Now it's time to share it and collect your first set of responses.",
       };
     }
 
@@ -202,21 +202,17 @@ export default function Dashboard() {
   return (
     <DashboardShell>
       <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
-        <PageHeader
-          title="Dashboard"
-          subtitle="A clear view of your workspace progress and next actions"
-          actions={
-            <Button
-              onClick={() => navigate("/surveys/create")}
-              trailingIcon={<FaArrowRight className="h-4 w-4" />}
-            >
-              Create survey
-            </Button>
-          }
-        />
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+            Dashboard
+          </h1>
+          <p className="text-sm text-slate-500">
+            A clear view of your Survica workspace, progress, and next steps.
+          </p>
+        </div>
 
         {loading ? (
-          <Card className="p-5 sm:p-6">
+          <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading dashboard...</p>
           </Card>
         ) : loadError ? (
@@ -226,7 +222,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
-              <Card className="relative overflow-hidden bg-gradient-to-br from-white via-white to-slate-50 p-5 sm:p-6 lg:p-7">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
                 <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
 
@@ -248,8 +244,7 @@ export default function Dashboard() {
                   <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                     <Button
                       onClick={() => navigate("/surveys/create")}
-                      className="w-full sm:w-auto"
-                      trailingIcon={<FaArrowRight className="h-4 w-4" />}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#4338ca] sm:w-auto"
                     >
                       Create survey
                     </Button>
@@ -265,7 +260,7 @@ export default function Dashboard() {
                 </div>
               </Card>
 
-              <Card className="p-5 sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-amber-50 p-3 text-amber-600">
                     <FaBolt className="h-5 w-5" />
@@ -275,7 +270,7 @@ export default function Dashboard() {
                       Workspace progress
                     </h2>
                     <p className="text-sm text-slate-500">
-                      What’s been completed so far
+                      What's been completed so far
                     </p>
                   </div>
                 </div>
@@ -340,7 +335,7 @@ export default function Dashboard() {
               {metricCards.map((card) => (
                 <Card
                   key={card.label}
-                  className="rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
+                  className="brand-card rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className={`rounded-2xl p-3 ${card.tone}`}>
@@ -360,7 +355,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <Card className="p-5 sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
                   Workspace overview
                 </h2>
@@ -411,7 +406,7 @@ export default function Dashboard() {
                 </div>
               </Card>
 
-              <Card className="p-5 sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
                   Quick access
                 </h2>
@@ -422,7 +417,7 @@ export default function Dashboard() {
                 <div className="mt-5 grid gap-3">
                   <button
                     onClick={() => navigate("/surveys/create")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -437,7 +432,7 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => navigate("/surveys")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -452,7 +447,7 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => navigate("/profile")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">

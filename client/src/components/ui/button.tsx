@@ -12,10 +12,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   trailingIcon?: ReactNode;
 };
 
-const sizeClasses: Record<ButtonSize, string> = {
-  sm: "min-h-9 px-3 text-xs",
-  md: "min-h-11 px-4 text-sm",
-  lg: "min-h-12 px-5 text-sm",
+const baseClasses =
+  "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:cursor-not-allowed disabled:opacity-60";
+
+const variantClasses = {
+  default: "bg-indigo-600 text-white hover:bg-indigo-700",
+  outline:
+    "border border-slate-300 bg-transparent text-slate-800 hover:bg-slate-50",
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
