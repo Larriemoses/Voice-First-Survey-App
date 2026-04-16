@@ -12,6 +12,10 @@ import {
 } from "react-icons/fa";
 
 import DashboardShell from "../components/DashboardShell";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { PageHeader } from "../components/ui/page-header";
 import { getMyOrganizationMembership } from "../lib/organization";
 import { supabase } from "../lib/supabase";
 
@@ -141,20 +145,23 @@ export default function Dashboard() {
     };
   }, [metrics]);
 
-  const progressItems = [
-    {
-      label: "Create survey",
-      done: metrics.totalSurveys > 0,
-    },
-    {
-      label: "Publish survey",
-      done: metrics.publishedSurveys > 0,
-    },
-    {
-      label: "Collect responses",
-      done: metrics.totalResponses > 0,
-    },
-  ];
+  const progressItems = useMemo(
+    () => [
+      {
+        label: "Create survey",
+        done: metrics.totalSurveys > 0,
+      },
+      {
+        label: "Publish survey",
+        done: metrics.publishedSurveys > 0,
+      },
+      {
+        label: "Collect responses",
+        done: metrics.totalResponses > 0,
+      },
+    ],
+    [metrics.totalSurveys, metrics.publishedSurveys, metrics.totalResponses],
+  );
 
   const completionPercent = useMemo(() => {
     const completed = progressItems.filter((item) => item.done).length;
@@ -207,7 +214,7 @@ export default function Dashboard() {
         {loading ? (
           <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading dashboard...</p>
-          </div>
+          </Card>
         ) : loadError ? (
           <div className="rounded-3xl border border-red-200 bg-red-50 p-5 sm:p-6">
             <p className="text-sm text-red-600">{loadError}</p>
@@ -235,23 +242,23 @@ export default function Dashboard() {
                   </div>
 
                   <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                    <button
+                    <Button
                       onClick={() => navigate("/surveys/create")}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#4338ca] sm:w-auto"
                     >
-                      Create Survey
-                      <FaArrowRight className="h-4 w-4" />
-                    </button>
+                      Create survey
+                    </Button>
 
-                    <button
+                    <Button
                       onClick={() => navigate("/surveys")}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+                      variant="secondary"
+                      className="w-full sm:w-auto"
                     >
-                      View Surveys
-                    </button>
+                      View surveys
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </Card>
 
               <div className="brand-card p-5 sm:p-6">
                 <div className="flex items-center gap-3">
@@ -307,15 +314,9 @@ export default function Dashboard() {
                         </span>
                       </div>
 
-                      <span
-                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          item.done
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
+                      <Badge variant={item.done ? "success" : "default"}>
                         {item.done ? "Done" : "Pending"}
-                      </span>
+                      </Badge>
                     </div>
                   ))}
                 </div>
@@ -327,12 +328,12 @@ export default function Dashboard() {
                   Continue setup
                   <FaArrowRight className="h-3.5 w-3.5" />
                 </button>
-              </div>
+              </Card>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {metricCards.map((card) => (
-                <div
+                <Card
                   key={card.label}
                   className="brand-card rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
                 >
@@ -349,7 +350,7 @@ export default function Dashboard() {
                     {card.value}
                   </h3>
                   <p className="mt-1 text-xs text-slate-500">{card.note}</p>
-                </div>
+                </Card>
               ))}
             </div>
 
@@ -403,7 +404,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
 
               <div className="brand-card p-5 sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
@@ -459,7 +460,7 @@ export default function Dashboard() {
                     <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
                   </button>
                 </div>
-              </div>
+              </Card>
             </div>
           </>
         )}

@@ -7,6 +7,11 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { EmptyState } from "../components/ui/empty-state";
+import { PageHeader } from "../components/ui/page-header";
 import { getMySurveys } from "../lib/surveys";
 
 type Survey = {
@@ -100,7 +105,7 @@ export default function Surveys() {
               <p className="mt-2 text-2xl font-semibold text-slate-900">
                 {summary.total}
               </p>
-            </div>
+            </Card>
 
             <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -109,7 +114,7 @@ export default function Surveys() {
               <p className="mt-2 text-2xl font-semibold text-slate-900">
                 {summary.published}
               </p>
-            </div>
+            </Card>
 
             <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -118,7 +123,7 @@ export default function Surveys() {
               <p className="mt-2 text-2xl font-semibold text-slate-900">
                 {summary.drafts}
               </p>
-            </div>
+            </Card>
 
             <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -127,14 +132,14 @@ export default function Surveys() {
               <p className="mt-2 text-2xl font-semibold text-slate-900">
                 {summary.closed}
               </p>
-            </div>
+            </Card>
           </div>
         ) : null}
 
         {loading ? (
           <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading surveys...</p>
-          </div>
+          </Card>
         ) : surveys.length === 0 ? (
           <div className="brand-card border-dashed border-slate-300 p-6 text-center sm:p-10">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
@@ -153,15 +158,17 @@ export default function Surveys() {
               type="button"
               className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#4338ca] sm:w-auto"
             >
-              <FaPlus className="h-4 w-4" />
               Create your first survey
-            </button>
-          </div>
+              </Button>
+            }
+          />
         ) : (
           <div className="grid gap-4">
             {surveys.map((survey) => (
-              <button
+              <Card
                 key={survey.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => navigate(`/surveys/${survey.id}`)}
                 type="button"
                 className="group rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md sm:p-5 lg:p-6"
@@ -173,12 +180,12 @@ export default function Surveys() {
                         {survey.title}
                       </h3>
 
-                      <span
-                        className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusClasses(
-                          survey.status,
-                        )}`}
-                      >
+                      <span className="inline-flex">
+                        <Badge
+                          className={`${getStatusClasses(survey.status)} capitalize`}
+                        >
                         {survey.status}
+                        </Badge>
                       </span>
                     </div>
 
@@ -201,7 +208,7 @@ export default function Surveys() {
                     </div>
                   </div>
                 </div>
-              </button>
+              </Card>
             ))}
           </div>
         )}

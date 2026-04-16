@@ -9,7 +9,6 @@ import {
 } from "react-icons/fa";
 import { getPublicSurveyById, getPublicSurveyQuestions } from "../lib/surveys";
 import { createRespondent } from "../lib/respondents";
-import PageMeta from "../components/PageMeta";
 
 type Survey = {
   id: string;
@@ -47,7 +46,7 @@ export default function PublicSurvey() {
         setError("");
 
         if (!surveyId) {
-          setError("Survey link is invalid.");
+          setError("Your survey link looks invalid — try opening it again");
           return;
         }
 
@@ -57,7 +56,7 @@ export default function PublicSurvey() {
         ]);
 
         if (!surveyData) {
-          setError("Survey not found or not available.");
+          setError("This survey isn’t available right now");
           return;
         }
 
@@ -65,7 +64,7 @@ export default function PublicSurvey() {
         setQuestions(questionData);
       } catch (err) {
         console.error("Public survey load error:", err);
-        setError("Failed to load this survey.");
+        setError("We couldn’t load this survey — please refresh and try again");
       } finally {
         setLoading(false);
       }
@@ -98,7 +97,11 @@ export default function PublicSurvey() {
       navigate(`/take-survey/${surveyId}/respond/${respondent.id}`);
     } catch (err) {
       console.error("Create respondent error:", err);
-      setError(err instanceof Error ? err.message : "Failed to start survey.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "We couldn’t start the survey — please try again",
+      );
     } finally {
       setStarting(false);
     }
@@ -149,10 +152,7 @@ export default function PublicSurvey() {
     <>
       <PageMeta
         title={survey?.title || "Survey"}
-        description={
-          survey?.description ||
-          "You have been invited to respond to this survey."
-        }
+        description={survey?.description || "You’ve been invited to share feedback"}
       />
 
       <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-8">
@@ -240,6 +240,7 @@ export default function PublicSurvey() {
                 Enter your details to start this survey.
               </p>
             </div>
+          </Card>
 
             <form onSubmit={handleStartSurvey} className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-2">
