@@ -31,6 +31,13 @@ export default function AudioRecorder({
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");
 
+  function cleanupStream() {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }
+
   useEffect(() => {
     return () => {
       cleanupStream();
@@ -44,13 +51,6 @@ export default function AudioRecorder({
       }
     };
   }, [audioUrl]);
-
-  function cleanupStream() {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-  }
 
   function clearTimer() {
     if (timerRef.current) {
@@ -236,7 +236,7 @@ export default function AudioRecorder({
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
           <div
             className={`h-full rounded-full transition-all duration-300 ${
-              isRecording ? "bg-rose-600" : "bg-[#0B4EA2]"
+              isRecording ? "bg-rose-600" : "bg-[#4f46e5]"
             }`}
             style={{ width: `${progress}%` }}
           />

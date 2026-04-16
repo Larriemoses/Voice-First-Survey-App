@@ -9,7 +9,7 @@ type AuthCardProps = {
 
 export default function AuthCard({ title, subtitle, children }: AuthCardProps) {
   return (
-    <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.18)]">
+    <div className="brand-card w-full max-w-md p-8">
       <div className="mb-8 space-y-5">
         <AppLogo />
         <div>

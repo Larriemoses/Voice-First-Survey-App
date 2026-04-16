@@ -13,9 +13,10 @@ export default function AppLogo({ collapsed = false }: AppLogoProps) {
 
       {!collapsed && (
         <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold text-slate-900">
+          <h1 className="truncate text-base font-semibold tracking-tight text-slate-900">
             Survica
           </h1>
+          <p className="truncate text-xs text-slate-500">Voice Intelligence</p>
         </div>
       )}
     </div>
