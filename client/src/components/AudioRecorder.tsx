@@ -31,6 +31,13 @@ export default function AudioRecorder({
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");
 
+  function cleanupStream() {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }
+
   useEffect(() => {
     return () => {
       cleanupStream();
@@ -44,13 +51,6 @@ export default function AudioRecorder({
       }
     };
   }, [audioUrl]);
-
-  function cleanupStream() {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-  }
 
   function clearTimer() {
     if (timerRef.current) {

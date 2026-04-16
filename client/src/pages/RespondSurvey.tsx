@@ -182,7 +182,7 @@ export default function RespondSurvey() {
       />
 
       <div className="min-h-screen bg-white">
-        <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-28 pt-5 sm:px-6 sm:pb-32 sm:pt-6">
+        <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-5 pb-28 pt-6 sm:px-8 sm:pb-32 sm:pt-8">
           {/* Top section */}
           <div className="space-y-4">
             {survey.logo_url ? (
@@ -226,7 +226,7 @@ export default function RespondSurvey() {
 
           {/* Main content */}
           <div className="flex flex-1 items-center py-6 sm:py-8">
-            <div className="w-full rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <div className="brand-card w-full p-4 sm:p-6">
               <div className="mb-5 flex items-center justify-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ecfeff]">
                   <FaMicrophoneAlt className="h-5 w-5 text-[#0891b2]" />
@@ -263,7 +263,7 @@ export default function RespondSurvey() {
 
         {/* Bottom action bar */}
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-4 sm:flex-row sm:justify-between sm:px-6">
+          <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 px-5 py-4 sm:flex-row sm:justify-between sm:px-8">
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0 || saving}

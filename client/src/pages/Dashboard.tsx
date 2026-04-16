@@ -194,7 +194,7 @@ export default function Dashboard() {
 
   return (
     <DashboardShell>
-      <div className="space-y-5 sm:space-y-6">
+      <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
             Dashboard
@@ -205,7 +205,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading dashboard...</p>
           </div>
         ) : loadError ? (
@@ -215,6 +215,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+              <div className="brand-card relative overflow-hidden bg-gradient-to-br from-white via-white to-slate-50 p-5 sm:p-6 lg:p-7">
               <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
                 <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
@@ -253,7 +254,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-amber-50 p-3 text-amber-600">
                     <FaBolt className="h-5 w-5" />
@@ -334,7 +335,7 @@ export default function Dashboard() {
               {metricCards.map((card) => (
                 <div
                   key={card.label}
-                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
+                  className="brand-card rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className={`rounded-2xl p-3 ${card.tone}`}>
@@ -354,7 +355,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
                   Workspace overview
                 </h2>
@@ -405,7 +406,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="brand-card p-5 sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
                   Quick access
                 </h2>

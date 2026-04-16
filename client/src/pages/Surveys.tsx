@@ -63,7 +63,7 @@ export default function Surveys() {
 
   return (
     <DashboardShell>
-      <div className="space-y-4 sm:space-y-5 lg:space-y-6">
+      <div className="mx-auto w-full max-w-7xl space-y-4 sm:space-y-5 lg:space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
@@ -93,7 +93,7 @@ export default function Surveys() {
 
         {!loading && surveys.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Total
               </p>
@@ -102,7 +102,7 @@ export default function Surveys() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Published
               </p>
@@ -111,7 +111,7 @@ export default function Surveys() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Drafts
               </p>
@@ -120,7 +120,7 @@ export default function Surveys() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="brand-card rounded-2xl p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Closed
               </p>
@@ -132,11 +132,11 @@ export default function Surveys() {
         ) : null}
 
         {loading ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="brand-card p-5 sm:p-6">
             <p className="text-sm text-slate-500">Loading surveys...</p>
           </div>
         ) : surveys.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-6 text-center shadow-sm sm:p-10">
+          <div className="brand-card border-dashed border-slate-300 p-6 text-center sm:p-10">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
               <FaClipboardList className="h-6 w-6" />
             </div>
