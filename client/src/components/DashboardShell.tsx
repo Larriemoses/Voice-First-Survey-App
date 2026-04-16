@@ -12,19 +12,27 @@ export default function DashboardShell({ children }: Props) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
-    function handleResize() {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
+    let rafId = 0;
 
-      if (!mobile) {
-        setMobileSidebarOpen(false);
-      }
+    function handleResize() {
+      cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(() => {
+        const mobile = window.innerWidth < 1024;
+        setIsMobile(mobile);
+
+        if (!mobile) {
+          setMobileSidebarOpen(false);
+        }
+      });
     }
 
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export default function DashboardShell({ children }: Props) {
       : "lg:pl-72";
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen text-slate-900">
       <Navbar
         isMobile={isMobile}
         desktopCollapsed={desktopCollapsed}
@@ -77,7 +85,7 @@ export default function DashboardShell({ children }: Props) {
           type="button"
           aria-label="Close sidebar overlay"
           onClick={closeMobileSidebar}
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
+          className="fixed inset-0 z-40 bg-slate-900/35 backdrop-blur-sm"
         />
       ) : null}
 
@@ -87,7 +95,7 @@ export default function DashboardShell({ children }: Props) {
           desktopPadding,
         ].join(" ")}
       >
-        <div className="mx-auto w-full max-w-[1600px] px-3 py-4 sm:px-4 sm:py-5 md:px-6 lg:px-8 lg:py-8">
+        <div className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           <div className="w-full min-w-0">{children}</div>
         </div>
       </main>

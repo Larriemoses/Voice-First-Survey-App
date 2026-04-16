@@ -86,7 +86,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center px-4 py-8">
       <AuthCard
         title="Welcome back"
         subtitle="Sign in to manage your organization surveys."
@@ -95,7 +95,7 @@ export default function Login() {
           <button
             onClick={handleGoogle}
             type="button"
-            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="brand-btn-secondary w-full cursor-pointer py-3 text-slate-700"
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -107,21 +107,21 @@ export default function Login() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-400">or</span>
+              <span className="bg-white px-3 text-slate-400">or</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Email
               </label>
               <input
                 type="email"
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-900"
+                className="brand-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
@@ -130,12 +130,12 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Password
               </label>
               <input
                 type="password"
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-gray-900"
+                className="brand-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
@@ -158,15 +158,15 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-xl bg-gray-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
+              className="brand-btn-primary w-full cursor-pointer py-3"
             >
               {loading ? "Signing in..." : "Login"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-slate-500">
             Don’t have an account?{" "}
-            <Link to="/signup" className="font-medium text-gray-900">
+            <Link to="/signup" className="font-medium text-indigo-700">
               Sign up
             </Link>
           </p>

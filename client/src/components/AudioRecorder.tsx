@@ -236,7 +236,7 @@ export default function AudioRecorder({
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
           <div
             className={`h-full rounded-full transition-all duration-300 ${
-              isRecording ? "bg-rose-600" : "bg-[#0B4EA2]"
+              isRecording ? "bg-rose-600" : "bg-[#4f46e5]"
             }`}
             style={{ width: `${progress}%` }}
           />
