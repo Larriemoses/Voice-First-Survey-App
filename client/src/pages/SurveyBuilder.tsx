@@ -555,7 +555,7 @@ export default function SurveyBuilder() {
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                  <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
                     <FaClipboardList className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
@@ -605,7 +605,7 @@ export default function SurveyBuilder() {
                       href={publicLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81]"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca]"
                     >
                       <FaLink className="h-4 w-4" />
                       Open Public Survey
@@ -616,7 +616,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handlePublishSurvey}
                       disabled={publishing}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                       type="button"
                     >
                       <FaRocket className="h-4 w-4" />
@@ -655,7 +655,7 @@ export default function SurveyBuilder() {
                 <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="rounded-2xl bg-[#EAF2FF] p-3 text-[#0B4EA2]">
+                      <div className="rounded-2xl bg-[#eef2ff] p-3 text-[#4f46e5]">
                         <FaPalette className="h-5 w-5" />
                       </div>
                       <div className="min-w-0">
@@ -683,7 +683,7 @@ export default function SurveyBuilder() {
                         <input
                           value={surveyTitle}
                           onChange={(e) => setSurveyTitle(e.target.value)}
-                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                           placeholder="Customer Experience Survey"
                         />
                       </div>
@@ -695,7 +695,7 @@ export default function SurveyBuilder() {
                         <textarea
                           value={surveyDescription}
                           onChange={(e) => setSurveyDescription(e.target.value)}
-                          className="min-h-[90px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="min-h-[90px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                           placeholder="Tell respondents what this survey is about."
                         />
                       </div>
@@ -707,7 +707,7 @@ export default function SurveyBuilder() {
                         <input
                           value={headerText}
                           onChange={(e) => setHeaderText(e.target.value)}
-                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                           placeholder="We value your honest feedback."
                         />
                       </div>
@@ -761,7 +761,7 @@ export default function SurveyBuilder() {
                 <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                      <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
                         <FaHandSparkles className="h-5 w-5" />
                       </div>
                       <div className="min-w-0">
@@ -789,7 +789,7 @@ export default function SurveyBuilder() {
                         <textarea
                           value={brief}
                           onChange={(e) => setBrief(e.target.value)}
-                          className="min-h-[110px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="min-h-[110px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                           placeholder="Paste your brand brief, audience context, research goals, or product direction..."
                         />
                       </div>
@@ -810,7 +810,7 @@ export default function SurveyBuilder() {
                 <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="rounded-2xl bg-[#FFF1E7] p-3 text-[#F56A00]">
+                      <div className="rounded-2xl bg-[#ecfeff] p-3 text-[#0891b2]">
                         <FaMicrophoneAlt className="h-5 w-5" />
                       </div>
                       <div className="min-w-0">
@@ -841,7 +841,7 @@ export default function SurveyBuilder() {
                         <textarea
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
-                          className="min-h-[96px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="min-h-[96px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                           placeholder="What would you like respondents to answer by voice?"
                         />
                       </div>
@@ -856,7 +856,7 @@ export default function SurveyBuilder() {
                           max="600"
                           value={maxDuration}
                           onChange={(e) => setMaxDuration(e.target.value)}
-                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                         />
                       </div>
 
@@ -888,7 +888,7 @@ export default function SurveyBuilder() {
                         type="button"
                         onClick={handleAddGeneratedQuestions}
                         disabled={addingGenerated || validGeneratedCount === 0}
-                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                       >
                         <FaPlus className="h-4 w-4" />
                         {addingGenerated ? "Adding..." : "Add All"}
@@ -928,7 +928,7 @@ export default function SurveyBuilder() {
                                   e.target.value,
                                 )
                               }
-                              className="min-h-[84px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0B4EA2]"
+                              className="min-h-[84px] w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#4f46e5]"
                             />
 
                             <div>
@@ -947,7 +947,7 @@ export default function SurveyBuilder() {
                                     e.target.value,
                                   )
                                 }
-                                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#4f46e5]"
                               />
                             </div>
                           </div>
@@ -959,7 +959,7 @@ export default function SurveyBuilder() {
 
                 <div className="space-y-3 pt-1">
                   <div className="flex items-center gap-3">
-                    <FaClipboardList className="h-5 w-5 text-[#0B4EA2]" />
+                    <FaClipboardList className="h-5 w-5 text-[#4f46e5]" />
                     <h3 className="text-lg font-semibold text-slate-900">
                       Survey Questions
                     </h3>
@@ -979,11 +979,11 @@ export default function SurveyBuilder() {
                         return (
                           <div
                             key={question.id}
-                            className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#0B4EA2]/20 hover:shadow-md"
+                            className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md"
                           >
                             <div className="flex items-start gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                                <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff]">
+                                <FaMicrophoneAlt className="h-4 w-4 text-[#4f46e5]" />
                               </div>
 
                               <div className="min-w-0 flex-1">
@@ -998,7 +998,7 @@ export default function SurveyBuilder() {
                                       onChange={(e) =>
                                         setEditingPrompt(e.target.value)
                                       }
-                                      className="min-h-[100px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                      className="min-h-[100px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                                     />
 
                                     <input
@@ -1009,7 +1009,7 @@ export default function SurveyBuilder() {
                                       onChange={(e) =>
                                         setEditingDuration(e.target.value)
                                       }
-                                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#0B4EA2]"
+                                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-[#4f46e5]"
                                     />
 
                                     <div className="flex flex-wrap gap-2">
@@ -1021,7 +1021,7 @@ export default function SurveyBuilder() {
                                         disabled={
                                           updatingQuestionId === question.id
                                         }
-                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                                       >
                                         <FaSave className="h-4 w-4" />
                                         {updatingQuestionId === question.id

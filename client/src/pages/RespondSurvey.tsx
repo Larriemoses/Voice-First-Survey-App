@@ -202,7 +202,7 @@ export default function RespondSurvey() {
 
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
                 <div
-                  className="h-full rounded-full bg-[#0B4EA2] transition-all duration-300"
+                  className="h-full rounded-full bg-[#4f46e5] transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -228,8 +228,8 @@ export default function RespondSurvey() {
           <div className="flex flex-1 items-center py-6 sm:py-8">
             <div className="w-full rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
               <div className="mb-5 flex items-center justify-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF1E7]">
-                  <FaMicrophoneAlt className="h-5 w-5 text-[#F56A00]" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ecfeff]">
+                  <FaMicrophoneAlt className="h-5 w-5 text-[#0891b2]" />
                 </div>
               </div>
 
@@ -275,7 +275,7 @@ export default function RespondSurvey() {
             <button
               onClick={handleNext}
               disabled={!canProceed || saving}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-[#0B4EA2] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving
                 ? "Saving..."

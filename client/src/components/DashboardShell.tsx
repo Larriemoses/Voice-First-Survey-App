@@ -58,7 +58,7 @@ export default function DashboardShell({ children }: Props) {
       : "lg:pl-72";
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen text-slate-900">
       <Navbar
         isMobile={isMobile}
         desktopCollapsed={desktopCollapsed}
@@ -77,7 +77,7 @@ export default function DashboardShell({ children }: Props) {
           type="button"
           aria-label="Close sidebar overlay"
           onClick={closeMobileSidebar}
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px]"
+          className="fixed inset-0 z-40 bg-slate-900/35 backdrop-blur-sm"
         />
       ) : null}
 

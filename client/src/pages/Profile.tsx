@@ -23,41 +23,41 @@ export default function Profile() {
     <DashboardShell>
       <div className="max-w-2xl space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">
+          <h2 className="text-2xl font-semibold text-slate-900">
             Profile Settings
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-slate-500">
             Manage your account details and preferences.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="brand-card p-6">
           <div className="grid gap-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Full name
               </label>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+                className="brand-input"
                 placeholder="Your full name"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Email
               </label>
               <input
                 value={email}
                 readOnly
-                className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 outline-none"
+                className="w-full rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 outline-none"
                 placeholder="you@company.com"
               />
             </div>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
               Email is managed by your authentication provider.
             </p>
           </div>

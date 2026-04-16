@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children }: Props) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500">
+      <div className="flex min-h-screen items-center justify-center text-sm text-slate-500">
         Loading...
       </div>
     );

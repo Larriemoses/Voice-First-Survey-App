@@ -136,7 +136,7 @@ export default function PublicSurvey() {
       <div className="min-h-screen bg-white px-3 py-4 sm:px-5 sm:py-6">
         <div className="mx-auto max-w-xl space-y-3 sm:space-y-4">
           <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-            <div className="bg-gradient-to-br from-slate-50 via-white to-[#EAF2FF]/30 px-4 py-5 sm:px-5 sm:py-6">
+            <div className="bg-gradient-to-br from-slate-50 via-white to-[#eef2ff]/30 px-4 py-5 sm:px-5 sm:py-6">
               {survey?.logo_url ? (
                 <div className="mb-3 flex justify-center sm:justify-start">
                   <img
@@ -148,8 +148,8 @@ export default function PublicSurvey() {
               ) : null}
 
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EAF2FF]">
-                  <FaMicrophoneAlt className="h-4 w-4 text-[#0B4EA2]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff]">
+                  <FaMicrophoneAlt className="h-4 w-4 text-[#4f46e5]" />
                 </div>
 
                 <div className="min-w-0">
@@ -192,7 +192,7 @@ export default function PublicSurvey() {
                     Language
                   </p>
                   <div className="mt-1 flex items-center gap-1.5 text-base font-semibold text-slate-900">
-                    <FaGlobe className="h-3 w-3 text-[#F56A00]" />
+                    <FaGlobe className="h-3 w-3 text-[#0891b2]" />
                     Any
                   </div>
                 </div>
@@ -218,7 +218,7 @@ export default function PublicSurvey() {
                 <input
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#4f46e5]"
                   placeholder="Your name"
                 />
               </div>
@@ -230,7 +230,7 @@ export default function PublicSurvey() {
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#4f46e5]"
                   placeholder="you@example.com"
                   type="email"
                 />
@@ -243,7 +243,7 @@ export default function PublicSurvey() {
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#0B4EA2]"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#4f46e5]"
                   placeholder="+234..."
                 />
               </div>
@@ -258,7 +258,7 @@ export default function PublicSurvey() {
                 <button
                   type="submit"
                   disabled={starting || !survey}
-                  className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl bg-[#0B4EA2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#093E81] disabled:opacity-60"
+                  className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                 >
                   <FaArrowRight className="h-4 w-4" />
                   {starting ? "Starting..." : "Start Survey"}
