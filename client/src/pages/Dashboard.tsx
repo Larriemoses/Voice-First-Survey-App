@@ -116,7 +116,7 @@ export default function Dashboard() {
   const insightMessage = useMemo(() => {
     if (metrics.totalSurveys === 0) {
       return {
-        title: "You’re ready to launch your first survey",
+        title: "You're ready to launch your first survey",
         text: "Create your first voice survey and start collecting real spoken feedback from your audience.",
       };
     }
@@ -131,7 +131,7 @@ export default function Dashboard() {
     if (metrics.totalResponses === 0) {
       return {
         title: "Your survey is live",
-        text: "Now it’s time to share it and collect your first set of responses.",
+        text: "Now it's time to share it and collect your first set of responses.",
       };
     }
 
@@ -215,7 +215,6 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
-              <div className="brand-card relative overflow-hidden bg-gradient-to-br from-white via-white to-slate-50 p-5 sm:p-6 lg:p-7">
               <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
                 <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
@@ -264,7 +263,7 @@ export default function Dashboard() {
                       Workspace progress
                     </h2>
                     <p className="text-sm text-slate-500">
-                      What’s been completed so far
+                      What's been completed so far
                     </p>
                   </div>
                 </div>
@@ -417,7 +416,7 @@ export default function Dashboard() {
                 <div className="mt-5 grid gap-3">
                   <button
                     onClick={() => navigate("/surveys/create")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -432,7 +431,7 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => navigate("/surveys")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
@@ -447,7 +446,7 @@ export default function Dashboard() {
 
                   <button
                     onClick={() => navigate("/profile")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/40"
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-900">
