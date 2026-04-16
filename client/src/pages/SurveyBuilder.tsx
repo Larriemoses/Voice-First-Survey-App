@@ -1041,7 +1041,7 @@ export default function SurveyBuilder() {
                                   </div>
                                 ) : (
                                   <>
-                                    <h4 className="mt-1 text-base font-semibold text-slate-900">
+                                    <h4 className="mt-1 break-words text-base font-semibold text-slate-900">
                                       {question.prompt}
                                     </h4>
 
@@ -1060,7 +1060,7 @@ export default function SurveyBuilder() {
                                         onClick={() =>
                                           startEditingQuestion(question)
                                         }
-                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                        className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
                                       >
                                         <FaEdit className="h-4 w-4" />
                                         Edit
@@ -1074,7 +1074,7 @@ export default function SurveyBuilder() {
                                         disabled={
                                           deletingQuestionId === question.id
                                         }
-                                        className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+                                        className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-60 sm:w-auto"
                                       >
                                         <FaTrash className="h-4 w-4" />
                                         {deletingQuestionId === question.id
