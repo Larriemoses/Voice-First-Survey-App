@@ -135,7 +135,7 @@ export default function PublicSurvey() {
 
       <div className="min-h-screen bg-white px-4 py-6 sm:px-6 sm:py-8">
         <div className="mx-auto max-w-2xl space-y-4 sm:space-y-5">
-          <div className="brand-card overflow-hidden">
+          <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
             <div className="bg-gradient-to-br from-slate-50 via-white to-[#eef2ff]/30 px-4 py-5 sm:px-5 sm:py-6">
               {survey?.logo_url ? (
                 <div className="mb-3 flex justify-center sm:justify-start">
@@ -158,7 +158,7 @@ export default function PublicSurvey() {
                   </p>
 
                   <h1 className="mt-1 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
-                    {survey?.header_text || "We’d love to hear your response"}
+                    {survey?.header_text || "We'd love to hear your response"}
                   </h1>
 
                   <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -258,7 +258,7 @@ export default function PublicSurvey() {
                 <button
                   type="submit"
                   disabled={starting || !survey}
-                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60 sm:w-auto"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-50"
                 >
                   <FaArrowRight className="h-4 w-4" />
                   {starting ? "Starting..." : "Start Survey"}
