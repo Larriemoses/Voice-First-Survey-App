@@ -216,6 +216,7 @@ export default function Dashboard() {
           <>
             <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
               <div className="brand-card relative overflow-hidden bg-gradient-to-br from-white via-white to-slate-50 p-5 sm:p-6 lg:p-7">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
                 <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
 

@@ -164,7 +164,7 @@ export default function Surveys() {
                 key={survey.id}
                 onClick={() => navigate(`/surveys/${survey.id}`)}
                 type="button"
-                className="brand-card group p-4 text-left transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md sm:p-5 lg:p-6"
+                className="group rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md sm:p-5 lg:p-6"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">

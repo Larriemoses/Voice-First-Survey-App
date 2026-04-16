@@ -605,7 +605,7 @@ export default function SurveyBuilder() {
                       href={publicLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] sm:w-auto"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca]"
                     >
                       <FaLink className="h-4 w-4" />
                       Open Public Survey
@@ -616,7 +616,7 @@ export default function SurveyBuilder() {
                     <button
                       onClick={handlePublishSurvey}
                       disabled={publishing}
-                      className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60 sm:w-auto"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
                       type="button"
                     >
                       <FaRocket className="h-4 w-4" />
@@ -979,7 +979,7 @@ export default function SurveyBuilder() {
                         return (
                           <div
                             key={question.id}
-                            className="brand-card p-4 transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md"
+                            className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#4f46e5]/20 hover:shadow-md"
                           >
                             <div className="flex items-start gap-3">
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff]">
