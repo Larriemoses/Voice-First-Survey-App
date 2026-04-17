@@ -1,68 +1,139 @@
 import { useEffect, useState } from "react";
+import { Mail, UserRound } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
-import { getCurrentUser } from "../lib/auth";
+import { getCurrentUser, updateCurrentUserProfile } from "../lib/auth";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { PageHeader } from "../components/ui/PageHeader";
+import { Skeleton } from "../components/ui/Skeleton";
 
 export default function Profile() {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     async function load() {
-      const user = await getCurrentUser();
+      try {
+        setLoading(true);
+        const user = await getCurrentUser();
 
-      if (!user) return;
+        if (!user) return;
 
-      setEmail(user.email || "");
-      setFullName((user.user_metadata?.full_name as string) || "");
+        setEmail(user.email || "");
+        setFullName((user.user_metadata?.full_name as string) || "");
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "We couldn't load your profile.",
+        );
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
   }, []);
 
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
+
+    if (!fullName.trim()) {
+      setError("Add your name so your workspace feels a little more personal.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      await updateCurrentUserProfile({ fullName });
+      setSuccessMessage("Your profile is updated.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "We couldn't save your profile.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <DashboardShell>
-      <div className="max-w-2xl space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">
-            Profile Settings
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Manage your account details and preferences.
-          </p>
-        </div>
+      <PageHeader
+        title="Your Profile"
+        subtitle="Keep your account details up to date so your workspace stays clear and personal"
+      />
 
-        <div className="brand-card p-6">
-          <div className="grid gap-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Full name
-              </label>
-              <input
+      {loading ? (
+        <Card className="space-y-4">
+          <Skeleton className="h-12 rounded-[20px]" />
+          <Skeleton className="h-12 rounded-[20px]" />
+          <Skeleton className="h-12 w-40 rounded-[20px]" />
+        </Card>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-[1fr_0.82fr]">
+          <Card>
+            <form onSubmit={handleSave} className="space-y-4">
+              <Input
+                label="Full name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="brand-input"
-                placeholder="Your full name"
+                placeholder="e.g. Ada Lovelace"
+                leadingIcon={<UserRound className="h-4 w-4" />}
               />
-            </div>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <input
+              <Input
+                label="Email"
                 value={email}
                 readOnly
-                className="w-full rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 outline-none"
-                placeholder="you@company.com"
+                leadingIcon={<Mail className="h-4 w-4" />}
+                helperText="Your email is managed by your sign-in provider"
               />
+
+              {error ? (
+                <Feedback variant="error" title="Your profile wasn't saved" description={error} />
+              ) : null}
+
+              {successMessage ? (
+                <Feedback
+                  variant="success"
+                  title="Changes saved"
+                  description={successMessage}
+                />
+              ) : null}
+
+              <Button type="submit" loading={saving} size="lg">
+                {saving ? "Saving changes" : "Save changes"}
+              </Button>
+            </form>
+          </Card>
+
+          <Card variant="flat" className="space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                Keep this simple
+              </h2>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                A clear profile helps your team know who's publishing and reviewing surveys
+              </p>
             </div>
 
-            <p className="text-xs text-slate-500">
-              Email is managed by your authentication provider.
-            </p>
-          </div>
+            <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+              <p className="text-sm font-semibold text-[var(--color-text)]">
+                Best practice
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+                Use the name your teammates recognize most often. It keeps shared survey workflows easier to scan.
+              </p>
+            </div>
+          </Card>
         </div>
-      </div>
+      )}
     </DashboardShell>
   );
 }

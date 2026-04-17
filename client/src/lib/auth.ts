@@ -45,3 +45,14 @@ export async function getCurrentUser() {
   if (error) throw error;
   return data.user;
 }
+
+export async function updateCurrentUserProfile(input: { fullName: string }) {
+  const { data, error } = await supabase.auth.updateUser({
+    data: {
+      full_name: input.fullName.trim(),
+    },
+  });
+
+  if (error) throw error;
+  return data.user;
+}

@@ -1,8 +1,14 @@
 import { useState } from "react";
+import { ArrowRight, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { FaClipboardList } from "react-icons/fa";
 import DashboardShell from "../components/DashboardShell";
 import { createSurvey } from "../lib/surveys";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { PageHeader } from "../components/ui/PageHeader";
+import { Textarea } from "../components/ui/Textarea";
 
 export default function CreateSurvey() {
   const navigate = useNavigate();
@@ -16,7 +22,7 @@ export default function CreateSurvey() {
     setError("");
 
     if (!title.trim()) {
-      setError("Survey title is required.");
+      setError("Give your survey a clear title so your team knows what it's for.");
       return;
     }
 
@@ -25,7 +31,7 @@ export default function CreateSurvey() {
       const survey = await createSurvey({ title, description });
       navigate(`/surveys/${survey.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create survey.");
+      setError(err instanceof Error ? err.message : "We couldn't create your survey.");
     } finally {
       setLoading(false);
     }
@@ -33,70 +39,70 @@ export default function CreateSurvey() {
 
   return (
     <DashboardShell>
-      <div className="max-w-3xl space-y-6">
-        <div className="flex items-center gap-3">
-          <FaClipboardList className="h-7 w-7 text-indigo-600" />
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              Create Survey
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Start a new voice survey for your organization.
-            </p>
-          </div>
-        </div>
+      <PageHeader
+        title="Create Survey"
+        subtitle="Start with a strong title and a short description, then add your questions next"
+        backHref="/surveys"
+      />
 
-        <div className="brand-card p-6">
-          <form onSubmit={handleSubmit} className="grid gap-5">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Survey Title
-              </label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="brand-input"
-                placeholder="Customer Experience Feedback"
-              />
-            </div>
+      <div className="grid gap-4 lg:grid-cols-[1fr_0.82fr]">
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Survey title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Customer Satisfaction Q3"
+              leadingIcon={<ClipboardList className="h-4 w-4" />}
+            />
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="brand-input min-h-[120px]"
-                placeholder="Add a short description for this survey..."
-              />
-            </div>
+            <Textarea
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Tell your team what this survey should uncover and who it's meant for"
+            />
 
             {error ? (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                {error}
-              </div>
+              <Feedback variant="error" title="Your survey isn't ready yet" description={error} />
             ) : null}
 
-            <div className="flex gap-3">
-              <button
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
                 type="submit"
-                disabled={loading}
-                className="brand-btn-primary px-5 py-3"
+                loading={loading}
+                size="lg"
+                trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
               >
-                {loading ? "Creating..." : "Create Survey"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate("/surveys")}
-                className="brand-btn-secondary px-5 py-3"
-              >
-                Cancel
-              </button>
+                {loading ? "Creating your survey" : "Create survey"}
+              </Button>
+              <Button type="button" variant="secondary" size="lg" onClick={() => navigate("/surveys")}>
+                Go back
+              </Button>
             </div>
           </form>
-        </div>
+        </Card>
+
+        <Card variant="flat" className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[var(--color-text)]">
+              Good survey titles are specific
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+              A strong setup makes the builder feel easier from the first screen
+            </p>
+          </div>
+
+          {[
+            "Customer onboarding experience",
+            "Retail staff satisfaction check-in",
+            "Post-event attendee feedback",
+          ].map((example) => (
+            <div key={example} className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm font-medium text-[var(--color-text)]">
+              {example}
+            </div>
+          ))}
+        </Card>
       </div>
     </DashboardShell>
   );

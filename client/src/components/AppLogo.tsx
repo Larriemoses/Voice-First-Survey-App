@@ -8,17 +8,19 @@ export default function AppLogo({ collapsed = false }: AppLogoProps) {
       <img
         src="https://res.cloudinary.com/dvl2r3bdw/image/upload/v1775943825/ChatGPT_Image_Apr_10_2026_12_41_04_AM_cwispp.png"
         alt="Survica"
-        className="h-10 w-10 rounded-xl object-contain"
+        className="h-10 w-10 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] object-contain p-1.5 shadow-sm"
       />
 
-      {!collapsed && (
+      {!collapsed ? (
         <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold tracking-tight text-slate-900">
+          <h1 className="truncate text-base font-semibold tracking-tight text-[var(--color-text)]">
             Survica
           </h1>
-          <p className="truncate text-xs text-slate-500">Voice Intelligence</p>
+          <p className="truncate text-xs text-[var(--color-text-muted)]">
+            Voice survey operating system
+          </p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

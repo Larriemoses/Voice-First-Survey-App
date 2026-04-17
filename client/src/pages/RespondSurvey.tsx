@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaMicrophoneAlt, FaCheckCircle } from "react-icons/fa";
+import { ArrowLeft, ArrowRight, Clock3, Mic } from "lucide-react";
 import AudioRecorder from "../components/AudioRecorder";
 import PageMeta from "../components/PageMeta";
 import { getPublicSurveyById, getPublicSurveyQuestions } from "../lib/surveys";
 import { uploadSurveyResponse } from "../lib/responses";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { Feedback } from "../components/ui/Feedback";
+import { Skeleton } from "../components/ui/Skeleton";
 
 type Survey = {
   id: string;
@@ -44,7 +48,6 @@ export default function RespondSurvey() {
 
       try {
         setError("");
-
         const [surveyData, questionData] = await Promise.all([
           getPublicSurveyById(surveyId),
           getPublicSurveyQuestions(surveyId),
@@ -54,7 +57,7 @@ export default function RespondSurvey() {
         setQuestions(questionData);
       } catch (error) {
         console.error("Respond survey load error:", error);
-        setError("Failed to load survey.");
+        setError("We couldn't load this survey right now.");
       } finally {
         setLoading(false);
       }
@@ -67,10 +70,16 @@ export default function RespondSurvey() {
   const currentAnswer = currentQuestion ? answers[currentQuestion.id] : null;
   const canProceed = !!currentAnswer;
 
-  const progress = useMemo(() => {
-    if (questions.length === 0) return 0;
-    return ((currentIndex + 1) / questions.length) * 100;
-  }, [currentIndex, questions.length]);
+  const progressItems = useMemo(
+    () =>
+      questions.map((question, index) => {
+        const answered = !!answers[question.id];
+        const active = index === currentIndex;
+
+        return { id: question.id, answered, active };
+      }),
+    [answers, currentIndex, questions],
+  );
 
   function handleRecorded(
     audioBlob: Blob | null,
@@ -125,7 +134,7 @@ export default function RespondSurvey() {
       }
     } catch (error) {
       console.error("Upload response error:", error);
-      setError("Failed to save your response. Please try again.");
+      setError("We couldn't save that answer yet. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -143,10 +152,17 @@ export default function RespondSurvey() {
   if (loading) {
     return (
       <>
-        <PageMeta title="Survey" description="Loading survey questions..." />
-
-        <div className="flex min-h-screen items-center justify-center bg-white px-4">
-          <p className="text-sm text-slate-500">Loading survey...</p>
+        <PageMeta title="Loading Survey | Survica" description="Loading your survey questions" />
+        <div className="min-h-screen px-4 py-6">
+          <div className="mx-auto max-w-4xl space-y-4">
+            <Card className="space-y-4">
+              <Skeleton className="h-10 w-32 rounded-full" />
+              <Skeleton className="h-12 w-4/5 rounded-[20px]" />
+            </Card>
+            <Card className="space-y-4">
+              <Skeleton className="h-56 rounded-[28px]" />
+            </Card>
+          </div>
         </div>
       </>
     );
@@ -156,19 +172,20 @@ export default function RespondSurvey() {
     return (
       <>
         <PageMeta
-          title="Survey unavailable"
-          description="This survey does not have any published questions yet."
+          title="Survey Unavailable | Survica"
+          description="This survey does not have published questions yet"
         />
-
-        <div className="flex min-h-screen items-center justify-center bg-white px-4">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Survey unavailable
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              This survey does not have any published questions yet.
-            </p>
-          </div>
+        <div className="flex min-h-screen items-center justify-center px-4 py-8">
+          <Card className="w-full max-w-lg">
+            <Feedback
+              variant="error"
+              title="This survey isn't ready just yet"
+              description={
+                error ||
+                "There aren't any published questions here yet. You can come back once the survey is live."
+              }
+            />
+          </Card>
         </div>
       </>
     );
@@ -177,112 +194,109 @@ export default function RespondSurvey() {
   return (
     <>
       <PageMeta
-        title={survey.title || "Survey"}
-        description="Respond to this survey."
+        title={`${survey.title || "Survey"} | Survica`}
+        description="Respond to this survey in your own voice"
       />
 
-      <div className="min-h-screen bg-white">
-        <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-5 pb-28 pt-6 sm:px-8 sm:pb-32 sm:pt-8">
-          {/* Top section */}
-          <div className="space-y-4">
+      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl space-y-4">
+          <Card className="space-y-5">
             {survey.logo_url ? (
-              <div className="flex justify-center sm:justify-start">
-                <img
-                  src={survey.logo_url}
-                  alt={survey.title}
-                  className="h-10 w-auto object-contain"
-                />
-              </div>
+              <img
+                src={survey.logo_url}
+                alt={survey.title}
+                className="h-10 w-auto max-w-[9rem] object-contain"
+              />
             ) : null}
 
-            <div className="space-y-2">
-              <p className="text-center text-xs font-medium uppercase tracking-[0.16em] text-slate-400 sm:text-left">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
                 Question {currentIndex + 1} of {questions.length}
-              </p>
+              </div>
 
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-[#4f46e5] transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {progressItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={[
+                      "rounded-full px-3 py-2 text-center text-xs font-semibold transition",
+                      item.active
+                        ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+                        : item.answered
+                          ? "bg-[color:color-mix(in_srgb,var(--color-success)_14%,transparent)] text-[var(--color-success)]"
+                          : "bg-[var(--color-surface)] text-[var(--color-text-muted)]",
+                    ].join(" ")}
+                  >
+                    Q{index + 1}
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-2 text-center sm:text-left">
-              <p className="text-sm font-medium text-slate-500">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-[var(--color-text-muted)]">
                 {survey.title}
               </p>
-
-              <h1 className="text-xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-2xl">
+              <h1 className="text-3xl font-semibold leading-tight text-[var(--color-text)]">
                 {currentQuestion.prompt}
               </h1>
-
-              <p className="text-sm text-slate-500">
-                Max duration: {currentQuestion.max_duration_seconds || 120}{" "}
-                seconds
+              <p className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+                <Clock3 className="h-4 w-4" />
+                Aim to keep this answer within {currentQuestion.max_duration_seconds || 120} seconds
               </p>
             </div>
-          </div>
+          </Card>
 
-          {/* Main content */}
-          <div className="flex flex-1 items-center py-6 sm:py-8">
-            <div className="brand-card w-full p-4 sm:p-6">
-              <div className="mb-5 flex items-center justify-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ecfeff]">
-                  <FaMicrophoneAlt className="h-5 w-5 text-[#0891b2]" />
-                </div>
-              </div>
+          <AudioRecorder
+            key={currentQuestion.id}
+            maxDurationSeconds={currentQuestion.max_duration_seconds || 120}
+            onRecorded={handleRecorded}
+          />
 
-              <AudioRecorder
-                key={currentQuestion.id}
-                maxDurationSeconds={currentQuestion.max_duration_seconds || 120}
-                onRecorded={handleRecorded}
-              />
+          {canProceed ? (
+            <Feedback
+              variant="success"
+              title="Your answer is recorded"
+              description="Listen back if you want, or move to the next question."
+            />
+          ) : (
+            <Feedback
+              variant="info"
+              title="Record your answer when you're ready"
+              description="You can re-record before moving forward."
+            />
+          )}
 
-              <div className="mt-4 flex justify-center">
-                {canProceed ? (
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
-                    <FaCheckCircle className="h-4 w-4" />
-                    Response recorded
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700">
-                    Record your answer to continue
-                  </div>
-                )}
-              </div>
+          {error ? (
+            <Feedback variant="error" title="Your answer wasn't saved" description={error} />
+          ) : null}
 
-              {error ? (
-                <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {error}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom action bar */}
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 px-5 py-4 sm:flex-row sm:justify-between sm:px-8">
-            <button
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
+            <Button
               onClick={handlePrevious}
               disabled={currentIndex === 0 || saving}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              disabledReason="You're already on the first question"
+              variant="secondary"
+              size="lg"
+              leadingIcon={<ArrowLeft className="h-4 w-4" />}
             >
               Previous
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleNext}
               disabled={!canProceed || saving}
-              className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-50"
+              disabledReason="Record this answer before moving on"
+              size="lg"
+              trailingIcon={!saving ? <ArrowRight className="h-4 w-4" /> : undefined}
             >
               {saving
-                ? "Saving..."
+                ? "Saving your answer"
                 : currentIndex < questions.length - 1
-                  ? "Next"
-                  : "Finish Survey"}
-            </button>
+                  ? "Next question"
+                  : "Finish survey"}
+            </Button>
           </div>
         </div>
       </div>
