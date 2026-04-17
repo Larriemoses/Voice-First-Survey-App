@@ -16,6 +16,10 @@ import { Card } from "../components/ui/Card";
 import { Feedback } from "../components/ui/Feedback";
 import { Input } from "../components/ui/Input";
 import { Skeleton } from "../components/ui/Skeleton";
+import {
+  BRAND_SHARE_IMAGE_URL,
+  DEFAULT_PUBLIC_SURVEY_DESCRIPTION,
+} from "../lib/branding";
 
 type Survey = {
   id: string;
@@ -163,11 +167,14 @@ export default function PublicSurvey() {
   return (
     <>
       <PageMeta
-        title={survey?.title || "Survey"}
+        title={`${survey?.title || "Survey"} | Survica`}
         description={
+          survey?.header_text ||
           survey?.description ||
-          "You've been invited to answer this voice survey"
+          DEFAULT_PUBLIC_SURVEY_DESCRIPTION
         }
+        image={survey?.logo_url || BRAND_SHARE_IMAGE_URL}
+        imageAlt={survey?.title || "Survica survey"}
       />
 
       <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">

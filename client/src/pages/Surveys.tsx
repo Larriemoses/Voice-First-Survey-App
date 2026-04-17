@@ -127,11 +127,11 @@ export default function Surveys() {
 
       {loading ? (
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
-              <Card key={index} className="space-y-3">
+              <Card key={index} className="space-y-2 p-4 sm:space-y-3 sm:p-5">
                 <Skeleton className="h-4 w-20 rounded-full" />
-                <Skeleton className="h-9 w-16 rounded-[20px]" />
+                <Skeleton className="h-8 w-14 rounded-[18px] sm:h-9 sm:w-16 sm:rounded-[20px]" />
                 <Skeleton className="h-4 w-28 rounded-full" />
               </Card>
             ))}
@@ -150,7 +150,7 @@ export default function Surveys() {
         />
       ) : (
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             {[
               { label: "Total", value: summary.total, icon: ClipboardList },
               { label: "Live", value: summary.published, icon: Radio },
@@ -160,16 +160,16 @@ export default function Surveys() {
               const Icon = item.icon;
 
               return (
-                <Card key={item.label} className="space-y-3">
+                <Card key={item.label} className="space-y-2 p-4 sm:space-y-3 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)] sm:text-xs">
                       {item.label}
                     </span>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-[18px] bg-[var(--color-surface)] text-[var(--color-primary)]">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--color-surface)] text-[var(--color-primary)] sm:h-10 sm:w-10 sm:rounded-[18px]">
                       <Icon className="h-4 w-4" />
                     </div>
                   </div>
-                  <p className="text-3xl font-semibold text-[var(--color-text)]">
+                  <p className="text-2xl font-semibold text-[var(--color-text)] sm:text-3xl">
                     {item.value}
                   </p>
                 </Card>

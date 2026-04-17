@@ -18,6 +18,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
   disabledReason?: string;
+  iconOnly?: boolean;
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -47,6 +48,7 @@ export function Button({
   leadingIcon,
   trailingIcon,
   disabledReason,
+  iconOnly = false,
   disabled,
   title,
   type = "button",
@@ -60,7 +62,11 @@ export function Button({
       className={cn(
         "inline-flex shrink-0 items-center justify-center gap-2 font-semibold transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55",
         variantClasses[variant],
-        sizeClasses[size],
+        iconOnly
+          ? size === "lg"
+            ? "h-12 w-12 rounded-[20px] p-0"
+            : "h-11 w-11 rounded-2xl p-0"
+          : sizeClasses[size],
         className,
       )}
       disabled={isDisabled}
@@ -68,8 +74,8 @@ export function Button({
       {...props}
     >
       {loading ? <Spinner size="sm" /> : leadingIcon}
-      <span className="truncate">{children}</span>
-      {!loading ? trailingIcon : null}
+      <span className={iconOnly ? "sr-only" : "truncate"}>{children}</span>
+      {!loading && !iconOnly ? trailingIcon : null}
     </button>
   );
 }

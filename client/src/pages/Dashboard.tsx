@@ -284,23 +284,23 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             {metricCards.map((card) => {
               const Icon = card.icon;
               return (
-                <Card key={card.label} className="space-y-3">
+                <Card key={card.label} className="space-y-2 p-4 sm:space-y-3 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[20px] bg-[var(--color-surface)] text-[var(--color-primary)]">
-                      <Icon className="h-5 w-5" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--color-surface)] text-[var(--color-primary)] sm:h-11 sm:w-11 sm:rounded-[20px]">
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)] sm:text-xs">
                       {card.label}
                     </span>
                   </div>
-                  <p className="text-3xl font-semibold text-[var(--color-text)]">
+                  <p className="text-2xl font-semibold text-[var(--color-text)] sm:text-3xl">
                     {card.value}
                   </p>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-xs leading-5 text-[var(--color-text-muted)] sm:text-sm sm:leading-6">
                     {card.note}
                   </p>
                 </Card>
