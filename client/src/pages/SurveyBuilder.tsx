@@ -184,7 +184,7 @@ function BuilderActionButton({
   disabled = false,
   disabledReason,
 }: BuilderActionButtonProps) {
-  const button = (
+  const compactButton = (
     <Button
       variant={variant}
       size="sm"
@@ -201,16 +201,42 @@ function BuilderActionButton({
     </Button>
   );
 
+  const fullButton = (
+    <Button
+      variant={variant}
+      size="sm"
+      onClick={onClick}
+      loading={loading}
+      disabled={disabled}
+      disabledReason={disabledReason}
+      title={label}
+      aria-label={label}
+      leadingIcon={!loading ? icon : undefined}
+      className="hidden lg:inline-flex"
+    >
+      {label}
+    </Button>
+  );
+
   return (
-    <Tooltip content={label}>
+    <>
+      <Tooltip content={label}>
+        {href ? (
+          <a href={href} target="_blank" rel="noreferrer" className="lg:hidden">
+            {compactButton}
+          </a>
+        ) : (
+          <span className="lg:hidden">{compactButton}</span>
+        )}
+      </Tooltip>
       {href ? (
         <a href={href} target="_blank" rel="noreferrer">
-          {button}
+          {fullButton}
         </a>
       ) : (
-        button
+        fullButton
       )}
-    </Tooltip>
+    </>
   );
 }
 
@@ -632,9 +658,7 @@ export default function SurveyBuilder() {
     setConfirmation(null);
   }
 
-  const appUrl = trimTrailingSlash(
-    import.meta.env.VITE_APP_URL || window.location.origin,
-  );
+  const appUrl = trimTrailingSlash(window.location.origin);
   const publicPath = surveyId ? getSurveyPath(surveyId) : "";
   const publicLink = publicPath ? `${appUrl}${publicPath}` : appUrl;
   const sharePath = surveyId ? getSurveySharePath(surveyId) : "";

@@ -66,10 +66,10 @@ export default function DashboardShell({ children }: Props) {
       <aside
         className={cn(
           "shell-noise fixed inset-y-0 left-0 z-30 hidden border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/95 backdrop-blur lg:flex lg:flex-col",
-          desktopCollapsed ? "w-16" : "w-60",
+          desktopCollapsed ? "w-16" : "w-72",
         )}
       >
-        <div className="flex h-20 items-center justify-between px-4">
+        <div className="flex h-20 items-center justify-between px-5">
           <AppLogo collapsed={desktopCollapsed} />
         </div>
 
@@ -215,7 +215,7 @@ export default function DashboardShell({ children }: Props) {
       <main
         className={cn(
           "min-h-screen pb-[calc(5.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 lg:pb-10",
-          desktopCollapsed ? "lg:pl-16" : "lg:pl-60",
+          desktopCollapsed ? "lg:pl-16" : "lg:pl-72",
         )}
       >
         <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 lg:px-8">

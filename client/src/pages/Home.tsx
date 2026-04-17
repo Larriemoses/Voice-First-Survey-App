@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { supabase } from "../lib/supabase";
 import AppLogo from "../components/AppLogo";
 import PageMeta from "../components/PageMeta";
 import { Button } from "../components/ui/button";
@@ -17,17 +16,44 @@ import { Card } from "../components/ui/Card";
 import { DEFAULT_SHARE_DESCRIPTION } from "../lib/branding";
 
 const heroImage =
-  "https://res.cloudinary.com/dvl2r3bdw/image/upload/f_auto,q_auto,w_1400,c_limit/v1776072823/ChatGPT_Image_Apr_13_2026_10_31_22_AM_gtnuto.png";
+  "https://res.cloudinary.com/dvl2r3bdw/image/upload/f_auto,q_auto,w_1120,c_limit/v1776072823/ChatGPT_Image_Apr_13_2026_10_31_22_AM_gtnuto.png";
 
 export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        navigate("/auth-check");
+    let cancelled = false;
+
+    const checkForSession = async () => {
+      const { supabase } = await import("../lib/supabase");
+      const { data } = await supabase.auth.getUser();
+
+      if (!cancelled && data.user) {
+        navigate("/auth-check", { replace: true });
       }
+    };
+
+    const defer =
+      typeof window !== "undefined" && "requestIdleCallback" in window
+        ? window.requestIdleCallback.bind(window)
+        : (callback: IdleRequestCallback) => window.setTimeout(callback, 1);
+
+    const handle = defer(() => {
+      void checkForSession();
     });
+
+    return () => {
+      cancelled = true;
+
+      if (typeof handle === "number") {
+        window.clearTimeout(handle);
+        return;
+      }
+
+      if (typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(handle);
+      }
+    };
   }, [navigate]);
 
   return (
@@ -40,8 +66,8 @@ export default function Home() {
       <div className="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-8">
           <header className="flex flex-col gap-4 rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <Link to="/" className="flex items-center gap-3">
-              <AppLogo />
+            <Link to="/" className="flex w-full max-w-[13rem] items-center sm:w-auto">
+              <AppLogo className="max-w-none" />
             </Link>
 
             <div className="flex items-center gap-2">
@@ -124,6 +150,10 @@ export default function Home() {
                   src={heroImage}
                   alt="Survica workspace preview"
                   className="w-full rounded-[24px] object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="(min-width: 1024px) 46vw, 100vw"
                 />
               </Card>
 

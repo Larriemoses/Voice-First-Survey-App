@@ -11,6 +11,7 @@ import { Card } from "./components/ui/Card";
 import { Skeleton } from "./components/ui/Skeleton";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { getSurveyPath } from "./lib/branding";
+import Home from "./pages/Home";
 
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -25,13 +26,12 @@ const PublicSurvey = lazy(() => import("./pages/PublicSurvey"));
 const RespondSurvey = lazy(() => import("./pages/RespondSurvey"));
 const SurveyThankYou = lazy(() => import("./pages/SurveyThankYou"));
 const SurveyResponses = lazy(() => import("./pages/SurveyResponses"));
-const Home = lazy(() => import("./pages/Home"));
 
 function SurveyShareRedirect() {
   const { surveyId } = useParams();
 
   if (!surveyId) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Navigate to={getSurveyPath(surveyId)} replace />;
@@ -71,13 +71,13 @@ export default function App() {
           className="motion-safe:animate-[page-in_260ms_cubic-bezier(0.16,1,0.3,1)]"
         >
           <Routes location={location}>
-            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/auth-check" element={<AuthGate />} />
             <Route path="/take-survey/:surveyId" element={<PublicSurvey />} />
             <Route path="/share/survey/:surveyId" element={<SurveyShareRedirect />} />
-            <Route path="/home" element={<Home />} />
 
             <Route
               path="/dashboard"
