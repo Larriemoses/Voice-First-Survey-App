@@ -10,15 +10,14 @@ import {
   Sparkles,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import AppLogo from "../components/AppLogo";
 import PageMeta from "../components/PageMeta";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
+import { DEFAULT_SHARE_DESCRIPTION } from "../lib/branding";
 
 const heroImage =
   "https://res.cloudinary.com/dvl2r3bdw/image/upload/f_auto,q_auto,w_1400,c_limit/v1776072823/ChatGPT_Image_Apr_13_2026_10_31_22_AM_gtnuto.png";
-
-const logoImage =
-  "https://res.cloudinary.com/dvl2r3bdw/image/upload/f_auto,q_auto,w_160,c_limit/v1775943825/ChatGPT_Image_Apr_10_2026_12_41_04_AM_cwispp.png";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -35,26 +34,14 @@ export default function Home() {
     <>
       <PageMeta
         title="Survica | Voice Survey Intelligence"
-        description="Create voice-first surveys, collect spoken feedback, and review clear response insights in one place"
+        description={DEFAULT_SHARE_DESCRIPTION}
       />
 
       <div className="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-8">
           <header className="flex flex-col gap-4 rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <Link to="/" className="flex items-center gap-3">
-              <img
-                src={logoImage}
-                alt="Survica"
-                className="h-11 w-11 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 object-contain"
-              />
-              <div>
-                <p className="text-base font-semibold text-[var(--color-text)]">
-                  Survica
-                </p>
-                <p className="text-sm text-[var(--color-text-muted)]">
-                  Voice survey operating system
-                </p>
-              </div>
+              <AppLogo />
             </Link>
 
             <div className="flex items-center gap-2">

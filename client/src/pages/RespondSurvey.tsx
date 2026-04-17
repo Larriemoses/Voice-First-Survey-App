@@ -9,6 +9,7 @@ import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
 import { Feedback } from "../components/ui/Feedback";
 import { Skeleton } from "../components/ui/Skeleton";
+import { BRAND_SHARE_IMAGE_URL } from "../lib/branding";
 
 type Survey = {
   id: string;
@@ -196,6 +197,8 @@ export default function RespondSurvey() {
       <PageMeta
         title={`${survey.title || "Survey"} | Survica`}
         description="Respond to this survey in your own voice"
+        image={survey.logo_url || BRAND_SHARE_IMAGE_URL}
+        imageAlt={survey.title || "Survica survey"}
       />
 
       <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">

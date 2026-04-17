@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowRight,
+  ChevronDown,
   Copy,
   Eye,
   FileImage,
@@ -14,6 +15,7 @@ import {
   Trash2,
   Upload,
   WandSparkles,
+  type LucideIcon,
 } from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import {
@@ -30,7 +32,7 @@ import {
   uploadSurveyLogo,
 } from "../lib/surveys";
 import { Badge } from "../components/ui/Badge";
-import { Button } from "../components/ui/button";
+import { Button, type ButtonVariant } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Feedback } from "../components/ui/Feedback";
@@ -39,6 +41,13 @@ import { Modal } from "../components/ui/Modal";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Skeleton } from "../components/ui/Skeleton";
 import { Textarea } from "../components/ui/Textarea";
+import { Tooltip } from "../components/ui/Tooltip";
+import { cn } from "../utils/helpers";
+import {
+  getSurveyPath,
+  getSurveySharePath,
+  trimTrailingSlash,
+} from "../lib/branding";
 
 type Survey = {
   id: string;
@@ -67,6 +76,8 @@ type GeneratedSurveyDraft = {
   questions: GeneratedQuestion[];
 };
 
+type BuilderSectionId = "branding" | "draft" | "question";
+
 type ConfirmationState =
   | {
       type: "deleteQuestion";
@@ -79,6 +90,129 @@ type ConfirmationState =
       type: "deleteSurvey";
     }
   | null;
+
+type BuilderAccordionCardProps = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  open: boolean;
+  onToggle: () => void;
+  badge?: ReactNode;
+  children: ReactNode;
+};
+
+type BuilderActionButtonProps = {
+  label: string;
+  icon: ReactNode;
+  variant?: ButtonVariant;
+  onClick?: () => void;
+  href?: string;
+  loading?: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
+};
+
+function BuilderAccordionCard({
+  title,
+  description,
+  icon: Icon,
+  open,
+  onToggle,
+  badge,
+  children,
+}: BuilderAccordionCardProps) {
+  return (
+    <Card className="overflow-hidden p-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-[var(--color-surface)] sm:px-6"
+      >
+        <div className="flex min-w-0 items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[20px] bg-[var(--color-surface)] text-[var(--color-primary)]">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-[var(--color-text)] sm:text-xl">
+                {title}
+              </h2>
+              {badge}
+            </div>
+            <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+              {description}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)] sm:inline">
+            {open ? "Hide" : "Open"}
+          </span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-text-muted)]">
+            <ChevronDown
+              className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
+            />
+          </span>
+        </div>
+      </button>
+
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-[var(--color-border-subtle)] p-5 sm:p-6">
+            {children}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function BuilderActionButton({
+  label,
+  icon,
+  variant = "secondary",
+  onClick,
+  href,
+  loading = false,
+  disabled = false,
+  disabledReason,
+}: BuilderActionButtonProps) {
+  const button = (
+    <Button
+      variant={variant}
+      size="sm"
+      iconOnly
+      onClick={onClick}
+      loading={loading}
+      disabled={disabled}
+      disabledReason={disabledReason}
+      title={label}
+      aria-label={label}
+      leadingIcon={!loading ? icon : undefined}
+    >
+      {label}
+    </Button>
+  );
+
+  return (
+    <Tooltip content={label}>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer">
+          {button}
+        </a>
+      ) : (
+        button
+      )}
+    </Tooltip>
+  );
+}
 
 function SurveyStatusBadge({ status }: { status: Survey["status"] }) {
   if (status === "published") return <Badge variant="success" dot>Live</Badge>;
@@ -118,6 +252,11 @@ export default function SurveyBuilder() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationState>(null);
+  const [openSections, setOpenSections] = useState<Record<BuilderSectionId, boolean>>({
+    branding: true,
+    draft: false,
+    question: false,
+  });
 
   async function loadData() {
     if (!surveyId) return;
@@ -148,9 +287,28 @@ export default function SurveyBuilder() {
     loadData();
   }, [surveyId]);
 
+  useEffect(() => {
+    if (generatedDraft) {
+      setOpenSections((current) => ({ ...current, draft: true }));
+    }
+  }, [generatedDraft]);
+
+  useEffect(() => {
+    if (!loading && questions.length === 0) {
+      setOpenSections((current) => ({ ...current, question: true }));
+    }
+  }, [loading, questions.length]);
+
   function clearFeedback() {
     setError("");
     setSuccessMessage("");
+  }
+
+  function toggleSection(section: BuilderSectionId) {
+    setOpenSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
   }
 
   async function handleSaveBranding() {
@@ -447,8 +605,8 @@ export default function SurveyBuilder() {
 
     try {
       setCopying(true);
-      await navigator.clipboard.writeText(publicLink);
-      setSuccessMessage("Your public link is copied.");
+      await navigator.clipboard.writeText(shareLink);
+      setSuccessMessage("Your public link is copied with a preview-friendly share URL.");
     } catch {
       setError("We couldn't copy the public link.");
     } finally {
@@ -474,8 +632,13 @@ export default function SurveyBuilder() {
     setConfirmation(null);
   }
 
-  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
-  const publicLink = `${appUrl}/take-survey/${surveyId}`;
+  const appUrl = trimTrailingSlash(
+    import.meta.env.VITE_APP_URL || window.location.origin,
+  );
+  const publicPath = surveyId ? getSurveyPath(surveyId) : "";
+  const publicLink = publicPath ? `${appUrl}${publicPath}` : appUrl;
+  const sharePath = surveyId ? getSurveySharePath(surveyId) : "";
+  const shareLink = sharePath ? `${appUrl}${sharePath}` : appUrl;
 
   const validGeneratedCount = useMemo(
     () => generatedDraft?.questions.filter((question) => question.prompt.trim()).length || 0,
@@ -516,69 +679,62 @@ export default function SurveyBuilder() {
     <DashboardShell>
       <PageHeader
         title={surveyTitle || "Untitled Survey"}
-        subtitle="Shape the survey experience, add questions, and publish when everything feels ready"
         backHref="/surveys"
         actions={
           <>
-            <Button
-              variant="secondary"
+            {survey?.status ? <SurveyStatusBadge status={survey.status} /> : null}
+            <BuilderActionButton
+              label="View responses"
               onClick={() => navigate(`/surveys/${surveyId}/responses`)}
-              leadingIcon={<Eye className="h-4 w-4" />}
-            >
-              View responses
-            </Button>
+              icon={<Eye className="h-4 w-4" />}
+            />
 
             {survey?.status === "published" ? (
               <>
-                <Button
-                  variant="secondary"
+                <BuilderActionButton
+                  label="Copy link"
                   onClick={handleCopyLink}
                   loading={copying}
-                  leadingIcon={!copying ? <Copy className="h-4 w-4" /> : undefined}
-                >
-                  Copy link
-                </Button>
-                <a href={publicLink} target="_blank" rel="noreferrer">
-                  <Button leadingIcon={<Link2 className="h-4 w-4" />}>
-                    Open survey
-                  </Button>
-                </a>
-                <Button
+                  icon={<Copy className="h-4 w-4" />}
+                />
+                <BuilderActionButton
+                  label="Open survey"
+                  href={publicLink}
+                  variant="primary"
+                  icon={<Link2 className="h-4 w-4" />}
+                />
+                <BuilderActionButton
+                  label="Close survey"
                   variant="danger"
                   onClick={() => setConfirmation({ type: "closeSurvey" })}
-                  leadingIcon={<Lock className="h-4 w-4" />}
+                  icon={<Lock className="h-4 w-4" />}
                   loading={closingSurvey}
-                >
-                  Close survey
-                </Button>
+                />
               </>
             ) : survey?.status === "closed" ? (
-              <Button
+              <BuilderActionButton
+                label="Delete survey"
                 variant="danger"
                 onClick={() => setConfirmation({ type: "deleteSurvey" })}
-                leadingIcon={<Trash2 className="h-4 w-4" />}
+                icon={<Trash2 className="h-4 w-4" />}
                 loading={deletingSurvey}
-              >
-                Delete survey
-              </Button>
+              />
             ) : (
               <>
-                <Button
-                  variant="secondary"
+                <BuilderActionButton
+                  label="Delete survey"
                   onClick={() => setConfirmation({ type: "deleteSurvey" })}
-                  leadingIcon={<Trash2 className="h-4 w-4" />}
-                >
-                  Delete survey
-                </Button>
-                <Button
+                  icon={<Trash2 className="h-4 w-4" />}
+                />
+                <BuilderActionButton
+                  label="Publish survey"
+                  variant="primary"
                   onClick={handlePublishSurvey}
+                  icon={<Rocket className="h-4 w-4" />}
                   loading={publishing}
                   disabled={!!publishDisabledReason}
                   disabledReason={publishDisabledReason}
-                  leadingIcon={!publishing ? <Rocket className="h-4 w-4" /> : undefined}
-                >
-                  Publish survey
-                </Button>
+                />
               </>
             )}
           </>
@@ -600,16 +756,13 @@ export default function SurveyBuilder() {
 
         <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-4">
-            <Card className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--color-text)]">
-                  Survey branding
-                </h2>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Give your respondents a clear, trustworthy first impression
-                </p>
-              </div>
-
+            <BuilderAccordionCard
+              title="Survey branding"
+              description="Keep the title, intro, and logo tucked away until you need them."
+              icon={FileImage}
+              open={openSections.branding}
+              onToggle={() => toggleSection("branding")}
+            >
               <div className="grid gap-4">
                 <Input
                   label="Survey title"
@@ -671,18 +824,22 @@ export default function SurveyBuilder() {
                   Save survey details
                 </Button>
               </div>
-            </Card>
+            </BuilderAccordionCard>
 
-            <Card className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--color-text)]">
-                  Generate a draft
-                </h2>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Paste your research brief or campaign goal and let Survica help you start faster
-                </p>
-              </div>
-
+            <BuilderAccordionCard
+              title="Generate a draft"
+              description="Turn a rough brief into a starting point, then edit the questions before you add them."
+              icon={WandSparkles}
+              open={openSections.draft}
+              onToggle={() => toggleSection("draft")}
+              badge={
+                generatedDraft ? (
+                  <Badge variant="info" dot>
+                    {validGeneratedCount} ready
+                  </Badge>
+                ) : undefined
+              }
+            >
               <Textarea
                 label="Brief"
                 value={brief}
@@ -761,18 +918,20 @@ export default function SurveyBuilder() {
                   </Button>
                 </div>
               ) : null}
-            </Card>
+            </BuilderAccordionCard>
 
-            <Card className="space-y-4">
-              <div>
-                <h2 className="text-xl font-semibold text-[var(--color-text)]">
-                  Add a question
-                </h2>
-                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Keep prompts simple, conversational, and easy to answer out loud
-                </p>
-              </div>
-
+            <BuilderAccordionCard
+              title="Add a question"
+              description="Open this when you're ready to add another spoken question to the flow."
+              icon={PencilLine}
+              open={openSections.question}
+              onToggle={() => toggleSection("question")}
+              badge={
+                <Badge variant="default">
+                  {questions.length} question{questions.length === 1 ? "" : "s"}
+                </Badge>
+              }
+            >
               <form onSubmit={handleAddQuestion} className="space-y-4">
                 <Textarea
                   label="Question prompt"
@@ -796,7 +955,7 @@ export default function SurveyBuilder() {
                   {saving ? "Adding your question" : "Add question"}
                 </Button>
               </form>
-            </Card>
+            </BuilderAccordionCard>
 
             <Card className="space-y-4">
               <div>
@@ -916,7 +1075,7 @@ export default function SurveyBuilder() {
                 {survey?.status ? <SurveyStatusBadge status={survey.status} /> : null}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="grid grid-cols-2 gap-3 xl:grid-cols-1">
                 <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
                     Questions
@@ -942,14 +1101,14 @@ export default function SurveyBuilder() {
                   Public link
                 </h2>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Share this once the survey is live
+                  Share this once the survey is live. The copied URL includes a richer preview in supported apps.
                 </p>
               </div>
 
               {survey?.status === "published" ? (
                 <>
                   <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 font-mono text-sm text-[var(--color-text)]">
-                    {publicLink}
+                    {shareLink}
                   </div>
                   <div className="flex flex-col gap-3">
                     <Button

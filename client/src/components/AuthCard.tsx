@@ -10,7 +10,10 @@ type AuthCardProps = {
 
 export default function AuthCard({ title, subtitle, children }: AuthCardProps) {
   return (
-    <Card className="w-full max-w-lg rounded-[32px] p-6 sm:p-8" variant="elevated">
+    <Card
+      className="w-full max-w-lg rounded-[32px] p-6 motion-safe:animate-[page-in_320ms_ease-out] sm:p-8"
+      variant="elevated"
+    >
       <div className="mb-8 space-y-5">
         <AppLogo />
         <div>

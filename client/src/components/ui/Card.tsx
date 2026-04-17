@@ -21,7 +21,11 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={cn("rounded-[28px] p-5 sm:p-6", variants[variant], className)}
+      className={cn(
+        "rounded-[28px] p-5 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 sm:p-6",
+        variants[variant],
+        className,
+      )}
       {...props}
     >
       {children}

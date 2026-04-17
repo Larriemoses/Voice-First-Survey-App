@@ -1,17 +1,31 @@
 import { useEffect } from "react";
+import {
+  BRAND_NAME,
+  BRAND_SHARE_IMAGE_URL,
+  DEFAULT_SHARE_DESCRIPTION,
+} from "../lib/branding";
 
 type Props = {
   title: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  url?: string;
+  type?: string;
 };
 
 export default function PageMeta({
   title,
-  description = "",
-  image = "https://res.cloudinary.com/dvl2r3bdw/image/upload/v1775943825/ChatGPT_Image_Apr_10_2026_12_41_04_AM_cwispp.png",
+  description = DEFAULT_SHARE_DESCRIPTION,
+  image = BRAND_SHARE_IMAGE_URL,
+  imageAlt = title,
+  url,
+  type = "website",
 }: Props) {
   useEffect(() => {
+    const resolvedDescription = description || DEFAULT_SHARE_DESCRIPTION;
+    const resolvedUrl = url || window.location.href;
+
     document.title = title;
 
     const setMeta = (name: string, content: string, attr = "name") => {
@@ -28,17 +42,38 @@ export default function PageMeta({
       el.setAttribute("content", content);
     };
 
-    setMeta("description", description);
+    const setLink = (rel: string, href: string) => {
+      let el = document.querySelector(
+        `link[rel="${rel}"]`,
+      ) as HTMLLinkElement | null;
+
+      if (!el) {
+        el = document.createElement("link");
+        el.setAttribute("rel", rel);
+        document.head.appendChild(el);
+      }
+
+      el.setAttribute("href", href);
+    };
+
+    setMeta("description", resolvedDescription);
     setMeta("og:title", title, "property");
-    setMeta("og:description", description, "property");
+    setMeta("og:description", resolvedDescription, "property");
     setMeta("og:image", image, "property");
-    setMeta("og:type", "website", "property");
+    setMeta("og:image:alt", imageAlt, "property");
+    setMeta("og:url", resolvedUrl, "property");
+    setMeta("og:site_name", BRAND_NAME, "property");
+    setMeta("og:type", type, "property");
 
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", title);
-    setMeta("twitter:description", description);
+    setMeta("twitter:description", resolvedDescription);
     setMeta("twitter:image", image);
-  }, [title, description, image]);
+    setMeta("twitter:image:alt", imageAlt);
+    setMeta("twitter:url", resolvedUrl);
+
+    setLink("canonical", resolvedUrl);
+  }, [description, image, imageAlt, title, type, url]);
 
   return null;
 }
