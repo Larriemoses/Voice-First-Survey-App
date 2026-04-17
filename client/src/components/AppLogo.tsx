@@ -1,32 +1,36 @@
 import {
   BRAND_LOGO_URL,
   BRAND_NAME,
-  BRAND_TAGLINE,
 } from "../lib/branding";
+import { cn } from "../utils/helpers";
 
 type AppLogoProps = {
   collapsed?: boolean;
+  className?: string;
 };
 
-export default function AppLogo({ collapsed = false }: AppLogoProps) {
+export default function AppLogo({
+  collapsed = false,
+  className,
+}: AppLogoProps) {
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className={cn(
+        "flex w-full items-center",
+        collapsed ? "justify-center" : "max-w-[12.75rem]",
+        className,
+      )}
+    >
       <img
         src={BRAND_LOGO_URL}
         alt={`${BRAND_NAME} logo`}
-        className="h-10 w-12 shrink-0 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] object-contain px-1.5 py-1 shadow-sm"
+        className={cn(
+          "object-contain shadow-sm ring-1 ring-black/5",
+          collapsed
+            ? "h-11 w-full max-w-[2.9rem] rounded-2xl border border-[var(--color-border)] bg-white p-1.5"
+            : "h-12 w-full rounded-[22px] border border-[color:color-mix(in_srgb,var(--color-border)_72%,white)] bg-white px-3 py-2",
+        )}
       />
-
-      {!collapsed ? (
-        <div className="min-w-0">
-          <p className="truncate text-base font-semibold tracking-tight text-[var(--color-text)]">
-            {BRAND_NAME}
-          </p>
-          <p className="truncate text-xs text-[var(--color-text-muted)]">
-            {BRAND_TAGLINE}
-          </p>
-        </div>
-      ) : null}
     </div>
   );
 }

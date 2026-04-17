@@ -1,5 +1,4 @@
 import { supabase } from "./supabase";
-import * as XLSX from "xlsx";
 
 export type ResponseItem = {
   id: string;
@@ -193,10 +192,11 @@ export async function exportSurveyResponsesAsCSV(surveyId: string) {
   return csv;
 }
 
-export function buildSurveyWorkbook(params: {
+export async function exportSurveyWorkbook(params: {
   surveyTitle: string;
   responses: ResponseItem[];
 }) {
+  const XLSX = await import("xlsx");
   const { surveyTitle, responses } = params;
 
   const grouped = new Map<
@@ -310,8 +310,5 @@ export function buildSurveyWorkbook(params: {
     sanitizeSheetName("Analytics"),
   );
 
-  return {
-    workbook,
-    fileName: `${sanitizeFileName(surveyTitle)}.xlsx`,
-  };
+  XLSX.writeFile(workbook, `${sanitizeFileName(surveyTitle)}.xlsx`);
 }

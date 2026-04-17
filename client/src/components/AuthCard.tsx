@@ -15,7 +15,7 @@ export default function AuthCard({ title, subtitle, children }: AuthCardProps) {
       variant="elevated"
     >
       <div className="mb-8 space-y-5">
-        <AppLogo />
+        <AppLogo className="max-w-[13rem]" />
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-[var(--color-text)]">
             {title}

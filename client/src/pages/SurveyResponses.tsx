@@ -10,12 +10,11 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import * as XLSX from "xlsx";
 import DashboardShell from "../components/DashboardShell";
 import { supabase } from "../lib/supabase";
 import {
-  buildSurveyWorkbook,
   downloadResponseAudio,
+  exportSurveyWorkbook,
   getSurveyResponsesForAdmin,
   type ResponseItem,
 } from "../lib/responses";
@@ -255,12 +254,11 @@ export default function SurveyResponses() {
     try {
       setExporting(true);
 
-      const { workbook, fileName } = buildSurveyWorkbook({
+      await exportSurveyWorkbook({
         surveyTitle: `Survey ${surveyId || "Responses"}`,
         responses,
       });
 
-      XLSX.writeFile(workbook, fileName);
       setFeedback({
         variant: "success",
         title: "Your export is ready",

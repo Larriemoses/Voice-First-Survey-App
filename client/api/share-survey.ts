@@ -1,101 +1,22 @@
 import {
   BRAND_NAME,
-  BRAND_SHARE_IMAGE_URL,
-  DEFAULT_PUBLIC_SURVEY_DESCRIPTION,
   getSurveyPath,
   getSurveySharePath,
+  getSurveyShareImagePath,
   trimTrailingSlash,
 } from "../src/lib/branding";
-
-declare const process: {
-  env: Record<string, string | undefined>;
-};
-
-type SurveyPreview = {
-  title?: string | null;
-  description?: string | null;
-  header_text?: string | null;
-  logo_url?: string | null;
-};
-
-type ShareRequest = {
-  headers: Record<string, string | string[] | undefined>;
-  query?: { surveyId?: string | string[] };
-};
-
-type ShareResponse = {
-  status: (code: number) => ShareResponse;
-  setHeader: (name: string, value: string) => void;
-  send: (body: string) => void;
-};
-
-function getHeader(
-  value: string | string[] | undefined,
-  fallback = "",
-) {
-  return Array.isArray(value) ? value[0] : value || fallback;
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function buildAppUrl(req: {
-  headers: Record<string, string | string[] | undefined>;
-}) {
-  const configuredUrl = trimTrailingSlash(process.env.VITE_APP_URL || "");
-
-  if (configuredUrl) {
-    return configuredUrl;
-  }
-
-  const protocol = getHeader(req.headers["x-forwarded-proto"], "https");
-  const host = getHeader(
-    req.headers["x-forwarded-host"] || req.headers.host,
-  );
-
-  return host ? `${protocol}://${host}` : "";
-}
-
-async function fetchSurveyPreview(surveyId: string) {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const supabaseKey =
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_SECRET_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return null;
-  }
-
-  const requestUrl = new URL("/rest/v1/surveys", supabaseUrl);
-  requestUrl.searchParams.set(
-    "select",
-    "title,description,header_text,logo_url",
-  );
-  requestUrl.searchParams.set("id", `eq.${surveyId}`);
-  requestUrl.searchParams.set("status", "eq.published");
-  requestUrl.searchParams.set("limit", "1");
-
-  const response = await fetch(requestUrl, {
-    headers: {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-    },
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const rows = (await response.json()) as SurveyPreview[];
-  return rows[0] || null;
-}
+import {
+  ShareRequest,
+  ShareResponse,
+  SurveyPreview,
+  buildAppUrl,
+  escapeHtml,
+  fetchSurveyPreview,
+  getHeader,
+  getShareDescription,
+  getShareTitle,
+  isPreviewBot,
+} from "./survey-share-utils";
 
 function renderSharePage(input: {
   shareUrl: string;
@@ -121,6 +42,7 @@ function renderSharePage(input: {
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:secure_url" content="${imageUrl}" />
     <meta property="og:url" content="${shareUrl}" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -128,14 +50,10 @@ function renderSharePage(input: {
     <meta name="twitter:description" content="${description}" />
     <meta name="twitter:image" content="${imageUrl}" />
     <meta name="twitter:url" content="${shareUrl}" />
-    <meta http-equiv="refresh" content="0; url=${surveyUrl}" />
     <link rel="canonical" href="${surveyUrl}" />
-    <script>
-      window.location.replace(${JSON.stringify(input.surveyUrl)});
-    </script>
   </head>
   <body>
-    <p>Redirecting to the survey...</p>
+    <p>Open the survey: <a href="${surveyUrl}">${surveyUrl}</a></p>
   </body>
 </html>`;
 }
@@ -156,6 +74,9 @@ export default async function handler(
   const sharePath = getSurveySharePath(surveyId);
   const surveyUrl = appUrl ? `${appUrl}${surveyPath}` : surveyPath;
   const shareUrl = appUrl ? `${appUrl}${sharePath}` : sharePath;
+  const shareImagePath = getSurveyShareImagePath(surveyId);
+  const shareImageUrl = appUrl ? `${appUrl}${shareImagePath}` : shareImagePath;
+  const previewRequest = isPreviewBot(req);
 
   let survey: SurveyPreview | null = null;
 
@@ -165,14 +86,15 @@ export default async function handler(
     console.error("share-survey preview lookup failed", error);
   }
 
-  const title = survey?.title
-    ? `${survey.title} | ${BRAND_NAME}`
-    : `Voice Survey | ${BRAND_NAME}`;
-  const description =
-    survey?.header_text ||
-    survey?.description ||
-    DEFAULT_PUBLIC_SURVEY_DESCRIPTION;
-  const imageUrl = survey?.logo_url || BRAND_SHARE_IMAGE_URL;
+  const title = getShareTitle(survey);
+  const description = getShareDescription(survey);
+
+  if (!previewRequest) {
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Location", surveyUrl);
+    res.status(307).send("");
+    return;
+  }
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader(
@@ -185,7 +107,7 @@ export default async function handler(
       surveyUrl,
       title,
       description,
-      imageUrl,
+      imageUrl: shareImageUrl,
     }),
   );
 }

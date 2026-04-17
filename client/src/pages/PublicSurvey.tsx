@@ -181,15 +181,17 @@ export default function PublicSurvey() {
         <div className="mx-auto max-w-3xl space-y-4">
           <Card className="space-y-5">
             {survey?.logo_url ? (
-              <img
-                src={survey.logo_url}
-                alt={survey.title}
-                className="h-10 w-auto max-w-[9rem] object-contain"
-              />
+              <div className="flex justify-center">
+                <img
+                  src={survey.logo_url}
+                  alt={survey.title}
+                  className="h-14 w-auto max-w-[15rem] object-contain"
+                />
+              </div>
             ) : null}
 
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+            <div className="space-y-3 text-center">
+              <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
                 <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
                 Voice survey
               </div>
@@ -231,7 +233,7 @@ export default function PublicSurvey() {
               </Card>
             </div>
 
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
               <Globe2 className="h-3.5 w-3.5 text-[var(--color-info)]" />
               You can answer naturally in the language that feels right to you
             </div>

@@ -60,6 +60,7 @@ export default function PageMeta({
     setMeta("og:title", title, "property");
     setMeta("og:description", resolvedDescription, "property");
     setMeta("og:image", image, "property");
+    setMeta("og:image:secure_url", image, "property");
     setMeta("og:image:alt", imageAlt, "property");
     setMeta("og:url", resolvedUrl, "property");
     setMeta("og:site_name", BRAND_NAME, "property");
@@ -71,6 +72,7 @@ export default function PageMeta({
     setMeta("twitter:image", image);
     setMeta("twitter:image:alt", imageAlt);
     setMeta("twitter:url", resolvedUrl);
+    setMeta("theme-color", "#2457f5");
 
     setLink("canonical", resolvedUrl);
   }, [description, image, imageAlt, title, type, url]);
