@@ -1,7 +1,13 @@
 import { useState } from "react";
+import { ArrowRight, Building2, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "../components/DashboardShell";
 import { createOrganization } from "../lib/onboarding";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { PageHeader } from "../components/ui/PageHeader";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -15,7 +21,7 @@ export default function Onboarding() {
     setError("");
 
     if (!name.trim()) {
-      setError("Organization name is required.");
+      setError("Give your workspace a name so your team can recognize it.");
       return;
     }
 
@@ -25,7 +31,7 @@ export default function Onboarding() {
       navigate("/dashboard");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to create organization.",
+        err instanceof Error ? err.message : "We couldn't create your workspace.",
       );
     } finally {
       setLoading(false);
@@ -34,57 +40,67 @@ export default function Onboarding() {
 
   return (
     <DashboardShell>
-      <div className="max-w-2xl space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">
-            Organization Setup
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Complete your company profile to unlock surveys and team management.
-          </p>
-        </div>
+      <PageHeader
+        title="Workspace Setup"
+        subtitle="Let's give your survey workspace a name and a clean home base"
+      />
 
-        <div className="brand-card p-6">
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Organization name
-              </label>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="brand-input"
-                placeholder="Your company name"
-              />
-            </div>
+      <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Workspace name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Northwind Research Team"
+              leadingIcon={<Building2 className="h-4 w-4" />}
+              helperText="This is what your team will see around the app"
+            />
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Organization slug
-              </label>
-              <input
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                className="brand-input"
-                placeholder="your-company"
-              />
-            </div>
+            <Input
+              label="Workspace slug"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="e.g. northwind-research"
+              helperText="We'll create one for you if you leave this blank"
+            />
 
             {error ? (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                {error}
-              </div>
+              <Feedback variant="error" title="Your workspace isn't ready yet" description={error} />
             ) : null}
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="brand-btn-primary mt-2 w-fit px-5 py-3"
+              loading={loading}
+              size="lg"
+              trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
             >
-              {loading ? "Saving..." : "Save organization"}
-            </button>
+              {loading ? "Saving your workspace" : "Save workspace"}
+            </Button>
           </form>
-        </div>
+        </Card>
+
+        <Card variant="flat" className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[var(--color-text)]">
+              What happens next
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+              You're one step away from creating your first survey
+            </p>
+          </div>
+
+          {[
+            "Your workspace becomes the home for every survey you publish",
+            "You can create surveys, publish links, and review responses in one place",
+            "You can come back later and refine the setup whenever you need to",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-3 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--color-success)]" />
+              <p className="text-sm leading-6 text-[var(--color-text-muted)]">{item}</p>
+            </div>
+          ))}
+        </Card>
       </div>
     </DashboardShell>
   );

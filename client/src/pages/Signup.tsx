@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, KeyRound, Mail, Sparkles, Users } from "lucide-react";
 import AuthCard from "../components/AuthCard";
+import PageMeta from "../components/PageMeta";
 import { signInWithGoogle, signUpWithPassword } from "../lib/auth";
+import { Button } from "../components/ui/button";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { Card } from "../components/ui/Card";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -9,7 +15,6 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -26,17 +31,17 @@ export default function Signup() {
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanEmail || !password || !confirmPassword) {
-      setError("Please fill all fields.");
+      setError("Add your email and choose a password to get started.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Those passwords don't match yet. Try one more time.");
       return;
     }
 
     if (password.length < 6) {
-      setError("Password should be at least 6 characters.");
+      setError("Use at least 6 characters so your account stays secure.");
       return;
     }
 
@@ -47,32 +52,26 @@ export default function Signup() {
 
       if (error) {
         const lowered = error.message.toLowerCase();
-
         if (lowered.includes("already registered")) {
-          setError("This email is already registered. Try signing in instead.");
+          setError("That email's already in use. Try signing in instead.");
         } else {
           setError(error.message);
         }
         return;
       }
 
-      // If confirm email is enabled, Supabase typically returns user but no session.
       if (data?.session) {
-        setSuccessMessage("Account created successfully. Redirecting...");
-        window.setTimeout(() => {
-          navigate("/auth-check");
-        }, 900);
+        setSuccessMessage("Your account is ready. Taking you into setup now.");
+        window.setTimeout(() => navigate("/auth-check"), 900);
         return;
       }
 
       setSuccessMessage(
-        "Account created successfully. Please check your email to confirm your account before signing in.",
+        "Your account is ready. Check your inbox to confirm your email, then sign in.",
       );
     } catch (err) {
       console.error("Signup error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to create account.",
-      );
+      setError(err instanceof Error ? err.message : "We couldn't create your account.");
     } finally {
       setLoading(false);
     }
@@ -80,114 +79,156 @@ export default function Signup() {
 
   async function handleGoogle() {
     clearMessages();
-
     const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
-    }
+    if (error) setError(error.message);
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <AuthCard
-        title="Create your account"
-        subtitle="Start building voice-first surveys for your organization."
-      >
-        <div className="space-y-4">
-          <button
-            onClick={handleGoogle}
-            type="button"
-            className="brand-btn-secondary w-full cursor-pointer py-3 text-slate-700"
+    <>
+      <PageMeta
+        title="Create Account | Survica"
+        description="Create your Survica account and start building voice-first surveys"
+      />
+
+      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <section className="hidden lg:block">
+            <div className="max-w-xl space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                Set up your survey workspace
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="text-5xl font-semibold text-[var(--color-text)]">
+                  Build a calmer way to collect honest feedback
+                </h1>
+                <p className="max-w-lg text-base leading-7 text-[var(--color-text-muted)]">
+                  Create your workspace, publish voice surveys, and review responses in a UI that helps your team move with confidence.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Card className="space-y-3">
+                  <Users className="h-5 w-5 text-[var(--color-primary)]" />
+                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                    Team-ready from day one
+                  </h2>
+                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                    Start with your workspace, then invite your team into a clean survey flow.
+                  </p>
+                </Card>
+                <Card className="space-y-3" variant="flat">
+                  <ArrowRight className="h-5 w-5 text-[var(--color-info)]" />
+                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                    Go from draft to live
+                  </h2>
+                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                    Launch your first survey in minutes and keep the experience smooth for respondents.
+                  </p>
+                </Card>
+              </div>
+            </div>
+          </section>
+
+          <AuthCard
+            title="Create Account"
+            subtitle="Let's get your workspace ready so you can launch your first survey"
           >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google"
-              className="h-5 w-5"
-            />
-            Continue with Google
-          </button>
+            <div className="space-y-5">
+              <Button
+                onClick={handleGoogle}
+                type="button"
+                variant="secondary"
+                size="lg"
+                className="w-full"
+                leadingIcon={
+                  <img
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    className="h-5 w-5"
+                  />
+                }
+              >
+                Continue with Google
+              </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400">or</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <input
-                type="email"
-                className="brand-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                autoComplete="email"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <input
-                type="password"
-                className="brand-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                autoComplete="new-password"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Confirm password
-              </label>
-              <input
-                type="password"
-                className="brand-input"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
-                autoComplete="new-password"
-              />
-            </div>
-
-            {error ? (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                {error}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[var(--color-border)]" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[var(--color-surface-raised)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                    Or use email
+                  </span>
+                </div>
               </div>
-            ) : null}
 
-            {successMessage ? (
-              <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">
-                {successMessage}
-              </div>
-            ) : null}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                  type="email"
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  leadingIcon={<Mail className="h-4 w-4" />}
+                />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="brand-btn-primary w-full cursor-pointer py-3"
-            >
-              {loading ? "Creating account..." : "Sign up"}
-            </button>
-          </form>
+                <Input
+                  type="password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Choose a password"
+                  autoComplete="new-password"
+                  leadingIcon={<KeyRound className="h-4 w-4" />}
+                  helperText="Use at least 6 characters"
+                />
 
-          <p className="text-center text-sm text-slate-500">
-            Already have an account?{" "}
-            <Link to="/login" className="font-medium text-indigo-700">
-              Sign in
-            </Link>
-          </p>
+                <Input
+                  type="password"
+                  label="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  autoComplete="new-password"
+                  leadingIcon={<KeyRound className="h-4 w-4" />}
+                />
+
+                {error ? (
+                  <Feedback variant="error" title="We couldn't create your account" description={error} />
+                ) : null}
+
+                {successMessage ? (
+                  <Feedback
+                    variant="success"
+                    title="You're almost there"
+                    description={successMessage}
+                  />
+                ) : null}
+
+                <Button
+                  type="submit"
+                  loading={loading}
+                  size="lg"
+                  className="w-full"
+                  trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
+                >
+                  {loading ? "Creating your account" : "Create account"}
+                </Button>
+              </form>
+
+              <p className="text-center text-sm text-[var(--color-text-muted)]">
+                Already have an account?{" "}
+                <Link to="/login" className="font-semibold text-[var(--color-primary)]">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </AuthCard>
         </div>
-      </AuthCard>
-    </div>
+      </div>
+    </>
   );
 }

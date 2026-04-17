@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  FaMicrophone,
-  FaStop,
-  FaPlay,
-  FaRedo,
-  FaCheckCircle,
-} from "react-icons/fa";
+  AudioWaveform,
+  CheckCircle2,
+  Mic,
+  Play,
+  RotateCcw,
+  Square,
+} from "lucide-react";
+import { Badge } from "./ui/Badge";
+import { Button } from "./ui/button";
+import { Card } from "./ui/Card";
+import { Feedback } from "./ui/Feedback";
 
 type AudioRecorderProps = {
   maxDurationSeconds?: number;
@@ -169,84 +174,120 @@ export default function AudioRecorder({
   }
 
   const hasRecording = !!audioBlob;
-  const progress = Math.min((seconds / maxDurationSeconds) * 100, 100);
+  const segments = 10;
+  const filledSegments = Math.min(
+    segments,
+    Math.max(0, Math.ceil((seconds / maxDurationSeconds) * segments)),
+  );
 
   return (
-    <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+    <Card className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+            <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-info)]" />
+            Voice recorder
+          </div>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Speak naturally. You can re-record before you continue.
+          </p>
+        </div>
+
+        <Badge
+          variant={isRecording ? "danger" : hasRecording ? "success" : "info"}
+          dot
+        >
+          {isRecording
+            ? "Recording now"
+            : hasRecording
+              ? "Answer saved"
+              : "Ready to record"}
+        </Badge>
+      </div>
+
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {!isRecording ? (
-          <button
-            type="button"
+          <Button
             onClick={startRecording}
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-rose-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-rose-700 sm:w-auto"
+            className="w-full sm:w-auto"
+            leadingIcon={<Mic className="h-4 w-4" />}
+            variant={hasRecording ? "secondary" : "primary"}
           >
-            <FaMicrophone className="h-4 w-4" />
-            {hasRecording ? "Record Again" : "Start Recording"}
-          </button>
+            {hasRecording ? "Record again" : "Start recording"}
+          </Button>
         ) : (
-          <button
-            type="button"
+          <Button
             onClick={stopRecording}
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-black sm:w-auto"
+            className="w-full sm:w-auto"
+            leadingIcon={<Square className="h-4 w-4" />}
+            variant="danger"
           >
-            <FaStop className="h-4 w-4" />
-            Stop Recording
-          </button>
+            Stop recording
+          </Button>
         )}
 
         {hasRecording ? (
-          <button
-            type="button"
+          <Button
             onClick={resetRecording}
-            className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+            className="w-full sm:w-auto"
+            leadingIcon={<RotateCcw className="h-4 w-4" />}
+            variant="ghost"
           >
-            <FaRedo className="h-4 w-4" />
-            Re-record
-          </button>
+            Clear answer
+          </Button>
         ) : null}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <Card className="space-y-4 rounded-[24px]" variant="flat">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-slate-500">Recording time</p>
-            <p className="mt-1 text-base font-semibold text-slate-900">
+            <p className="text-sm text-[var(--color-text-muted)]">
+              Recording time
+            </p>
+            <p className="mt-1 text-base font-semibold text-[var(--color-text)]">
               {formatTime(seconds)} / {formatTime(maxDurationSeconds)}
             </p>
           </div>
 
           <div className="text-left sm:text-right">
             {isRecording ? (
-              <p className="text-sm font-medium text-rose-600">
-                Recording in progress...
+              <p className="text-sm font-medium text-[var(--color-danger)]">
+                Recording your answer
               </p>
             ) : hasRecording ? (
-              <p className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600">
-                <FaCheckCircle className="h-4 w-4" />
-                Recording saved
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-success)]">
+                <CheckCircle2 className="h-4 w-4" />
+                Your answer is ready
               </p>
             ) : (
-              <p className="text-sm text-slate-500">
-                Record your answer before moving on.
+              <p className="text-sm text-[var(--color-text-muted)]">
+                Start when you're ready.
               </p>
             )}
           </div>
         </div>
 
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
-          <div
-            className={`h-full rounded-full transition-all duration-300 ${
-              isRecording ? "bg-rose-600" : "bg-[#4f46e5]"
-            }`}
-            style={{ width: `${progress}%` }}
-          />
+        <div className="grid grid-cols-10 gap-2">
+          {Array.from({ length: segments }, (_, index) => (
+            <div
+              key={index}
+              className={[
+                "h-2 rounded-full transition-colors duration-200",
+                index < filledSegments
+                  ? isRecording
+                    ? "bg-[var(--color-danger)]"
+                    : "bg-[var(--color-primary)]"
+                  : "bg-[var(--color-border)]",
+              ].join(" ")}
+            />
+          ))}
         </div>
-      </div>
+      </Card>
 
       {audioUrl ? (
-        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <FaPlay className="h-4 w-4" />
+        <Card className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-[var(--color-text)]">
+            <Play className="h-4 w-4" />
             Playback
           </div>
 
@@ -254,14 +295,16 @@ export default function AudioRecorder({
             <source src={audioUrl} />
             Your browser does not support audio playback.
           </audio>
-        </div>
+        </Card>
       ) : null}
 
       {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
-        </div>
+        <Feedback
+          variant="error"
+          title="Your microphone isn't available yet"
+          description={error}
+        />
       ) : null}
-    </div>
+    </Card>
   );
 }

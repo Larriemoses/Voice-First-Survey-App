@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FaClipboardList,
-  FaUsers,
-  FaChartBar,
-  FaRocket,
-  FaArrowRight,
-  FaBolt,
-  FaWaveSquare,
-  FaCheckCircle,
-} from "react-icons/fa";
-
+  AudioWaveform,
+  ArrowRight,
+  ClipboardList,
+  MessageSquareText,
+  Rocket,
+  Users,
+} from "lucide-react";
 import DashboardShell from "../components/DashboardShell";
 import { getMyOrganizationMembership } from "../lib/organization";
 import { supabase } from "../lib/supabase";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { EmptyState } from "../components/ui/EmptyState";
+import { Feedback } from "../components/ui/Feedback";
+import { PageHeader } from "../components/ui/PageHeader";
+import { Skeleton } from "../components/ui/Skeleton";
+import { Badge } from "../components/ui/Badge";
 
 type OrgState = {
   id?: string;
@@ -72,8 +76,7 @@ export default function Dashboard() {
 
         const totalSurveys = surveys?.length || 0;
         const publishedSurveys =
-          surveys?.filter((survey) => survey.status === "published").length ||
-          0;
+          surveys?.filter((survey) => survey.status === "published").length || 0;
 
         const [
           { count: responseCount, error: responsesError },
@@ -102,7 +105,7 @@ export default function Dashboard() {
         });
       } catch (error) {
         console.error("Dashboard load error:", error);
-        setLoadError("Failed to load dashboard data.");
+        setLoadError("We couldn't load your dashboard right now.");
       } finally {
         setLoading(false);
       }
@@ -116,354 +119,277 @@ export default function Dashboard() {
   const insightMessage = useMemo(() => {
     if (metrics.totalSurveys === 0) {
       return {
-        title: "You're ready to launch your first survey",
-        text: "Create your first voice survey and start collecting real spoken feedback from your audience.",
+        title: "You're ready for your first survey",
+        text: "Create a survey, shape the voice experience, and publish it when it feels right.",
       };
     }
 
     if (metrics.publishedSurveys === 0) {
       return {
-        title: "You have surveys, but none are live yet",
-        text: "Publish a survey so respondents can start sending voice responses into your workspace.",
+        title: "Your drafts are waiting to go live",
+        text: "Review your builder, publish a survey, and start collecting real responses.",
       };
     }
 
     if (metrics.totalResponses === 0) {
       return {
         title: "Your survey is live",
-        text: "Now it's time to share it and collect your first set of responses.",
+        text: "Now's the moment to share it and bring your first responses into the workspace.",
       };
     }
 
     return {
-      title: "Your workspace is active",
-      text: "Track performance, review incoming responses, and keep improving how your team collects insight.",
+      title: "Your workspace has momentum",
+        text: "Stay close to what's coming in, review transcripts, and keep improving the experience.",
     };
   }, [metrics]);
 
-  const progressItems = [
-    {
-      label: "Create survey",
-      done: metrics.totalSurveys > 0,
-    },
-    {
-      label: "Publish survey",
-      done: metrics.publishedSurveys > 0,
-    },
-    {
-      label: "Collect responses",
-      done: metrics.totalResponses > 0,
-    },
+  const steps = [
+    { label: "Create a survey", done: metrics.totalSurveys > 0 },
+    { label: "Publish it", done: metrics.publishedSurveys > 0 },
+    { label: "Collect responses", done: metrics.totalResponses > 0 },
   ];
 
-  const completionPercent = useMemo(() => {
-    const completed = progressItems.filter((item) => item.done).length;
-    return Math.round((completed / progressItems.length) * 100);
-  }, [progressItems]);
+  const completion = steps.filter((step) => step.done).length;
 
   const metricCards = [
     {
       label: "Surveys",
       value: metrics.totalSurveys,
-      icon: <FaClipboardList className="h-5 w-5" />,
-      tone: "text-[#4f46e5] bg-[#eef2ff]",
-      note: "Created surveys",
+      note: "Total survey drafts and live surveys",
+      icon: ClipboardList,
     },
     {
-      label: "Published",
+      label: "Live",
       value: metrics.publishedSurveys,
-      icon: <FaRocket className="h-5 w-5" />,
-      tone: "text-[#0891b2] bg-[#ecfeff]",
-      note: "Currently live",
+      note: "Published surveys collecting responses",
+      icon: Rocket,
     },
     {
       label: "Responses",
       value: metrics.totalResponses,
-      icon: <FaChartBar className="h-5 w-5" />,
-      tone: "text-emerald-600 bg-emerald-50",
-      note: "Collected so far",
+      note: "Voice responses recorded so far",
+      icon: MessageSquareText,
     },
     {
       label: "Team",
       value: metrics.teamMembers,
-      icon: <FaUsers className="h-5 w-5" />,
-      tone: "text-cyan-600 bg-cyan-50",
-      note: "Workspace members",
+      note: "People in this workspace",
+      icon: Users,
     },
   ];
 
   return (
     <DashboardShell>
-      <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
-            Dashboard
-          </h1>
-          <p className="text-sm text-slate-500">
-            A clear view of your Survica workspace, progress, and next steps.
-          </p>
+      <PageHeader
+        title="Dashboard"
+        subtitle={`A calm view of what's happening in ${orgName}`}
+        actions={
+          <Button
+            onClick={() => navigate("/surveys/create")}
+            trailingIcon={<ArrowRight className="h-4 w-4" />}
+          >
+            Create survey
+          </Button>
+        }
+      />
+
+      {loading ? (
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="space-y-4">
+            <Skeleton className="h-6 w-28 rounded-full" />
+            <Skeleton className="h-14 w-4/5" />
+            <Skeleton className="h-24 rounded-[24px]" />
+          </Card>
+          <Card className="space-y-4">
+            <Skeleton className="h-5 w-32 rounded-full" />
+            <Skeleton className="h-14 rounded-[20px]" />
+            <Skeleton className="h-14 rounded-[20px]" />
+            <Skeleton className="h-14 rounded-[20px]" />
+          </Card>
         </div>
-
-        {loading ? (
-          <div className="brand-card p-5 sm:p-6">
-            <p className="text-sm text-slate-500">Loading dashboard...</p>
-          </div>
-        ) : loadError ? (
-          <div className="rounded-3xl border border-red-200 bg-red-50 p-5 sm:p-6">
-            <p className="text-sm text-red-600">{loadError}</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
-              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-sm sm:p-6 lg:p-7">
-                <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-[#4f46e5]/5 blur-3xl sm:h-36 sm:w-36" />
-                <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-[#0891b2]/5 blur-3xl sm:h-28 sm:w-28" />
-
-                <div className="relative">
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-semibold text-[#4f46e5]">
-                    <FaWaveSquare className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{orgName}</span>
-                  </div>
-
-                  <div className="mt-4 max-w-2xl">
-                    <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-                      {insightMessage.title}
-                    </h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">
-                      {insightMessage.text}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                    <button
-                      onClick={() => navigate("/surveys/create")}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4f46e5] px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#4338ca] sm:w-auto"
-                    >
-                      Create Survey
-                      <FaArrowRight className="h-4 w-4" />
-                    </button>
-
-                    <button
-                      onClick={() => navigate("/surveys")}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-                    >
-                      View Surveys
-                    </button>
-                  </div>
-                </div>
+      ) : loadError ? (
+        <Feedback
+          variant="error"
+          title="Your dashboard didn't load"
+          description={loadError}
+        />
+      ) : !membership?.organization ? (
+        <EmptyState
+          icon={<AudioWaveform className="h-6 w-6" />}
+          title="Let's set up your workspace"
+          description="Create your workspace first, then you can start building surveys and collecting responses."
+          action={
+            <Button onClick={() => navigate("/onboarding")}>
+              Finish setup
+            </Button>
+          }
+        />
+      ) : (
+        <div className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <Card className="space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                {orgName}
               </div>
 
-              <div className="brand-card p-5 sm:p-6">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-amber-50 p-3 text-amber-600">
-                    <FaBolt className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-semibold text-slate-900">
-                      Workspace progress
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      What's been completed so far
-                    </p>
-                  </div>
-                </div>
+              <div className="space-y-3">
+                <h2 className="text-3xl font-semibold text-[var(--color-text)]">
+                  {insightMessage.title}
+                </h2>
+                <p className="max-w-2xl text-sm leading-7 text-[var(--color-text-muted)]">
+                  {insightMessage.text}
+                </p>
+              </div>
 
-                <div className="mt-5">
-                  <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700">
-                      Completion
-                    </span>
-                    <span className="font-semibold text-slate-900">
-                      {completionPercent}%
-                    </span>
-                  </div>
-
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className="h-full rounded-full bg-[#4f46e5] transition-all duration-300"
-                      style={{ width: `${completionPercent}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-5 space-y-3">
-                  {progressItems.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                            item.done
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-slate-200 text-slate-500"
-                          }`}
-                        >
-                          <FaCheckCircle className="h-3.5 w-3.5" />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700">
-                          {item.label}
-                        </span>
-                      </div>
-
-                      <span
-                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          item.done
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
-                        {item.done ? "Done" : "Pending"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
                   onClick={() => navigate("/surveys/create")}
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[#4f46e5] transition hover:text-[#4338ca]"
+                  trailingIcon={<ArrowRight className="h-4 w-4" />}
                 >
-                  Continue setup
-                  <FaArrowRight className="h-3.5 w-3.5" />
-                </button>
+                  Create survey
+                </Button>
+                <Button variant="secondary" onClick={() => navigate("/surveys")}>
+                  View surveys
+                </Button>
               </div>
-            </div>
+            </Card>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {metricCards.map((card) => (
-                <div
-                  key={card.label}
-                  className="brand-card rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
-                >
+            <Card variant="flat" className="space-y-4">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                  Next milestones
+                </h2>
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                  You've completed {completion} of {steps.length} key setup steps
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {steps.map((step) => (
+                  <div
+                    key={step.label}
+                    className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3"
+                  >
+                    <span className="text-sm font-medium text-[var(--color-text)]">
+                      {step.label}
+                    </span>
+                    <Badge variant={step.done ? "success" : "warning"} dot>
+                      {step.done ? "Done" : "Next"}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {metricCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Card key={card.label} className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
-                    <div className={`rounded-2xl p-3 ${card.tone}`}>
-                      {card.icon}
+                    <div className="flex h-11 w-11 items-center justify-center rounded-[20px] bg-[var(--color-surface)] text-[var(--color-primary)]">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-xs font-medium text-slate-400">
+                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
                       {card.label}
                     </span>
                   </div>
-
-                  <h3 className="mt-4 text-2xl font-semibold text-slate-900 sm:text-3xl">
+                  <p className="text-3xl font-semibold text-[var(--color-text)]">
                     {card.value}
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500">{card.note}</p>
-                </div>
+                  </p>
+                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                    {card.note}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="space-y-4">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                  What to do next
+                </h2>
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                  Keep moving the workspace forward without guessing
+                </p>
+              </div>
+
+              {[
+                {
+                  title: "Create a new survey",
+                  description: "Start with a title, add questions, and shape the respondent experience.",
+                  action: () => navigate("/surveys/create"),
+                },
+                {
+                  title: "Review existing surveys",
+                  description: "Open your survey list to publish drafts or revisit live work.",
+                  action: () => navigate("/surveys"),
+                },
+                {
+                  title: "Update your profile",
+                  description: "Keep your account details tidy so shared workflows stay clear.",
+                  action: () => navigate("/profile"),
+                },
+              ].map((item) => (
+                <button
+                  key={item.title}
+                  type="button"
+                  onClick={item.action}
+                  className="flex min-h-14 items-center justify-between gap-4 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 text-left transition hover:bg-[var(--color-surface)]"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--color-text)]">
+                      {item.title}
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                      {item.description}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" />
+                </button>
               ))}
-            </div>
+            </Card>
 
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="brand-card p-5 sm:p-6">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Workspace overview
+            <Card variant="flat" className="space-y-4">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                  Workspace pulse
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  A quick summary of what is happening in your workspace
+                <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                  A quick read on how your workspace is performing right now
                 </p>
-
-                <div className="mt-5 space-y-3">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-900">
-                      Surveys created
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      You currently have{" "}
-                      <span className="font-semibold text-slate-900">
-                        {metrics.totalSurveys}
-                      </span>{" "}
-                      survey{metrics.totalSurveys === 1 ? "" : "s"} in your
-                      workspace.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-900">
-                      Surveys published
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      <span className="font-semibold text-slate-900">
-                        {metrics.publishedSurveys}
-                      </span>{" "}
-                      survey{metrics.publishedSurveys === 1 ? "" : "s"} are live
-                      and collecting responses.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-900">
-                      Total responses
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-500">
-                      Your workspace has collected{" "}
-                      <span className="font-semibold text-slate-900">
-                        {metrics.totalResponses}
-                      </span>{" "}
-                      response{metrics.totalResponses === 1 ? "" : "s"} so far.
-                    </p>
-                  </div>
-                </div>
               </div>
 
-              <div className="brand-card p-5 sm:p-6">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Quick access
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Jump into the most common workspace tasks
-                </p>
+              <div className="space-y-3">
+                <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+                  <p className="text-sm font-semibold text-[var(--color-text)]">
+                    Survey drafts
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+                    You currently have {metrics.totalSurveys - metrics.publishedSurveys} survey drafts waiting for polish or publication.
+                  </p>
+                </div>
 
-                <div className="mt-5 grid gap-3">
-                  <button
-                    onClick={() => navigate("/surveys/create")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Create survey
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Start a new voice survey workflow
-                      </p>
-                    </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/surveys")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Manage surveys
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Review, edit, and organize surveys
-                      </p>
-                    </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/profile")}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition hover:border-[#4f46e5]/30 hover:bg-[#eef2ff]/50"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900">
-                        Manage profile
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Update your account and workspace preferences
-                      </p>
-                    </div>
-                    <FaArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-[#4f46e5]" />
-                  </button>
+                <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+                  <p className="text-sm font-semibold text-[var(--color-text)]">
+                    Live collection
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+                    {metrics.publishedSurveys > 0
+                      ? `${metrics.publishedSurveys} live surveys are ready to receive more voice responses.`
+                      : "No live surveys yet. Publish one when you're ready to collect feedback."}
+                  </p>
                 </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            </Card>
+          </div>
+        </div>
+      )}
     </DashboardShell>
   );
 }

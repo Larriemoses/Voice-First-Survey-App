@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, KeyRound, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import AuthCard from "../components/AuthCard";
+import PageMeta from "../components/PageMeta";
 import { signInWithGoogle, signInWithPassword } from "../lib/auth";
+import { Button } from "../components/ui/button";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { Card } from "../components/ui/Card";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -25,7 +30,7 @@ export default function Login() {
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanEmail || !password) {
-      setError("Please enter your email and password.");
+      setError("Add your email and password so we can sign you in.");
       return;
     }
 
@@ -41,13 +46,13 @@ export default function Login() {
           lowered.includes("invalid login credentials") ||
           lowered.includes("invalid credentials")
         ) {
-          setError("Invalid email or password.");
+          setError("That email and password don't match. Try again.");
         } else if (
           lowered.includes("email not confirmed") ||
           lowered.includes("email_not_confirmed")
         ) {
           setError(
-            "Your email is not confirmed yet. Please check your inbox and confirm your account first.",
+            "You still need to confirm your email. Check your inbox, then come right back.",
           );
         } else {
           setError(error.message);
@@ -57,20 +62,15 @@ export default function Login() {
       }
 
       if (!data?.session) {
-        setError(
-          "Login could not be completed. Please confirm your email first or try again.",
-        );
+        setError("We couldn't finish signing you in yet. Confirm your email first.");
         return;
       }
 
-      setSuccessMessage("Signed in successfully. Redirecting...");
-
-      window.setTimeout(() => {
-        navigate("/auth-check");
-      }, 700);
+      setSuccessMessage("You're in. Taking you to your workspace now.");
+      window.setTimeout(() => navigate("/auth-check"), 700);
     } catch (err) {
       console.error("Login error:", err);
-      setError(err instanceof Error ? err.message : "Failed to sign in.");
+      setError(err instanceof Error ? err.message : "We couldn't sign you in.");
     } finally {
       setLoading(false);
     }
@@ -78,100 +78,145 @@ export default function Login() {
 
   async function handleGoogle() {
     clearMessages();
-
     const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
-    }
+    if (error) setError(error.message);
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <AuthCard
-        title="Welcome back"
-        subtitle="Sign in to manage your organization surveys."
-      >
-        <div className="space-y-4">
-          <button
-            onClick={handleGoogle}
-            type="button"
-            className="brand-btn-secondary w-full cursor-pointer py-3 text-slate-700"
+    <>
+      <PageMeta
+        title="Welcome Back | Survica"
+        description="Sign in to manage your voice surveys and team workflows"
+      />
+
+      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <section className="hidden lg:block">
+            <div className="max-w-xl space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                Voice feedback, without the friction
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="text-5xl font-semibold text-[var(--color-text)]">
+                  Hear what people mean, not just what they typed
+                </h1>
+                <p className="max-w-lg text-base leading-7 text-[var(--color-text-muted)]">
+                  Survica helps your team launch voice-first surveys, collect clear spoken responses, and review insights without chasing recordings across tools.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Card className="space-y-3">
+                  <ShieldCheck className="h-5 w-5 text-[var(--color-success)]" />
+                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                    Built for trust
+                  </h2>
+                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                    Give respondents a flow that feels simple, private, and easy to finish.
+                  </p>
+                </Card>
+                <Card className="space-y-3" variant="flat">
+                  <ArrowRight className="h-5 w-5 text-[var(--color-info)]" />
+                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                    Move faster
+                  </h2>
+                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                    Publish faster, review transcripts sooner, and keep your team aligned.
+                  </p>
+                </Card>
+              </div>
+            </div>
+          </section>
+
+          <AuthCard
+            title="Welcome Back"
+            subtitle="Sign in to pick up right where you left off"
           >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google"
-              className="h-5 w-5"
-            />
-            Continue with Google
-          </button>
+            <div className="space-y-5">
+              <Button
+                onClick={handleGoogle}
+                type="button"
+                variant="secondary"
+                size="lg"
+                className="w-full"
+                leadingIcon={
+                  <img
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    className="h-5 w-5"
+                  />
+                }
+              >
+                Continue with Google
+              </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400">or</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <input
-                type="email"
-                className="brand-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                autoComplete="email"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <input
-                type="password"
-                className="brand-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                autoComplete="current-password"
-              />
-            </div>
-
-            {error ? (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                {error}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[var(--color-border)]" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[var(--color-surface-raised)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                    Or use email
+                  </span>
+                </div>
               </div>
-            ) : null}
 
-            {successMessage ? (
-              <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">
-                {successMessage}
-              </div>
-            ) : null}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                  type="email"
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  leadingIcon={<Mail className="h-4 w-4" />}
+                />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="brand-btn-primary w-full cursor-pointer py-3"
-            >
-              {loading ? "Signing in..." : "Login"}
-            </button>
-          </form>
+                <Input
+                  type="password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Add your password"
+                  autoComplete="current-password"
+                  leadingIcon={<KeyRound className="h-4 w-4" />}
+                />
 
-          <p className="text-center text-sm text-slate-500">
-            Don’t have an account?{" "}
-            <Link to="/signup" className="font-medium text-indigo-700">
-              Sign up
-            </Link>
-          </p>
+                {error ? (
+                  <Feedback variant="error" title="We couldn't sign you in" description={error} />
+                ) : null}
+
+                {successMessage ? (
+                  <Feedback
+                    variant="success"
+                    title="You're on your way"
+                    description={successMessage}
+                  />
+                ) : null}
+
+                <Button
+                  type="submit"
+                  loading={loading}
+                  size="lg"
+                  className="w-full"
+                  trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
+                >
+                  {loading ? "Signing you in" : "Sign in"}
+                </Button>
+              </form>
+
+              <p className="text-center text-sm text-[var(--color-text-muted)]">
+                New here?{" "}
+                <Link to="/signup" className="font-semibold text-[var(--color-primary)]">
+                  Create your account
+                </Link>
+              </p>
+            </div>
+          </AuthCard>
         </div>
-      </AuthCard>
-    </div>
+      </div>
+    </>
   );
 }

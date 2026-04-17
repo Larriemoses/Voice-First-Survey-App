@@ -1,18 +1,15 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  FaDownload,
-  FaFileExcel,
-  FaPlay,
-  FaBolt,
-  FaUser,
-  FaUsers,
-  FaClock,
-  FaWaveSquare,
-  FaChevronDown,
-  FaChevronUp,
-  FaChartBar,
-} from "react-icons/fa";
+  AudioWaveform,
+  Download,
+  FileSpreadsheet,
+  Headphones,
+  Play,
+  Search,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import * as XLSX from "xlsx";
 import DashboardShell from "../components/DashboardShell";
 import { supabase } from "../lib/supabase";
@@ -22,6 +19,17 @@ import {
   getSurveyResponsesForAdmin,
   type ResponseItem,
 } from "../lib/responses";
+import { formatDateTime, formatDuration } from "../utils/helpers";
+import { Badge } from "../components/ui/Badge";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/Card";
+import { DataTable, type DataTableColumn } from "../components/ui/DataTable";
+import { Drawer } from "../components/ui/Drawer";
+import { EmptyState } from "../components/ui/EmptyState";
+import { Feedback } from "../components/ui/Feedback";
+import { Input } from "../components/ui/Input";
+import { PageHeader } from "../components/ui/PageHeader";
+import { Skeleton } from "../components/ui/Skeleton";
 
 type GroupedResponseRow = {
   respondentId: string;
@@ -29,28 +37,35 @@ type GroupedResponseRow = {
   answers: ResponseItem[];
 };
 
+type StatusFilter = "all" | "completed" | "processing" | "failed" | "pending";
+
+function TranscriptStatusBadge({ status }: { status?: string | null }) {
+  if (status === "completed") return <Badge variant="success" dot>Completed</Badge>;
+  if (status === "processing") return <Badge variant="info" dot>Processing</Badge>;
+  if (status === "failed") return <Badge variant="danger" dot>Failed</Badge>;
+  return <Badge variant="warning" dot>Pending</Badge>;
+}
+
 export default function SurveyResponses() {
   const { surveyId } = useParams();
 
   const [responses, setResponses] = useState<ResponseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-
+  const [feedback, setFeedback] = useState<{
+    variant: "success" | "error" | "info";
+    title: string;
+    description?: string;
+  } | null>(null);
   const [downloadingPath, setDownloadingPath] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [processingAll, setProcessingAll] = useState(false);
-
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-
-  const [expandedRespondents, setExpandedRespondents] = useState<
-    Record<string, boolean>
-  >({});
+  const [selectedRespondentId, setSelectedRespondentId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "completed" | "processing" | "failed" | "pending"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   async function loadResponses() {
     if (!surveyId) return;
@@ -61,7 +76,7 @@ export default function SurveyResponses() {
       setResponses(data);
     } catch (error) {
       console.error("Load responses error:", error);
-      setLoadError("Failed to load responses.");
+      setLoadError("We couldn't load your responses right now.");
     }
   }
 
@@ -82,9 +97,14 @@ export default function SurveyResponses() {
     try {
       setDownloadingPath(audioPath);
       const url = await downloadResponseAudio(audioPath);
-      window.open(url, "_blank");
+      window.open(url, "_blank", "noopener,noreferrer");
     } catch (err) {
       console.error("Download audio error:", err);
+      setFeedback({
+        variant: "error",
+        title: "Audio download failed",
+        description: "We couldn't fetch that recording right now.",
+      });
     } finally {
       setDownloadingPath(null);
     }
@@ -104,6 +124,11 @@ export default function SurveyResponses() {
       setPlayingUrl(url);
     } catch (err) {
       console.error("Play audio error:", err);
+      setFeedback({
+        variant: "error",
+        title: "Playback isn't ready",
+        description: "We couldn't open that recording right now.",
+      });
     }
   }
 
@@ -117,7 +142,11 @@ export default function SurveyResponses() {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        alert("Your session has expired. Please log in again.");
+        setFeedback({
+          variant: "error",
+          title: "Your session expired",
+          description: "Sign in again, then try processing this response one more time.",
+        });
         return;
       }
 
@@ -130,19 +159,38 @@ export default function SurveyResponses() {
 
       if (error) {
         console.error("Edge Function Error:", error);
-        alert(`Error: ${error.message}`);
+        setFeedback({
+          variant: "error",
+          title: "Transcription didn't start",
+          description: error.message,
+        });
         return;
       }
 
       setResponses((prev) =>
-        prev.map((r) =>
-          r.id === item.id ? { ...r, transcript_status: "processing" } : r,
+        prev.map((response) =>
+          response.id === item.id
+            ? { ...response, transcript_status: "processing" }
+            : response,
         ),
       );
 
-      setTimeout(loadResponses, 4000);
+      setFeedback({
+        variant: "success",
+        title: "Transcription started",
+        description: "We'll refresh this list in a few seconds.",
+      });
+
+      window.setTimeout(() => {
+        void loadResponses();
+      }, 4000);
     } catch (err) {
       console.error("Processing error:", err);
+      setFeedback({
+        variant: "error",
+        title: "Transcription didn't start",
+        description: "Please try again in a moment.",
+      });
     } finally {
       setProcessingId(null);
     }
@@ -156,7 +204,7 @@ export default function SurveyResponses() {
         (item) =>
           item.audio_path &&
           item.transcript_status !== "processing" &&
-          processingId !== item.id,
+          item.transcript_status !== "completed",
       );
 
       for (const item of pendingItems) {
@@ -173,16 +221,31 @@ export default function SurveyResponses() {
       }
 
       setResponses((prev) =>
-        prev.map((r) => ({
-          ...r,
+        prev.map((response) => ({
+          ...response,
           transcript_status:
-            r.transcript_status === "completed" ? "completed" : "processing",
+            response.transcript_status === "completed"
+              ? "completed"
+              : "processing",
         })),
       );
 
-      setTimeout(loadResponses, 5000);
+      setFeedback({
+        variant: "success",
+        title: "Transcription kicked off",
+        description: "We're processing the current set of recordings now.",
+      });
+
+      window.setTimeout(() => {
+        void loadResponses();
+      }, 5000);
     } catch (err) {
       console.error("Process all error:", err);
+      setFeedback({
+        variant: "error",
+        title: "We couldn't process everything",
+        description: "Try again in a moment.",
+      });
     } finally {
       setProcessingAll(false);
     }
@@ -198,8 +261,18 @@ export default function SurveyResponses() {
       });
 
       XLSX.writeFile(workbook, fileName);
+      setFeedback({
+        variant: "success",
+        title: "Your export is ready",
+        description: "The spreadsheet has been downloaded to your device.",
+      });
     } catch (err) {
       console.error("Export Excel error:", err);
+      setFeedback({
+        variant: "error",
+        title: "Export failed",
+        description: "We couldn't build the spreadsheet right now.",
+      });
     } finally {
       setExporting(false);
     }
@@ -226,8 +299,8 @@ export default function SurveyResponses() {
 
     rows.forEach((group) => {
       group.answers.sort(
-        (a, b) =>
-          (a.question?.order_index || 0) - (b.question?.order_index || 0),
+        (left, right) =>
+          (left.question?.order_index || 0) - (right.question?.order_index || 0),
       );
     });
 
@@ -243,7 +316,6 @@ export default function SurveyResponses() {
     const processingTranscripts = responses.filter(
       (item) => item.transcript_status === "processing",
     ).length;
-
     const avgDuration =
       responses.length > 0
         ? Math.round(
@@ -261,9 +333,9 @@ export default function SurveyResponses() {
       processingTranscripts,
       avgDuration,
     };
-  }, [responses, groupedResponses]);
+  }, [groupedResponses.length, responses]);
 
-  const filteredGroupedResponses = useMemo(() => {
+  const filteredGroups = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
     return groupedResponses
@@ -272,25 +344,17 @@ export default function SurveyResponses() {
           statusFilter === "all"
             ? group.answers
             : group.answers.filter((answer) => {
-                const status = (answer.transcript_status || "pending") as
-                  | "completed"
-                  | "processing"
-                  | "failed"
-                  | "pending";
+                const status = (answer.transcript_status || "pending") as StatusFilter;
                 return status === statusFilter;
               });
 
         const matchesSearch =
           !term ||
-          (group.respondent?.display_name || "")
-            .toLowerCase()
-            .includes(term) ||
+          (group.respondent?.display_name || "").toLowerCase().includes(term) ||
           (group.respondent?.email || "").toLowerCase().includes(term) ||
           (group.respondent?.phone || "").toLowerCase().includes(term);
 
-        if (!matchesSearch || filteredAnswers.length === 0) {
-          return null;
-        }
+        if (!matchesSearch || filteredAnswers.length === 0) return null;
 
         return {
           ...group,
@@ -300,497 +364,364 @@ export default function SurveyResponses() {
       .filter(Boolean) as GroupedResponseRow[];
   }, [groupedResponses, searchTerm, statusFilter]);
 
-  function toggleExpanded(respondentId: string) {
-    setExpandedRespondents((prev) => ({
-      ...prev,
-      [respondentId]: !prev[respondentId],
-    }));
-  }
+  const selectedGroup =
+    filteredGroups.find((group) => group.respondentId === selectedRespondentId) ||
+    groupedResponses.find((group) => group.respondentId === selectedRespondentId) ||
+    null;
 
-  function getTranscriptStatusLabel(status?: string | null) {
-    if (status === "completed") return "Completed";
-    if (status === "processing") return "Processing";
-    if (status === "failed") return "Failed";
-    return "Pending";
-  }
+  const processableCount = responses.filter(
+    (item) =>
+      item.audio_path &&
+      item.transcript_status !== "processing" &&
+      item.transcript_status !== "completed",
+  ).length;
 
-  function getTranscriptStatusClass(status?: string | null) {
-    if (status === "completed") return "bg-green-50 text-green-700";
-    if (status === "processing") return "bg-blue-50 text-blue-700";
-    if (status === "failed") return "bg-red-50 text-red-700";
-    return "bg-gray-100 text-gray-600";
-  }
+  const columns: Array<DataTableColumn<GroupedResponseRow>> = [
+    {
+      id: "respondent",
+      header: "Respondent",
+      sortValue: (group) => (group.respondent?.display_name || "anonymous").toLowerCase(),
+      cell: (group) => (
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-[var(--color-text)]">
+            {group.respondent?.display_name || "Anonymous respondent"}
+          </p>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            {group.respondent?.phone || "No phone shared"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "email",
+      header: "Email",
+      sortValue: (group) => (group.respondent?.email || "").toLowerCase(),
+      cell: (group) => (
+        <span className="text-sm text-[var(--color-text-muted)]">
+          {group.respondent?.email || "No email shared"}
+        </span>
+      ),
+    },
+    {
+      id: "answers",
+      header: "Answers",
+      sortValue: (group) => group.answers.length,
+      cell: (group) => (
+        <span className="text-sm font-semibold text-[var(--color-text)]">
+          {group.answers.length}
+        </span>
+      ),
+    },
+    {
+      id: "transcripts",
+      header: "Transcripts",
+      sortValue: (group) =>
+        group.answers.filter((item) => item.transcript_status === "completed").length,
+      cell: (group) => (
+        <span className="text-sm text-[var(--color-text-muted)]">
+          {
+            group.answers.filter((item) => item.transcript_status === "completed").length
+          }{" "}
+          completed
+        </span>
+      ),
+    },
+    {
+      id: "duration",
+      header: "Avg duration",
+      sortValue: (group) =>
+        group.answers.reduce((sum, item) => sum + (item.duration_seconds || 0), 0) /
+        Math.max(group.answers.length, 1),
+      cell: (group) => {
+        const averageDuration =
+          group.answers.length > 0
+            ? Math.round(
+                group.answers.reduce(
+                  (sum, item) => sum + (item.duration_seconds || 0),
+                  0,
+                ) / group.answers.length,
+              )
+            : 0;
+
+        return (
+          <span className="text-sm text-[var(--color-text-muted)]">
+            {formatDuration(averageDuration)}
+          </span>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Details",
+      cell: (group) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSelectedRespondentId(group.respondentId)}
+        >
+          Open
+        </Button>
+      ),
+      className: "text-right",
+    },
+  ];
 
   return (
     <DashboardShell>
-      <div className="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#eef2ff] text-[#4f46e5]">
-                <FaWaveSquare className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900 sm:text-2xl">
-                  Survey Responses
-                </h2>
-                <p className="text-sm text-slate-500">
-                  Review respondent answers, transcripts, and exports in one
-                  place.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <button
+      <PageHeader
+        title="Survey Responses"
+        subtitle="Review respondent answers, check transcription progress, and export what the team needs"
+        backHref={`/surveys/${surveyId}`}
+        actions={
+          <>
+            <Button
+              variant="secondary"
               onClick={handleProcessAll}
-              disabled={processingAll || responses.length === 0}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 sm:w-auto"
+              loading={processingAll}
+              disabled={processableCount === 0}
+              disabledReason="There aren't any pending recordings to transcribe"
+              leadingIcon={!processingAll ? <Sparkles className="h-4 w-4" /> : undefined}
             >
-              <FaBolt className="h-4 w-4" />
-              {processingAll ? "Processing All..." : "Transcribe All"}
-            </button>
-
-            <button
+              {processingAll ? "Starting transcription" : "Transcribe all"}
+            </Button>
+            <Button
               onClick={handleExportExcel}
-              disabled={exporting}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60 sm:w-auto"
+              loading={exporting}
+              leadingIcon={!exporting ? <FileSpreadsheet className="h-4 w-4" /> : undefined}
             >
-              <FaFileExcel className="h-4 w-4" />
-              {exporting ? "Exporting..." : "Export Excel"}
-            </button>
-          </div>
-        </div>
+              {exporting ? "Exporting responses" : "Export Excel"}
+            </Button>
+          </>
+        }
+      />
+
+      <div className="space-y-4">
+        {feedback ? (
+          <Feedback
+            variant={feedback.variant}
+            title={feedback.title}
+            description={feedback.description}
+            dismissible
+            onDismiss={() => setFeedback(null)}
+          />
+        ) : null}
 
         {loading ? (
-          <div className="brand-card p-8">
-            <p className="text-sm text-slate-500">Loading responses...</p>
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Card key={index} className="space-y-3">
+                  <Skeleton className="h-4 w-20 rounded-full" />
+                  <Skeleton className="h-9 w-16 rounded-[20px]" />
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                </Card>
+              ))}
+            </div>
+            <Card className="space-y-4">
+              <Skeleton className="h-12 rounded-[20px]" />
+              <Skeleton className="h-16 rounded-[24px]" />
+              <Skeleton className="h-16 rounded-[24px]" />
+            </Card>
           </div>
         ) : loadError ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
-            <p className="text-sm text-red-600">{loadError}</p>
-          </div>
+          <Feedback
+            variant="error"
+            title="Your responses didn't load"
+            description={loadError}
+          />
         ) : groupedResponses.length === 0 ? (
-          <div className="brand-card border-dashed border-slate-300 p-10 text-center">
-            <p className="text-sm text-slate-500">No responses yet.</p>
-          </div>
+          <EmptyState
+            icon={<AudioWaveform className="h-6 w-6" />}
+            title="No responses yet"
+            description="Once respondents start answering, you'll see each voice response and transcript status here."
+          />
         ) : (
           <>
-            <div className="brand-card p-4 sm:p-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Search respondent
-                  </label>
-                  <input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="brand-input py-2.5"
-                    placeholder="Name, email, or phone"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Transcript status
-                  </label>
-                  <select
-                    value={statusFilter}
-                    onChange={(e) =>
-                      setStatusFilter(
-                        e.target.value as
-                          | "all"
-                          | "completed"
-                          | "processing"
-                          | "failed"
-                          | "pending",
-                      )
-                    }
-                    className="brand-input py-2.5"
-                  >
-                    <option value="all">All statuses</option>
-                    <option value="completed">Completed</option>
-                    <option value="processing">Processing</option>
-                    <option value="failed">Failed</option>
-                    <option value="pending">Pending</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              <div className="brand-card rounded-2xl p-5">
-                <div className="flex items-center gap-3">
-                  <FaUsers className="h-4 w-4 text-[#4f46e5]" />
-                  <p className="text-sm text-slate-500">Respondents</p>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">
-                  {analytics.totalRespondents}
-                </p>
-              </div>
-
-              <div className="brand-card rounded-2xl p-5">
-                <div className="flex items-center gap-3">
-                  <FaWaveSquare className="h-4 w-4 text-[#0891b2]" />
-                  <p className="text-sm text-slate-500">Responses</p>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">
-                  {analytics.totalResponses}
-                </p>
-              </div>
-
-              <div className="brand-card rounded-2xl p-5">
-                <div className="flex items-center gap-3">
-                  <FaBolt className="h-4 w-4 text-green-600" />
-                  <p className="text-sm text-slate-500">Transcribed</p>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">
-                  {analytics.completedTranscripts}
-                </p>
-              </div>
-
-              <div className="brand-card rounded-2xl p-5">
-                <div className="flex items-center gap-3">
-                  <FaChartBar className="h-4 w-4 text-blue-600" />
-                  <p className="text-sm text-slate-500">Processing</p>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">
-                  {analytics.processingTranscripts}
-                </p>
-              </div>
-
-              <div className="brand-card rounded-2xl p-5">
-                <div className="flex items-center gap-3">
-                  <FaClock className="h-4 w-4 text-slate-600" />
-                  <p className="text-sm text-slate-500">Avg Duration</p>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">
-                  {analytics.avgDuration}s
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3 md:hidden">
-              {filteredGroupedResponses.map((group) => {
-                const isExpanded = !!expandedRespondents[group.respondentId];
-                const completedCount = group.answers.filter(
-                  (item) => item.transcript_status === "completed",
-                ).length;
+              {[
+                { label: "Respondents", value: analytics.totalRespondents, icon: Users },
+                { label: "Responses", value: analytics.totalResponses, icon: AudioWaveform },
+                { label: "Completed", value: analytics.completedTranscripts, icon: Sparkles },
+                { label: "Processing", value: analytics.processingTranscripts, icon: Sparkles },
+                { label: "Avg duration", value: formatDuration(analytics.avgDuration), icon: Headphones },
+              ].map((card) => {
+                const Icon = card.icon;
 
                 return (
-                  <div key={group.respondentId} className="brand-card p-4">
-                    <button
-                      onClick={() => toggleExpanded(group.respondentId)}
-                      className="flex w-full items-start justify-between gap-3 text-left"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {group.respondent?.display_name || "Anonymous Respondent"}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {group.respondent?.email || "No email"}
-                        </p>
-                        <p className="mt-2 text-xs text-slate-500">
-                          {group.answers.length} answers • {completedCount} completed
-                        </p>
+                  <Card key={card.label} className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                        {card.label}
+                      </span>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[18px] bg-[var(--color-surface)] text-[var(--color-primary)]">
+                        <Icon className="h-4 w-4" />
                       </div>
-                      {isExpanded ? (
-                        <FaChevronUp className="mt-1 h-4 w-4 text-slate-500" />
-                      ) : (
-                        <FaChevronDown className="mt-1 h-4 w-4 text-slate-500" />
-                      )}
-                    </button>
-
-                    {isExpanded ? (
-                      <div className="mt-4 space-y-3">
-                        {group.answers.map((item) => (
-                          <div
-                            key={item.id}
-                            className="rounded-xl border border-slate-200 bg-slate-50 p-3"
-                          >
-                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                              Q{item.question?.order_index || "—"}
-                            </p>
-                            <p className="mt-1 text-sm font-medium text-slate-900">
-                              {item.question?.prompt || "No question found"}
-                            </p>
-                            <p className="mt-2 text-xs text-slate-500">
-                              {item.duration_seconds || 0}s •{" "}
-                              {getTranscriptStatusLabel(item.transcript_status)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+                    </div>
+                    <p className="text-3xl font-semibold text-[var(--color-text)]">
+                      {card.value}
+                    </p>
+                  </Card>
                 );
               })}
             </div>
 
-            <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Respondent
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Email
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Answers
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Completed Transcripts
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Avg Duration
-                      </th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
+            <Card className="grid gap-4 sm:grid-cols-2">
+              <Input
+                label="Search respondents"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name, email, or phone"
+                leadingIcon={<Search className="h-4 w-4" />}
+              />
 
-                  <tbody className="divide-y divide-slate-100 bg-white">
-                    {filteredGroupedResponses.map((group) => {
-                      const isExpanded =
-                        !!expandedRespondents[group.respondentId];
-                      const completedCount = group.answers.filter(
-                        (item) => item.transcript_status === "completed",
-                      ).length;
-                      const averageDuration =
-                        group.answers.length > 0
-                          ? Math.round(
-                              group.answers.reduce(
-                                (sum, item) =>
-                                  sum + (item.duration_seconds || 0),
-                                0,
-                              ) / group.answers.length,
-                            )
-                          : 0;
-
-                      return (
-                        <Fragment key={group.respondentId}>
-                          <tr
-                            className="align-top transition hover:bg-slate-50"
-                          >
-                            <td className="px-4 py-4">
-                              <div className="flex items-start gap-3">
-                                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-[#eef2ff] text-[#4f46e5]">
-                                  <FaUser className="h-4 w-4" />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-semibold text-slate-900">
-                                    {group.respondent?.display_name ||
-                                      "Anonymous Respondent"}
-                                  </p>
-                                  <p className="mt-1 text-xs text-slate-500">
-                                    {group.respondent?.phone || "No phone"}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="px-4 py-4 text-sm text-slate-600">
-                              {group.respondent?.email || "No email"}
-                            </td>
-
-                            <td className="px-4 py-4 text-sm font-medium text-slate-900">
-                              {group.answers.length}
-                            </td>
-
-                            <td className="px-4 py-4 text-sm font-medium text-slate-900">
-                              {completedCount}
-                            </td>
-
-                            <td className="px-4 py-4 text-sm text-slate-600">
-                              {averageDuration}s
-                            </td>
-
-                            <td className="px-4 py-4 text-right">
-                              <button
-                                onClick={() =>
-                                  toggleExpanded(group.respondentId)
-                                }
-                                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                              >
-                                {isExpanded ? (
-                                  <>
-                                    Hide
-                                    <FaChevronUp className="h-3.5 w-3.5" />
-                                  </>
-                                ) : (
-                                  <>
-                                    View
-                                    <FaChevronDown className="h-3.5 w-3.5" />
-                                  </>
-                                )}
-                              </button>
-                            </td>
-                          </tr>
-
-                          {isExpanded ? (
-                            <tr className="bg-slate-50/50">
-                              <td colSpan={6} className="px-4 py-4">
-                                <div className="space-y-4">
-                                  {group.answers.map((item) => {
-                                    const preferredPath =
-                                      item.audio_path_mp3 || item.audio_path;
-                                    const isPlaying = playingId === item.id;
-                                    const isProcessing =
-                                      processingId === item.id;
-                                    const transcriptStatus =
-                                      item.transcript_status || "pending";
-
-                                    return (
-                                      <div
-                                        key={item.id}
-                                        className="rounded-2xl border border-slate-200 bg-white p-4"
-                                      >
-                                        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                                          <div className="min-w-0 flex-1 space-y-3">
-                                            <div className="space-y-1">
-                                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                                Question #
-                                                {item.question?.order_index ||
-                                                  "—"}
-                                              </p>
-                                              <p className="text-base font-semibold leading-relaxed text-slate-900">
-                                                {item.question?.prompt ||
-                                                  "No question found"}
-                                              </p>
-                                            </div>
-
-                                            <div className="flex flex-wrap gap-4 text-xs text-slate-500">
-                                              <span className="inline-flex items-center gap-1">
-                                                <FaClock className="h-3 w-3" />
-                                                {item.duration_seconds || 0}s
-                                              </span>
-                                              <span>
-                                                {new Date(
-                                                  item.created_at,
-                                                ).toLocaleString()}
-                                              </span>
-                                            </div>
-                                          </div>
-
-                                          <div className="flex shrink-0 flex-wrap gap-2">
-                                            <button
-                                              onClick={() => handlePlay(item)}
-                                              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                                            >
-                                              <FaPlay className="h-4 w-4" />
-                                              {isPlaying
-                                                ? "Hide Player"
-                                                : "Play"}
-                                            </button>
-
-                                            <button
-                                              onClick={() =>
-                                                handleDownload(preferredPath)
-                                              }
-                                              disabled={
-                                                downloadingPath ===
-                                                preferredPath
-                                              }
-                                              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
-                                            >
-                                              <FaDownload className="h-4 w-4" />
-                                              {downloadingPath === preferredPath
-                                                ? "Preparing..."
-                                                : "Download"}
-                                            </button>
-
-                                            <button
-                                              onClick={() =>
-                                                handleProcess(item)
-                                              }
-                                              disabled={
-                                                isProcessing ||
-                                                transcriptStatus ===
-                                                  "processing"
-                                              }
-                                              className="inline-flex items-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#4338ca] disabled:opacity-60"
-                                            >
-                                              <FaBolt className="h-4 w-4" />
-                                              {isProcessing
-                                                ? "Processing..."
-                                                : transcriptStatus ===
-                                                    "completed"
-                                                  ? "Reprocess"
-                                                  : transcriptStatus ===
-                                                      "processing"
-                                                    ? "Processing..."
-                                                    : "Process"}
-                                            </button>
-                                          </div>
-                                        </div>
-
-                                        {isPlaying && playingUrl && (
-                                          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                                            <audio
-                                              controls
-                                              src={playingUrl}
-                                              className="w-full"
-                                            />
-                                          </div>
-                                        )}
-
-                                        <div className="mt-4">
-                                          <div className="mb-2 flex items-center justify-between">
-                                            <h4 className="text-sm font-semibold text-slate-900">
-                                              Transcript
-                                            </h4>
-                                            <span
-                                              className={`rounded-full px-3 py-1 text-xs font-medium ${getTranscriptStatusClass(
-                                                transcriptStatus,
-                                              )}`}
-                                            >
-                                              {getTranscriptStatusLabel(
-                                                transcriptStatus,
-                                              )}
-                                            </span>
-                                          </div>
-
-                                          {transcriptStatus === "completed" ? (
-                                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                                              {item.transcript ||
-                                                "Transcript completed but empty."}
-                                            </div>
-                                          ) : transcriptStatus ===
-                                            "processing" ? (
-                                            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
-                                              Processing transcript...
-                                            </div>
-                                          ) : transcriptStatus === "failed" ? (
-                                            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                                              Transcript failed. Try again.
-                                            </div>
-                                          ) : (
-                                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-400">
-                                              No transcript yet.
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </td>
-                            </tr>
-                          ) : null}
-                        </Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[var(--color-text)]">
+                  Transcript status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                  className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3.5 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)]"
+                >
+                  <option value="all">All statuses</option>
+                  <option value="completed">Completed</option>
+                  <option value="processing">Processing</option>
+                  <option value="failed">Failed</option>
+                  <option value="pending">Pending</option>
+                </select>
               </div>
-            </div>
+            </Card>
+
+            <DataTable
+              data={filteredGroups}
+              columns={columns}
+              getRowId={(group) => group.respondentId}
+              initialSort={{ id: "answers", direction: "desc" }}
+              emptyState={
+                <EmptyState
+                  icon={<Search className="h-6 w-6" />}
+                  title="No respondents match yet"
+                  description="Try a different search or clear the status filter to see more responses."
+                />
+              }
+              mobileCard={(group) => (
+                <Card className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-base font-semibold text-[var(--color-text)]">
+                        {group.respondent?.display_name || "Anonymous respondent"}
+                      </p>
+                      <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                        {group.respondent?.email || "No email shared"}
+                      </p>
+                    </div>
+                    <Badge variant="info">{group.answers.length} answers</Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      {
+                        group.answers.filter((item) => item.transcript_status === "completed").length
+                      }{" "}
+                      transcript{group.answers.length === 1 ? "" : "s"} completed
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedRespondentId(group.respondentId)}
+                    >
+                      Open
+                    </Button>
+                  </div>
+                </Card>
+              )}
+            />
           </>
         )}
       </div>
+
+      <Drawer
+        open={!!selectedGroup}
+        onClose={() => setSelectedRespondentId(null)}
+        title={selectedGroup?.respondent?.display_name || "Anonymous respondent"}
+        description={
+          selectedGroup
+            ? `${selectedGroup.respondent?.email || "No email shared"}${selectedGroup.respondent?.phone ? ` | ${selectedGroup.respondent.phone}` : ""}`
+            : undefined
+        }
+      >
+        <div className="space-y-4">
+          {selectedGroup?.answers.map((item) => {
+            const preferredPath = item.audio_path_mp3 || item.audio_path;
+            const isPlaying = playingId === item.id;
+            const isProcessing = processingId === item.id;
+
+            return (
+              <Card key={item.id} variant="flat" className="space-y-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-2">
+                    <Badge variant="info">Question {item.question?.order_index || "-"}</Badge>
+                    <p className="text-base font-semibold text-[var(--color-text)]">
+                      {item.question?.prompt || "No question found"}
+                    </p>
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      {formatDuration(item.duration_seconds || 0)} | {formatDateTime(item.created_at)}
+                    </p>
+                  </div>
+                  <TranscriptStatusBadge status={item.transcript_status} />
+                </div>
+
+                <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+                  <p className="text-sm font-semibold text-[var(--color-text)]">
+                    Transcript
+                  </p>
+                  <p className="mt-2 text-sm leading-7 text-[var(--color-text-muted)]">
+                    {item.transcript?.trim()
+                      ? item.transcript
+                      : item.transcript_status === "processing"
+                        ? "We're processing this recording now."
+                        : "This answer hasn't been transcribed yet."}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Button
+                    variant="secondary"
+                    onClick={() => handlePlay(item)}
+                    leadingIcon={<Play className="h-4 w-4" />}
+                  >
+                    {isPlaying ? "Hide playback" : "Play answer"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleDownload(preferredPath)}
+                    loading={downloadingPath === preferredPath}
+                    leadingIcon={downloadingPath !== preferredPath ? <Download className="h-4 w-4" /> : undefined}
+                  >
+                    Download audio
+                  </Button>
+                  <Button
+                    onClick={() => handleProcess(item)}
+                    loading={isProcessing}
+                    disabled={item.transcript_status === "processing"}
+                    disabledReason="This response is already processing"
+                    leadingIcon={!isProcessing ? <Sparkles className="h-4 w-4" /> : undefined}
+                  >
+                    {isProcessing ? "Starting transcription" : "Transcribe answer"}
+                  </Button>
+                </div>
+
+                {isPlaying && playingUrl ? (
+                  <audio controls className="w-full">
+                    <source src={playingUrl} />
+                    Your browser does not support audio playback.
+                  </audio>
+                ) : null}
+              </Card>
+            );
+          })}
+        </div>
+      </Drawer>
     </DashboardShell>
   );
 }
