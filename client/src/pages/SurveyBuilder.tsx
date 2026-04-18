@@ -44,7 +44,6 @@ import { Textarea } from "../components/ui/Textarea";
 import { Tooltip } from "../components/ui/Tooltip";
 import { cn } from "../utils/helpers";
 import {
-  getSurveyPath,
   getSurveySharePath,
   trimTrailingSlash,
 } from "../lib/branding";
@@ -721,8 +720,6 @@ export default function SurveyBuilder() {
   }
 
   const appUrl = trimTrailingSlash(window.location.origin);
-  const publicPath = surveyId ? getSurveyPath(surveyId) : "";
-  const publicLink = publicPath ? `${appUrl}${publicPath}` : appUrl;
   const sharePath = surveyId ? getSurveySharePath(surveyId) : "";
   const shareLink = sharePath ? `${appUrl}${sharePath}` : appUrl;
 
@@ -798,7 +795,7 @@ export default function SurveyBuilder() {
                 />
                 <BuilderActionButton
                   label="Open survey"
-                  href={publicLink}
+                  href={shareLink}
                   variant="primary"
                   icon={<Link2 className="h-4 w-4" />}
                 />
@@ -1193,7 +1190,7 @@ export default function SurveyBuilder() {
                     >
                       Copy public link
                     </Button>
-                    <a href={publicLink} target="_blank" rel="noreferrer">
+                    <a href={shareLink} target="_blank" rel="noreferrer">
                       <Button
                         className="w-full"
                         leadingIcon={<Link2 className="h-4 w-4" />}

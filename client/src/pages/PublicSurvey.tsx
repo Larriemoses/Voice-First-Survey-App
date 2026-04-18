@@ -27,6 +27,14 @@ type Survey = {
   description: string | null;
   logo_url?: string | null;
   header_text?: string | null;
+  organization?:
+    | {
+        name?: string | null;
+      }
+    | Array<{
+        name?: string | null;
+      }>
+    | null;
 };
 
 type Question = {
@@ -121,6 +129,17 @@ export default function PublicSurvey() {
     );
     return Math.round(total / questions.length) || 60;
   }, [questions]);
+  const organizationName = useMemo(() => {
+    const organization = survey?.organization;
+
+    if (!organization) return "";
+
+    if (Array.isArray(organization)) {
+      return organization[0]?.name?.trim() || "";
+    }
+
+    return organization.name?.trim() || "";
+  }, [survey]);
 
   if (loading) {
     return (
@@ -167,7 +186,11 @@ export default function PublicSurvey() {
   return (
     <>
       <PageMeta
-        title={`${survey?.title || "Survey"} | Survica`}
+        title={
+          organizationName
+            ? `${survey?.title || "Survey"} | ${organizationName}`
+            : `${survey?.title || "Survey"} | Survica`
+        }
         description={
           survey?.header_text ||
           survey?.description ||
@@ -191,9 +214,17 @@ export default function PublicSurvey() {
             ) : null}
 
             <div className="space-y-3 text-center">
-              <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                Voice survey
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {organizationName ? (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                    <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                    From {organizationName}
+                  </div>
+                ) : null}
+                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
+                  <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                  Voice survey
+                </div>
               </div>
               <h1 className="text-3xl font-semibold text-[var(--color-text)]">
                 {survey?.header_text || "We'd love to hear your response"}

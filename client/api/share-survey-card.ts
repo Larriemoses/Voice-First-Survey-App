@@ -6,6 +6,7 @@ import {
   fetchSurveyPreview,
   getHeader,
   getShareDescription,
+  getSurveyOrganizationName,
   getShareTitle,
   resolveSurveyLogoDataUri,
   wrapSvgText,
@@ -13,11 +14,17 @@ import {
 
 function renderSvgCard(input: {
   logoDataUri: string;
+  organizationName: string;
   title: string;
   description: string;
 }) {
   const titleLines = wrapSvgText(input.title, 28, 3);
   const descriptionLines = wrapSvgText(input.description, 46, 4);
+  const organizationName = escapeHtml(
+    input.organizationName.length > 36
+      ? `${input.organizationName.slice(0, 33)}...`
+      : input.organizationName,
+  );
   const titleStartY = 255;
   const titleLineHeight = 62;
   const descriptionStartY = titleStartY + titleLines.length * titleLineHeight + 28;
@@ -59,12 +66,12 @@ function renderSvgCard(input: {
   <rect x="94" y="94" width="1012" height="442" rx="30" fill="url(#accent)" fill-opacity="0.16" />
   <rect x="104" y="104" width="140" height="140" rx="28" fill="#FFFFFF" />
   <image href="${input.logoDataUri}" x="122" y="122" width="104" height="104" preserveAspectRatio="xMidYMid meet" />
-  <rect x="270" y="118" width="174" height="34" rx="17" fill="rgba(255,255,255,0.12)" />
-  <text x="357" y="140" fill="#DCE7F7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Voice survey invite</text>
+  <rect x="270" y="118" width="248" height="34" rx="17" fill="rgba(255,255,255,0.12)" />
+  <text x="394" y="140" fill="#DCE7F7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Voice survey invitation</text>
   <text x="104" y="${titleStartY}" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="700">${titleText}</text>
   <text x="104" y="${descriptionStartY}" fill="#C4D1E1" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500">${descriptionText}</text>
-  <rect x="104" y="482" width="252" height="28" rx="14" fill="rgba(255,255,255,0.10)" />
-  <text x="230" y="501" fill="#E9F1FB" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Hosted on ${escapeHtml(BRAND_NAME)}</text>
+  <rect x="104" y="482" width="420" height="28" rx="14" fill="rgba(255,255,255,0.10)" />
+  <text x="314" y="501" fill="#E9F1FB" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" text-anchor="middle">From ${organizationName || escapeHtml(BRAND_NAME)}</text>
   <path d="M858 402C906.049 402 945 363.049 945 315C945 266.951 906.049 228 858 228C809.951 228 771 266.951 771 315C771 363.049 809.951 402 858 402Z" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
   <path d="M922 447C966.183 447 1002 411.183 1002 367C1002 322.817 966.183 287 922 287C877.817 287 842 322.817 842 367C842 411.183 877.817 447 922 447Z" stroke="rgba(103,161,255,0.18)" stroke-width="2"/>
 </svg>`;
@@ -92,6 +99,7 @@ export default async function handler(
   const title = getShareTitle(survey);
   const description = getShareDescription(survey);
   const logoDataUri = await resolveSurveyLogoDataUri(survey?.logo_url);
+  const organizationName = getSurveyOrganizationName(survey) || BRAND_NAME;
 
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader(
@@ -101,6 +109,7 @@ export default async function handler(
   res.status(200).send(
     renderSvgCard({
       logoDataUri,
+      organizationName,
       title,
       description,
     }),

@@ -13,6 +13,14 @@ export type SurveyRecord = {
   created_at?: string;
   logo_url?: string | null;
   header_text?: string | null;
+  organization?:
+    | {
+        name?: string | null;
+      }
+    | Array<{
+        name?: string | null;
+      }>
+    | null;
 };
 
 export type GeneratedSurveyDraft = {
@@ -256,7 +264,7 @@ export async function closeSurvey(surveyId: string) {
 export async function getPublicSurveyById(surveyId: string) {
   const { data, error } = await supabase
     .from("surveys")
-    .select("*")
+    .select("*, organization:organizations(name)")
     .eq("id", surveyId)
     .eq("status", "published")
     .maybeSingle();

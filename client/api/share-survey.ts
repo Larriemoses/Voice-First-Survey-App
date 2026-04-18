@@ -1,30 +1,30 @@
 import {
-  BRAND_NAME,
   getSurveyPath,
   getSurveySharePath,
   getSurveyShareImagePath,
-  trimTrailingSlash,
 } from "../src/lib/branding";
 import {
-  ShareRequest,
-  ShareResponse,
-  SurveyPreview,
   buildAppUrl,
   escapeHtml,
   fetchSurveyPreview,
   getHeader,
   getShareDescription,
+  getShareSiteName,
   getShareTitle,
-  isPreviewBot,
+  ShareRequest,
+  ShareResponse,
+  SurveyPreview,
 } from "./survey-share-utils";
 
 function renderSharePage(input: {
   shareUrl: string;
   surveyUrl: string;
+  siteName: string;
   title: string;
   description: string;
   imageUrl: string;
 }) {
+  const siteName = escapeHtml(input.siteName);
   const title = escapeHtml(input.title);
   const description = escapeHtml(input.description);
   const shareUrl = escapeHtml(input.shareUrl);
@@ -35,25 +35,39 @@ function renderSharePage(input: {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${title}</title>
     <meta name="description" content="${description}" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta property="og:site_name" content="${BRAND_NAME}" />
+    <meta property="og:site_name" content="${siteName}" />
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:image" content="${imageUrl}" />
     <meta property="og:image:secure_url" content="${imageUrl}" />
+    <meta property="og:image:alt" content="${title}" />
     <meta property="og:url" content="${shareUrl}" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${title}" />
     <meta name="twitter:description" content="${description}" />
     <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:image:alt" content="${title}" />
     <meta name="twitter:url" content="${shareUrl}" />
     <link rel="canonical" href="${surveyUrl}" />
+    <meta http-equiv="refresh" content="0;url=${surveyUrl}" />
+    <script>
+      window.location.replace(${JSON.stringify(input.surveyUrl)});
+    </script>
   </head>
   <body>
-    <p>Open the survey: <a href="${surveyUrl}">${surveyUrl}</a></p>
+    <main style="font-family: Inter, Arial, sans-serif; padding: 24px; color: #101828;">
+      <p style="margin: 0 0 8px; font-size: 14px; color: #52606d;">Opening your survey...</p>
+      <h1 style="margin: 0 0 8px; font-size: 24px;">${title}</h1>
+      <p style="margin: 0 0 16px; max-width: 48rem; line-height: 1.6;">${description}</p>
+      <p style="margin: 0;">
+        <a href="${surveyUrl}" style="color: #2457f5; font-weight: 600;">Continue to survey</a>
+      </p>
+    </main>
   </body>
 </html>`;
 }
@@ -76,7 +90,6 @@ export default async function handler(
   const shareUrl = appUrl ? `${appUrl}${sharePath}` : sharePath;
   const shareImagePath = getSurveyShareImagePath(surveyId);
   const shareImageUrl = appUrl ? `${appUrl}${shareImagePath}` : shareImagePath;
-  const previewRequest = isPreviewBot(req);
 
   let survey: SurveyPreview | null = null;
 
@@ -88,13 +101,7 @@ export default async function handler(
 
   const title = getShareTitle(survey);
   const description = getShareDescription(survey);
-
-  if (!previewRequest) {
-    res.setHeader("Cache-Control", "no-store");
-    res.setHeader("Location", surveyUrl);
-    res.status(307).send("");
-    return;
-  }
+  const siteName = getShareSiteName(survey);
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader(
@@ -105,6 +112,7 @@ export default async function handler(
     renderSharePage({
       shareUrl,
       surveyUrl,
+      siteName,
       title,
       description,
       imageUrl: shareImageUrl,
