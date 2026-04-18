@@ -44,6 +44,7 @@ import { Textarea } from "../components/ui/Textarea";
 import { Tooltip } from "../components/ui/Tooltip";
 import { cn } from "../utils/helpers";
 import {
+  getSurveyPath,
   getSurveySharePath,
   trimTrailingSlash,
 } from "../lib/branding";
@@ -271,6 +272,7 @@ export default function SurveyBuilder() {
   const [surveyTitle, setSurveyTitle] = useState("");
   const [surveyDescription, setSurveyDescription] = useState("");
   const [headerText, setHeaderText] = useState("");
+  const [titleError, setTitleError] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [editingInfo, setEditingInfo] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -319,6 +321,7 @@ export default function SurveyBuilder() {
       setSurveyTitle(surveyData.title || "");
       setSurveyDescription(surveyData.description || "");
       setHeaderText(surveyData.header_text || "");
+      setTitleError("");
       setLogoUrl(surveyData.logo_url || "");
       setQuestions(questionData);
     } catch (err) {
@@ -361,8 +364,10 @@ export default function SurveyBuilder() {
     if (!surveyId) return;
 
     clearFeedback();
+    setTitleError("");
 
     if (!surveyTitle.trim()) {
+      setTitleError("Add a survey title before saving.");
       setError("Give your survey a title before saving the branding.");
       return;
     }
@@ -720,6 +725,8 @@ export default function SurveyBuilder() {
   }
 
   const appUrl = trimTrailingSlash(window.location.origin);
+  const publicPath = surveyId ? getSurveyPath(surveyId) : "";
+  const publicLink = publicPath ? `${appUrl}${publicPath}` : appUrl;
   const sharePath = surveyId ? getSurveySharePath(surveyId) : "";
   const shareLink = sharePath ? `${appUrl}${sharePath}` : appUrl;
 
@@ -795,7 +802,7 @@ export default function SurveyBuilder() {
                 />
                 <BuilderActionButton
                   label="Open survey"
-                  href={shareLink}
+                  href={publicLink}
                   variant="primary"
                   icon={<Link2 className="h-4 w-4" />}
                 />
@@ -1190,7 +1197,7 @@ export default function SurveyBuilder() {
                     >
                       Copy public link
                     </Button>
-                    <a href={shareLink} target="_blank" rel="noreferrer">
+                    <a href={publicLink} target="_blank" rel="noreferrer">
                       <Button
                         className="w-full"
                         leadingIcon={<Link2 className="h-4 w-4" />}
@@ -1275,8 +1282,16 @@ export default function SurveyBuilder() {
           <Input
             label="Survey title"
             value={surveyTitle}
-            onChange={(e) => setSurveyTitle(e.target.value)}
+            onChange={(e) => {
+              setSurveyTitle(e.target.value);
+              if (e.target.value.trim()) {
+                setTitleError("");
+              }
+            }}
             placeholder="e.g. Customer Experience Survey"
+            helperText="This is the survey name people see in sharing and reporting."
+            error={titleError || undefined}
+            autoFocus
           />
 
           <Input
@@ -1284,6 +1299,7 @@ export default function SurveyBuilder() {
             value={headerText}
             onChange={(e) => setHeaderText(e.target.value)}
             placeholder="e.g. We'd love to hear how your visit went"
+            helperText="This is the main welcome line respondents will see first."
           />
 
           <Textarea
@@ -1291,6 +1307,7 @@ export default function SurveyBuilder() {
             value={surveyDescription}
             onChange={(e) => setSurveyDescription(e.target.value)}
             placeholder="Tell respondents what this survey is about and what kind of answers you're hoping to hear"
+            helperText="Keep it short and reassuring so people know why they should respond."
           />
 
           <div className="space-y-2">
