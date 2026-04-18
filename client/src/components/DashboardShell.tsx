@@ -154,9 +154,6 @@ export default function DashboardShell({ children }: Props) {
             variant="secondary"
             size="sm"
             onClick={handleLogout}
-            iconOnly
-            title="Sign out"
-            aria-label="Sign out"
             leadingIcon={<LogOut className="h-4 w-4" />}
           >
             Sign out
