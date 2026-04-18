@@ -70,18 +70,12 @@ export default function Home() {
               <AppLogo className="max-w-none" />
             </Link>
 
-            <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  Sign in
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button size="sm" trailingIcon={<ArrowRight className="h-4 w-4" />}>
-                  Create your workspace
-                </Button>
-              </Link>
-            </div>
+            <Link
+              to="/login"
+              className="text-sm font-semibold text-[var(--color-text-muted)] transition hover:text-[var(--color-text)]"
+            >
+              Sign in
+            </Link>
           </header>
 
           <main className="grid gap-6 md:grid-cols-[1.05fr_0.95fr] md:items-center">
@@ -100,15 +94,10 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div>
                 <Link to="/signup">
                   <Button size="lg" trailingIcon={<ArrowRight className="h-4 w-4" />}>
                     Start your first survey
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button size="lg" variant="secondary">
-                    Sign in to your workspace
                   </Button>
                 </Link>
               </div>

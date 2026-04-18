@@ -32,16 +32,20 @@ import {
   uploadSurveyLogo,
 } from "../lib/surveys";
 import { Badge } from "../components/ui/Badge";
-import { Button, type ButtonVariant } from "../components/ui/button";
+import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Feedback } from "../components/ui/Feedback";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
+import {
+  OverflowMenu,
+  type OverflowMenuItem,
+} from "../components/ui/OverflowMenu";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Skeleton } from "../components/ui/Skeleton";
 import { Textarea } from "../components/ui/Textarea";
-import { Tooltip } from "../components/ui/Tooltip";
+import { SurveyStatusBadge } from "../components/surveys/SurveyStatusBadge";
 import { cn } from "../utils/helpers";
 import {
   getSurveyPath,
@@ -99,17 +103,6 @@ type BuilderAccordionCardProps = {
   onToggle: () => void;
   badge?: ReactNode;
   children: ReactNode;
-};
-
-type BuilderActionButtonProps = {
-  label: string;
-  icon: ReactNode;
-  variant?: ButtonVariant;
-  onClick?: () => void;
-  href?: string;
-  loading?: boolean;
-  disabled?: boolean;
-  disabledReason?: string;
 };
 
 function BuilderAccordionCard({
@@ -174,87 +167,6 @@ function BuilderAccordionCard({
         </div>
       </div>
     </Card>
-  );
-}
-
-function BuilderActionButton({
-  label,
-  icon,
-  variant = "secondary",
-  onClick,
-  href,
-  loading = false,
-  disabled = false,
-  disabledReason,
-}: BuilderActionButtonProps) {
-  const compactButton = (
-    <Button
-      variant={variant}
-      size="sm"
-      iconOnly
-      onClick={onClick}
-      loading={loading}
-      disabled={disabled}
-      disabledReason={disabledReason}
-      title={label}
-      aria-label={label}
-      leadingIcon={!loading ? icon : undefined}
-    >
-      {label}
-    </Button>
-  );
-
-  const fullButton = (
-    <Button
-      variant={variant}
-      size="sm"
-      onClick={onClick}
-      loading={loading}
-      disabled={disabled}
-      disabledReason={disabledReason}
-      title={label}
-      aria-label={label}
-      leadingIcon={!loading ? icon : undefined}
-      className="hidden md:inline-flex"
-    >
-      {label}
-    </Button>
-  );
-
-  return (
-    <>
-      <Tooltip content={label}>
-        {href ? (
-          <a href={href} target="_blank" rel="noreferrer" className="md:hidden">
-            {compactButton}
-          </a>
-        ) : (
-          <span className="md:hidden">{compactButton}</span>
-        )}
-      </Tooltip>
-      {href ? (
-        <a href={href} target="_blank" rel="noreferrer">
-          {fullButton}
-        </a>
-      ) : (
-        fullButton
-      )}
-    </>
-  );
-}
-
-function SurveyStatusBadge({ status }: { status: Survey["status"] }) {
-  if (status === "published")
-    return (
-      <Badge variant="success" dot>
-        Live
-      </Badge>
-    );
-  if (status === "closed") return <Badge variant="default">Closed</Badge>;
-  return (
-    <Badge variant="warning" dot>
-      Draft
-    </Badge>
   );
 }
 
@@ -742,6 +654,55 @@ export default function SurveyBuilder() {
     : questions.length === 0
       ? "Add at least one question before you publish"
       : undefined;
+  const canPublish = !publishDisabledReason;
+  const publishRequirements = [
+    { label: "Survey title added", done: !!surveyTitle.trim() },
+    { label: "At least one question added", done: questions.length > 0 },
+  ];
+  const surveyMenuItems: OverflowMenuItem[] = [
+    {
+      label: "Edit info",
+      icon: <PencilLine className="h-4 w-4" />,
+      onSelect: () => setEditingInfo(true),
+    },
+    {
+      label: "View responses",
+      icon: <Eye className="h-4 w-4" />,
+      onSelect: () => navigate(`/surveys/${surveyId}/responses`),
+    },
+  ];
+
+  if (survey?.status === "published") {
+    surveyMenuItems.push(
+      {
+        label: "Copy public link",
+        icon: <Copy className="h-4 w-4" />,
+        onSelect: () => {
+          void handleCopyLink();
+        },
+      },
+      {
+        label: "Open public survey",
+        icon: <Link2 className="h-4 w-4" />,
+        href: publicLink,
+      },
+      {
+        label: "Close survey",
+        icon: <Lock className="h-4 w-4" />,
+        tone: "danger",
+        disabled: closingSurvey,
+        onSelect: () => setConfirmation({ type: "closeSurvey" }),
+      },
+    );
+  } else {
+    surveyMenuItems.push({
+      label: "Delete survey",
+      icon: <Trash2 className="h-4 w-4" />,
+      tone: "danger",
+      disabled: deletingSurvey,
+      onSelect: () => setConfirmation({ type: "deleteSurvey" }),
+    });
+  }
 
   if (loading) {
     return (
@@ -781,65 +742,7 @@ export default function SurveyBuilder() {
             {survey?.status ? (
               <SurveyStatusBadge status={survey.status} />
             ) : null}
-            <BuilderActionButton
-              label="Edit info"
-              onClick={() => setEditingInfo(true)}
-              icon={<PencilLine className="h-4 w-4" />}
-            />
-            <BuilderActionButton
-              label="View responses"
-              onClick={() => navigate(`/surveys/${surveyId}/responses`)}
-              icon={<Eye className="h-4 w-4" />}
-            />
-
-            {survey?.status === "published" ? (
-              <>
-                <BuilderActionButton
-                  label="Copy link"
-                  onClick={handleCopyLink}
-                  loading={copying}
-                  icon={<Copy className="h-4 w-4" />}
-                />
-                <BuilderActionButton
-                  label="Open survey"
-                  href={publicLink}
-                  variant="primary"
-                  icon={<Link2 className="h-4 w-4" />}
-                />
-                <BuilderActionButton
-                  label="Close survey"
-                  variant="danger"
-                  onClick={() => setConfirmation({ type: "closeSurvey" })}
-                  icon={<Lock className="h-4 w-4" />}
-                  loading={closingSurvey}
-                />
-              </>
-            ) : survey?.status === "closed" ? (
-              <BuilderActionButton
-                label="Delete survey"
-                variant="danger"
-                onClick={() => setConfirmation({ type: "deleteSurvey" })}
-                icon={<Trash2 className="h-4 w-4" />}
-                loading={deletingSurvey}
-              />
-            ) : (
-              <>
-                <BuilderActionButton
-                  label="Delete survey"
-                  onClick={() => setConfirmation({ type: "deleteSurvey" })}
-                  icon={<Trash2 className="h-4 w-4" />}
-                />
-                <BuilderActionButton
-                  label="Publish survey"
-                  variant="primary"
-                  onClick={handlePublishSurvey}
-                  icon={<Rocket className="h-4 w-4" />}
-                  loading={publishing}
-                  disabled={!!publishDisabledReason}
-                  disabledReason={publishDisabledReason}
-                />
-              </>
-            )}
+            <OverflowMenu items={surveyMenuItems} />
           </>
         }
       />
@@ -1060,29 +963,26 @@ export default function SurveyBuilder() {
                             ) : null}
                           </div>
                           {!isEditing ? (
-                            <div className="flex flex-wrap gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => startEditingQuestion(question)}
-                                leadingIcon={<PencilLine className="h-4 w-4" />}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setConfirmation({
-                                    type: "deleteQuestion",
-                                    question,
-                                  })
-                                }
-                                leadingIcon={<Trash2 className="h-4 w-4" />}
-                              >
-                                Remove
-                              </Button>
-                            </div>
+                            <OverflowMenu
+                              buttonVariant="ghost"
+                              items={[
+                                {
+                                  label: "Edit question",
+                                  icon: <PencilLine className="h-4 w-4" />,
+                                  onSelect: () => startEditingQuestion(question),
+                                },
+                                {
+                                  label: "Remove question",
+                                  icon: <Trash2 className="h-4 w-4" />,
+                                  tone: "danger",
+                                  onSelect: () =>
+                                    setConfirmation({
+                                      type: "deleteQuestion",
+                                      question,
+                                    }),
+                                },
+                              ]}
+                            />
                           ) : null}
                         </div>
 
@@ -1132,6 +1032,61 @@ export default function SurveyBuilder() {
                 </div>
               )}
             </Card>
+
+            {survey?.status === "draft" ? (
+              canPublish ? (
+                <Card className="space-y-4">
+                  <div>
+                    <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                      Ready to publish
+                    </h2>
+                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                      Your survey has the minimum required setup. Publish when
+                      you're ready for responses.
+                    </p>
+                  </div>
+
+                  <Button
+                    size="lg"
+                    onClick={handlePublishSurvey}
+                    loading={publishing}
+                    leadingIcon={!publishing ? <Rocket className="h-4 w-4" /> : undefined}
+                  >
+                    {publishing ? "Publishing your survey" : "Publish survey"}
+                  </Button>
+                </Card>
+              ) : (
+                <Card variant="flat" className="space-y-4">
+                  <div>
+                    <h2 className="text-xl font-semibold text-[var(--color-text)]">
+                      Complete this before publishing
+                    </h2>
+                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                      Publish appears after the required pieces are in place.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {publishRequirements.map((requirement) => (
+                      <div
+                        key={requirement.label}
+                        className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3"
+                      >
+                        <span className="text-sm font-medium text-[var(--color-text)]">
+                          {requirement.label}
+                        </span>
+                        <Badge
+                          variant={requirement.done ? "success" : "warning"}
+                          dot
+                        >
+                          {requirement.done ? "Done" : "Next"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )
+            ) : null}
           </div>
 
           <div className="space-y-4 xl:sticky xl:top-24 xl:h-fit">
@@ -1186,26 +1141,13 @@ export default function SurveyBuilder() {
                   <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 font-mono text-sm text-[var(--color-text)]">
                     {shareLink}
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <Button
-                      variant="secondary"
-                      onClick={handleCopyLink}
-                      loading={copying}
-                      leadingIcon={
-                        !copying ? <Copy className="h-4 w-4" /> : undefined
-                      }
-                    >
-                      Copy public link
-                    </Button>
-                    <a href={publicLink} target="_blank" rel="noreferrer">
-                      <Button
-                        className="w-full"
-                        leadingIcon={<Link2 className="h-4 w-4" />}
-                      >
-                        Open public survey
-                      </Button>
-                    </a>
-                  </div>
+                  <Button
+                    onClick={handleCopyLink}
+                    loading={copying}
+                    leadingIcon={!copying ? <Copy className="h-4 w-4" /> : undefined}
+                  >
+                    Copy public link
+                  </Button>
                 </>
               ) : (
                 <Feedback
