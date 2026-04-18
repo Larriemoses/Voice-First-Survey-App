@@ -48,6 +48,7 @@ export async function getMySurveys() {
 export async function createSurvey(input: {
   title: string;
   description?: string;
+  logo_url?: string | null;
 }) {
   const [{ data: userData, error: userError }, membership] = await Promise.all([
     supabase.auth.getUser(),
@@ -68,6 +69,7 @@ export async function createSurvey(input: {
     .insert({
       title: input.title,
       description: input.description || null,
+      logo_url: input.logo_url || null,
       organization_id: membership.organization.id,
       created_by: user.id,
       status: "draft",

@@ -177,7 +177,7 @@ export default function PublicSurvey() {
         imageAlt={survey?.title || "Survica survey"}
       />
 
-      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen px-4 py-6 sm:px-6 md:px-8">
         <div className="mx-auto max-w-3xl space-y-4">
           <Card className="space-y-5">
             {survey?.logo_url ? (

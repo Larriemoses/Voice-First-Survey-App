@@ -76,7 +76,7 @@ export default function Profile() {
           <Skeleton className="h-12 w-40 rounded-[20px]" />
         </Card>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-[1fr_0.82fr]">
+        <div className="grid gap-4 md:grid-cols-[1fr_0.82fr]">
           <Card>
             <form onSubmit={handleSave} className="space-y-4">
               <Input

@@ -80,13 +80,13 @@ export function DataTable<T>({
 
   return (
     <>
-      <div className="space-y-3 lg:hidden">
+      <div className="space-y-3 md:hidden">
         {sortedData.map((row) => (
           <div key={getRowId(row)}>{mobileCard(row)}</div>
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-sm lg:block">
+      <div className="hidden overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-sm md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-[var(--color-border-subtle)]">
             <thead className="bg-[var(--color-surface)]">

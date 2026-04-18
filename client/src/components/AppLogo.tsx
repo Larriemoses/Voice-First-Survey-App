@@ -14,21 +14,15 @@ export default function AppLogo({
   className,
 }: AppLogoProps) {
   return (
-    <div
-      className={cn(
-        "flex w-full items-center",
-        collapsed ? "justify-center" : "max-w-[12.75rem]",
-        className,
-      )}
-    >
+    <div className={cn("flex w-full items-center justify-center", className)}>
       <img
         src={BRAND_LOGO_URL}
         alt={`${BRAND_NAME} logo`}
         className={cn(
-          "object-contain shadow-sm ring-1 ring-black/5",
+          "object-contain",
           collapsed
-            ? "h-11 w-full max-w-[2.9rem] rounded-2xl border border-[var(--color-border)] bg-white p-1.5"
-            : "h-12 w-full rounded-[22px] border border-[color:color-mix(in_srgb,var(--color-border)_72%,white)] bg-white px-3 py-2",
+            ? "h-11 w-auto max-w-[3.5rem]"
+            : "h-14 w-auto max-w-[13rem] sm:h-16 sm:max-w-[16rem] md:h-[4.5rem] md:max-w-[18rem]",
         )}
       />
     </div>

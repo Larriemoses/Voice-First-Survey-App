@@ -45,7 +45,7 @@ export default function Onboarding() {
         subtitle="Let's give your survey workspace a name and a clean home base"
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+      <div className="grid gap-4 md:grid-cols-[1fr_0.8fr]">
         <Card>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
