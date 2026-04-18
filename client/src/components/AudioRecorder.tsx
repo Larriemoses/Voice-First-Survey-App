@@ -184,11 +184,11 @@ export default function AudioRecorder({
     <Card className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-            <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-info)]" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+            <AudioWaveform className="h-3.5 w-3.5 text-[var(--accent)]" />
             Voice recorder
           </div>
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <p className="text-sm text-[var(--text-muted)]">
             Speak naturally. You can re-record before you continue.
           </p>
         </div>
@@ -238,29 +238,29 @@ export default function AudioRecorder({
         ) : null}
       </div>
 
-      <Card className="space-y-4 rounded-[24px]" variant="flat">
+      <Card className="space-y-4 p-4" variant="flat">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p className="text-sm text-[var(--text-muted)]">
               Recording time
             </p>
-            <p className="mt-1 text-base font-semibold text-[var(--color-text)]">
+            <p className="mt-1 text-base font-semibold text-[var(--text)]">
               {formatTime(seconds)} / {formatTime(maxDurationSeconds)}
             </p>
           </div>
 
           <div className="text-left sm:text-right">
             {isRecording ? (
-              <p className="text-sm font-medium text-[var(--color-danger)]">
+              <p className="text-sm font-medium text-[var(--danger)]">
                 Recording your answer
               </p>
             ) : hasRecording ? (
-              <p className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-success)]">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-[var(--success)]">
                 <CheckCircle2 className="h-4 w-4" />
                 Your answer is ready
               </p>
             ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="text-sm text-[var(--text-muted)]">
                 Start when you're ready.
               </p>
             )}
@@ -275,9 +275,9 @@ export default function AudioRecorder({
                 "h-2 rounded-full transition-colors duration-200",
                 index < filledSegments
                   ? isRecording
-                    ? "bg-[var(--color-danger)]"
-                    : "bg-[var(--color-primary)]"
-                  : "bg-[var(--color-border)]",
+                    ? "bg-[var(--danger)]"
+                    : "bg-[var(--accent)]"
+                  : "bg-[var(--border)]",
               ].join(" ")}
             />
           ))}
@@ -285,8 +285,8 @@ export default function AudioRecorder({
       </Card>
 
       {audioUrl ? (
-        <Card className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-[var(--color-text)]">
+        <Card className="space-y-3 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-[var(--text)]">
             <Play className="h-4 w-4" />
             Playback
           </div>

@@ -42,7 +42,7 @@ export default function Onboarding() {
     <DashboardShell>
       <PageHeader
         title="Workspace Setup"
-        subtitle="Let's give your survey workspace a name and a clean home base"
+        subtitle="Name the workspace so every survey and response has a clear home."
       />
 
       <div className="grid gap-4 md:grid-cols-[1fr_0.8fr]">
@@ -82,10 +82,10 @@ export default function Onboarding() {
 
         <Card variant="flat" className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold text-[var(--color-text)]">
+            <h2 className="text-xl font-semibold text-[var(--text)]">
               What happens next
             </h2>
-            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
               You're one step away from creating your first survey
             </p>
           </div>
@@ -95,9 +95,9 @@ export default function Onboarding() {
             "You can create surveys, publish links, and review responses in one place",
             "You can come back later and refine the setup whenever you need to",
           ].map((item) => (
-            <div key={item} className="flex items-start gap-3 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--color-success)]" />
-              <p className="text-sm leading-6 text-[var(--color-text-muted)]">{item}</p>
+            <div key={item} className="flex items-start gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-4">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 text-[var(--success)]" />
+              <p className="text-sm leading-6 text-[var(--text-muted)]">{item}</p>
             </div>
           ))}
         </Card>

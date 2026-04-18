@@ -94,36 +94,36 @@ export default function Signup() {
         <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-6 md:grid-cols-[1.05fr_0.95fr]">
           <section className="hidden md:block">
             <div className="max-w-xl space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+                <Sparkles className="h-3.5 w-3.5 text-[var(--accent)]" />
                 Set up your survey workspace
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-5xl font-semibold text-[var(--color-text)]">
+                <h1 className="text-5xl font-semibold text-[var(--text)]">
                   Build a calmer way to collect honest feedback
                 </h1>
-                <p className="max-w-lg text-base leading-7 text-[var(--color-text-muted)]">
+                <p className="max-w-lg text-base leading-7 text-[var(--text-muted)]">
                   Create your workspace, publish voice surveys, and review responses in a UI that helps your team move with confidence.
                 </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Card className="space-y-3">
-                  <Users className="h-5 w-5 text-[var(--color-primary)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <Users className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Team-ready from day one
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Start with your workspace, then invite your team into a clean survey flow.
                   </p>
                 </Card>
                 <Card className="space-y-3" variant="flat">
-                  <ArrowRight className="h-5 w-5 text-[var(--color-info)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <ArrowRight className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Go from draft to live
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Launch your first survey in minutes and keep the experience smooth for respondents.
                   </p>
                 </Card>
@@ -132,6 +132,7 @@ export default function Signup() {
           </section>
 
           <AuthCard
+            mode="signup"
             title="Create Account"
             subtitle="Let's get your workspace ready so you can launch your first survey"
           >
@@ -158,7 +159,7 @@ export default function Signup() {
                   <div className="w-full border-t border-[var(--color-border)]" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-[var(--color-surface-raised)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                  <span className="bg-[var(--surface)] px-3 text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-muted)]">
                     Or use email
                   </span>
                 </div>
@@ -221,7 +222,7 @@ export default function Signup() {
 
               <p className="text-center text-sm text-[var(--color-text-muted)]">
                 Already have an account?{" "}
-                <Link to="/login" className="font-semibold text-[var(--color-primary)]">
+                <Link to="/login" className="font-semibold text-[var(--accent)]">
                   Sign in
                 </Link>
               </p>

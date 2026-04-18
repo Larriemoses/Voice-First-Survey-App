@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { publicSupabase, supabase } from "./supabase";
 
 export type ResponseItem = {
   id: string;
@@ -70,7 +70,7 @@ export async function uploadSurveyResponse(input: {
 
   const mimeType = input.audioBlob.type || "audio/webm";
 
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await publicSupabase.storage
     .from("voice-surveys")
     .upload(filePath, input.audioBlob, {
       contentType: mimeType,
@@ -82,7 +82,7 @@ export async function uploadSurveyResponse(input: {
     throw new Error(uploadError.message || "Failed to upload audio.");
   }
 
-  const { error: responseError } = await supabase.from("responses").upsert(
+  const { error: responseError } = await publicSupabase.from("responses").upsert(
     {
       survey_id: input.surveyId,
       respondent_id: input.respondentId,

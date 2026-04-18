@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { publicSupabase, supabase } from "./supabase";
 import { getMyOrganizationMembership } from "./organization";
 
 export type SurveyStatus = "draft" | "published" | "closed";
@@ -11,6 +11,7 @@ export type SurveyRecord = {
   organization_id?: string;
   created_by?: string;
   created_at?: string;
+  updated_at?: string | null;
   logo_url?: string | null;
   header_text?: string | null;
   organization?:
@@ -51,6 +52,25 @@ export async function getMySurveys() {
 
   if (error) throw error;
   return data || [];
+}
+
+export async function getSurveyResponseCounts(surveyIds: string[]) {
+  if (surveyIds.length === 0) {
+    return {} as Record<string, number>;
+  }
+
+  const { data, error } = await supabase
+    .from("responses")
+    .select("survey_id")
+    .in("survey_id", surveyIds);
+
+  if (error) throw error;
+
+  return (data || []).reduce<Record<string, number>>((counts, item) => {
+    const surveyId = item.survey_id as string;
+    counts[surveyId] = (counts[surveyId] || 0) + 1;
+    return counts;
+  }, {});
 }
 
 export async function createSurvey(input: {
@@ -262,7 +282,7 @@ export async function closeSurvey(surveyId: string) {
 }
 
 export async function getPublicSurveyById(surveyId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await publicSupabase
     .from("surveys")
     .select("*, organization:organizations(name)")
     .eq("id", surveyId)
@@ -274,14 +294,24 @@ export async function getPublicSurveyById(surveyId: string) {
 }
 
 export async function getPublicSurveyQuestions(surveyId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await publicSupabase
     .from("questions")
-    .select("*")
+    .select(
+      `
+      id,
+      prompt,
+      order_index,
+      max_duration_seconds,
+      surveys!inner(status)
+    `,
+    )
     .eq("survey_id", surveyId)
+    .eq("surveys.status", "published")
     .order("order_index", { ascending: true });
 
   if (error) throw error;
-  return data || [];
+
+  return (data || []).map(({ surveys, ...question }) => question);
 }
 
 export async function generateSurveyDraftFromBrief(brief: string) {

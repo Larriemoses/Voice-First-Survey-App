@@ -53,7 +53,11 @@ export default function RespondSurvey() {
 
   useEffect(() => {
     async function load() {
-      if (!surveyId) return;
+      if (!surveyId) {
+        setLoading(false);
+        setError("This survey link is incomplete.");
+        return;
+      }
 
       try {
         setError("");
@@ -64,60 +68,49 @@ export default function RespondSurvey() {
 
         setSurvey(surveyData);
         setQuestions(questionData);
-      } catch (error) {
-        console.error("Respond survey load error:", error);
+      } catch (loadError) {
+        console.error("Respond survey load error:", loadError);
         setError("We couldn't load this survey right now.");
       } finally {
         setLoading(false);
       }
     }
 
-    load();
+    void load();
   }, [surveyId]);
 
   const currentQuestion = questions[currentIndex];
   const currentAnswer = currentQuestion ? answers[currentQuestion.id] : null;
-  const canProceed = !!currentAnswer;
-  const answeredCount = useMemo(
-    () => questions.filter((question) => !!answers[question.id]).length,
-    [answers, questions],
-  );
   const progressPercentage = useMemo(() => {
-    if (questions.length === 0) return 0;
-    return ((currentIndex + 1) / questions.length) * 100;
-  }, [currentIndex, questions.length]);
-  const organizationName = useMemo(() => {
-    const organization = survey?.organization;
-
-    if (!organization) return "";
-
-    if (Array.isArray(organization)) {
-      return organization[0]?.name?.trim() || "";
+    if (questions.length === 0) {
+      return 0;
     }
 
-    return organization.name?.trim() || "";
-  }, [survey]);
+    return ((currentIndex + 1) / questions.length) * 100;
+  }, [currentIndex, questions.length]);
 
   function handleRecorded(
     audioBlob: Blob | null,
     audioUrl: string | null,
     duration: number,
   ) {
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      return;
+    }
 
     setError("");
 
     if (!audioBlob || !audioUrl) {
-      setAnswers((prev) => {
-        const next = { ...prev };
+      setAnswers((current) => {
+        const next = { ...current };
         delete next[currentQuestion.id];
         return next;
       });
       return;
     }
 
-    setAnswers((prev) => ({
-      ...prev,
+    setAnswers((current) => ({
+      ...current,
       [currentQuestion.id]: {
         blob: audioBlob,
         audioUrl,
@@ -127,10 +120,9 @@ export default function RespondSurvey() {
   }
 
   async function handleNext() {
-    if (!currentQuestion || !surveyId || !respondentId) return;
-
-    const answer = answers[currentQuestion.id];
-    if (!answer) return;
+    if (!surveyId || !respondentId || !currentQuestion || !currentAnswer) {
+      return;
+    }
 
     try {
       setSaving(true);
@@ -140,29 +132,20 @@ export default function RespondSurvey() {
         surveyId,
         respondentId,
         questionId: currentQuestion.id,
-        audioBlob: answer.blob,
-        durationSeconds: answer.duration,
+        audioBlob: currentAnswer.blob,
+        durationSeconds: currentAnswer.duration,
       });
 
       if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
+        setCurrentIndex((index) => index + 1);
       } else {
         navigate(`/take-survey/${surveyId}/thank-you`);
       }
-    } catch (error) {
-      console.error("Upload response error:", error);
+    } catch (saveError) {
+      console.error("Upload response error:", saveError);
       setError("We couldn't save that answer yet. Please try again.");
     } finally {
       setSaving(false);
-    }
-  }
-
-  function handlePrevious() {
-    if (saving) return;
-
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-      setError("");
     }
   }
 
@@ -170,14 +153,15 @@ export default function RespondSurvey() {
     return (
       <>
         <PageMeta title="Loading Survey | Survica" description="Loading your survey questions" />
-        <div className="min-h-screen px-4 py-6">
-          <div className="mx-auto max-w-4xl space-y-4">
+        <div className="min-h-screen px-4 py-8">
+          <div className="mx-auto max-w-3xl space-y-4">
+            <Skeleton className="mx-auto h-7 w-28" />
             <Card className="space-y-4">
-              <Skeleton className="h-10 w-32 rounded-full" />
-              <Skeleton className="h-12 w-4/5 rounded-[20px]" />
+              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-10 w-full" />
             </Card>
             <Card className="space-y-4">
-              <Skeleton className="h-56 rounded-[28px]" />
+              <Skeleton className="h-64 w-full" />
             </Card>
           </div>
         </div>
@@ -185,7 +169,7 @@ export default function RespondSurvey() {
     );
   }
 
-  if (!survey || questions.length === 0 || !currentQuestion) {
+  if (!survey || questions.length === 0 || !currentQuestion || error === "This survey link is incomplete.") {
     return (
       <>
         <PageMeta
@@ -195,11 +179,11 @@ export default function RespondSurvey() {
         <div className="flex min-h-screen items-center justify-center px-4 py-8">
           <Card className="w-full max-w-lg">
             <Feedback
-              variant="error"
-              title="This survey isn't ready just yet"
+              variant="warning"
+              title="This survey is no longer available"
               description={
                 error ||
-                "There aren't any published questions here yet. You can come back once the survey is live."
+                "There aren't any published questions here right now."
               }
             />
           </Card>
@@ -211,70 +195,46 @@ export default function RespondSurvey() {
   return (
     <>
       <PageMeta
-        title={
-          organizationName
-            ? `${survey.title || "Survey"} | ${organizationName}`
-            : `${survey.title || "Survey"} | Survica`
-        }
+        title={`${survey.title || "Survey"} | Survica`}
         description="Respond to this survey in your own voice"
         image={survey.logo_url || BRAND_SHARE_IMAGE_URL}
         imageAlt={survey.title || "Survica survey"}
       />
 
-      <div className="min-h-screen px-4 py-6 sm:px-6 md:px-8">
-        <div className="mx-auto max-w-4xl space-y-4">
+      <div className="min-h-screen px-4 py-8">
+        <div className="mx-auto max-w-3xl space-y-4">
+          {survey.logo_url ? (
+            <div className="mx-auto h-7 w-fit">
+              <img
+                src={survey.logo_url}
+                alt={survey.title}
+                className="h-full w-auto object-contain"
+              />
+            </div>
+          ) : null}
+
           <Card className="space-y-5">
-            {survey.logo_url ? (
-              <div className="flex justify-center">
-                <img
-                  src={survey.logo_url}
-                  alt={survey.title}
-                  className="h-14 w-auto max-w-[15rem] object-contain"
-                />
-              </div>
-            ) : null}
-
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                Voice response
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
-                  <span>Progress</span>
-                  <span>{answeredCount} recorded</span>
-                </div>
-                <div className="relative overflow-hidden rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-info)] transition-[width] duration-300 ease-out"
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                  <div className="relative flex h-8 items-center justify-center text-xs font-semibold tracking-[0.08em] text-[var(--color-text)]">
-                    Q{currentIndex + 1} / Q{questions.length}
-                  </div>
-                </div>
-              </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+              <Mic className="h-3.5 w-3.5 text-[var(--accent)]" />
+              Question {currentIndex + 1} of {questions.length}
             </div>
 
             <div className="space-y-2">
-              <div className="space-y-1">
-                {organizationName ? (
-                  <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                    From {organizationName}
-                  </p>
-                ) : null}
-                <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                  {survey.title}
-                </p>
-              </div>
-              <h1 className="text-3xl font-semibold leading-tight text-[var(--color-text)]">
+              <p className="text-sm text-[var(--text-muted)]">{survey.title}</p>
+              <h1 className="text-2xl font-semibold text-[var(--text)] sm:text-3xl">
                 {currentQuestion.prompt}
               </h1>
-              <p className="inline-flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
+              <p className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)]">
                 <Clock3 className="h-4 w-4" />
                 Aim to keep this answer within {currentQuestion.max_duration_seconds || 120} seconds
               </p>
+            </div>
+
+            <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]">
+              <div
+                className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-200"
+                style={{ width: `${progressPercentage}%` }}
+              />
             </div>
           </Card>
 
@@ -284,45 +244,46 @@ export default function RespondSurvey() {
             onRecorded={handleRecorded}
           />
 
-          {canProceed ? (
+          {currentAnswer ? (
             <Feedback
               variant="success"
-              title="Your answer is recorded"
+              title="Answer recorded"
               description="Listen back if you want, or move to the next question."
             />
           ) : (
             <Feedback
               variant="info"
               title="Record your answer when you're ready"
-              description="You can re-record before moving forward."
+              description="You can re-record before moving on."
             />
           )}
 
           {error ? (
-            <Feedback variant="error" title="Your answer wasn't saved" description={error} />
+            <Feedback
+              variant="error"
+              title="Answer not saved"
+              description={error}
+            />
           ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             <Button
-              onClick={handlePrevious}
+              variant="secondary"
+              onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
               disabled={currentIndex === 0 || saving}
               disabledReason="You're already on the first question"
-              variant="secondary"
-              size="lg"
               leadingIcon={<ArrowLeft className="h-4 w-4" />}
             >
               Previous
             </Button>
-
             <Button
               onClick={handleNext}
-              disabled={!canProceed || saving}
+              disabled={!currentAnswer || saving}
               disabledReason="Record this answer before moving on"
-              size="lg"
               trailingIcon={!saving ? <ArrowRight className="h-4 w-4" /> : undefined}
             >
               {saving
-                ? "Saving your answer"
+                ? "Saving answer"
                 : currentIndex < questions.length - 1
                   ? "Next question"
                   : "Finish survey"}

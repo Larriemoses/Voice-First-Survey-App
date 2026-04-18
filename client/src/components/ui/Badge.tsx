@@ -8,14 +8,15 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 
 const variants = {
   default:
-    "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)]",
+    "border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-muted)]",
   success:
-    "border border-transparent bg-[color:color-mix(in_srgb,var(--color-success)_16%,transparent)] text-[var(--color-success)]",
+    "border border-[color:color-mix(in_srgb,var(--success)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--success)_10%,transparent)] text-[var(--success)]",
   warning:
-    "border border-transparent bg-[color:color-mix(in_srgb,var(--color-warning)_16%,transparent)] text-[var(--color-warning)]",
+    "border border-[color:color-mix(in_srgb,var(--warning)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--warning)_10%,transparent)] text-[var(--warning)]",
   danger:
-    "border border-transparent bg-[color:color-mix(in_srgb,var(--color-danger)_14%,transparent)] text-[var(--color-danger)]",
-  info: "border border-transparent bg-[color:color-mix(in_srgb,var(--color-info)_14%,transparent)] text-[var(--color-info)]",
+    "border border-[color:color-mix(in_srgb,var(--danger)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--danger)_10%,transparent)] text-[var(--danger)]",
+  info:
+    "border border-[color:color-mix(in_srgb,var(--accent)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] text-[var(--accent)]",
 };
 
 export function Badge({
@@ -28,7 +29,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold",
+        "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium",
         variants[variant],
         className,
       )}

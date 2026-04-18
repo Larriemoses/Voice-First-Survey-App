@@ -6,7 +6,7 @@ type SkeletonProps = HTMLAttributes<HTMLDivElement>;
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
-      className={cn("skeleton-shimmer rounded-2xl", className)}
+      className={cn("skeleton-shimmer rounded-[var(--radius)]", className)}
       aria-hidden="true"
       {...props}
     />

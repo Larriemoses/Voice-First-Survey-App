@@ -10,8 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { Card } from "./components/ui/Card";
 import { Skeleton } from "./components/ui/Skeleton";
 import { getSurveyPath } from "./lib/branding";
-import Home from "./pages/Home";
 
+const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -38,20 +38,20 @@ function SurveyShareRedirect() {
 
 function AppFallback() {
   return (
-    <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen px-4 py-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-        <Skeleton className="h-16 rounded-[28px]" />
+        <Skeleton className="h-12 w-32" />
         <div className="grid gap-4 lg:grid-cols-[1.5fr_0.9fr]">
           <Card className="space-y-4">
-            <Skeleton className="h-6 w-36 rounded-full" />
+            <Skeleton className="h-6 w-36" />
             <Skeleton className="h-12 w-4/5" />
-            <Skeleton className="h-20 rounded-[24px]" />
+            <Skeleton className="h-20" />
           </Card>
           <Card className="space-y-4">
             <Skeleton className="h-5 w-28" />
-            <Skeleton className="h-12 rounded-[20px]" />
-            <Skeleton className="h-12 rounded-[20px]" />
-            <Skeleton className="h-12 rounded-[20px]" />
+            <Skeleton className="h-12" />
+            <Skeleton className="h-12" />
+            <Skeleton className="h-12" />
           </Card>
         </div>
       </div>

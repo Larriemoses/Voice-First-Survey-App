@@ -17,6 +17,19 @@ export function getInitials(name?: string | null): string {
     .join("");
 }
 
+export function getFirstName(value?: string | null): string {
+  if (!value?.trim()) {
+    return "there";
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.includes("@")) {
+    return trimmed.split("@")[0];
+  }
+
+  return trimmed.split(/\s+/)[0] || "there";
+}
+
 export function formatDate(
   value?: string | null,
   options: Intl.DateTimeFormatOptions = {
@@ -40,6 +53,31 @@ export function formatDateTime(value?: string | null): string {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+export function formatRelativeDate(value?: string | null): string {
+  if (!value) {
+    return "recently";
+  }
+
+  const target = new Date(value).getTime();
+  const now = Date.now();
+  const difference = target - now;
+  const minutes = Math.round(difference / (1000 * 60));
+  const hours = Math.round(difference / (1000 * 60 * 60));
+  const days = Math.round(difference / (1000 * 60 * 60 * 24));
+
+  const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+
+  if (Math.abs(minutes) < 60) {
+    return formatter.format(minutes, "minute");
+  }
+
+  if (Math.abs(hours) < 24) {
+    return formatter.format(hours, "hour");
+  }
+
+  return formatter.format(days, "day");
 }
 
 export function formatShortNumber(value: number): string {

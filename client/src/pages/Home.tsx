@@ -65,68 +65,66 @@ export default function Home() {
 
       <div className="min-h-screen px-4 py-4 sm:px-6 md:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-8">
-          <header className="flex flex-col gap-4 rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <Link to="/" className="flex w-full max-w-[16rem] items-center sm:w-auto">
-              <AppLogo className="max-w-none" />
-            </Link>
-
-            <Link
-              to="/login"
-              className="text-sm font-semibold text-[var(--color-text-muted)] transition hover:text-[var(--color-text)]"
-            >
-              Sign in
+          <header className="flex h-14 items-center px-1 sm:px-0">
+            <Link to="/" className="h-7">
+              <AppLogo imageClassName="h-full w-auto" />
             </Link>
           </header>
 
           <main className="grid gap-6 md:grid-cols-[1.05fr_0.95fr] md:items-center">
             <section className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)] shadow-sm">
-                <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+                <Sparkles className="h-3.5 w-3.5 text-[var(--accent)]" />
                 Built for modern research and feedback teams
               </div>
 
               <div className="space-y-4">
-                <h1 className="max-w-[12ch] text-4xl font-semibold leading-tight text-[var(--color-text)] sm:max-w-none sm:text-5xl lg:text-6xl">
+                <h1 className="max-w-[12ch] text-4xl font-semibold leading-tight text-[var(--text)] sm:max-w-none sm:text-5xl lg:text-6xl">
                   Let people answer in their own voice
                 </h1>
-                <p className="max-w-2xl text-base leading-7 text-[var(--color-text-muted)]">
-                  Survica gives your team a premium survey workflow for collecting spoken responses, tracking completion, and turning voice into insight you can actually act on.
+                <p className="max-w-2xl text-base leading-7 text-[var(--text-muted)]">
+                  Create voice surveys, publish them fast, and review spoken feedback without making respondents type their way through the experience.
                 </p>
               </div>
 
-              <div>
-                <Link to="/signup">
-                  <Button size="lg" trailingIcon={<ArrowRight className="h-4 w-4" />}>
-                    Start your first survey
+              <div className="flex w-full max-w-xs gap-3 sm:max-w-sm">
+                <Link to="/login" className="flex-1 min-w-0">
+                  <Button variant="secondary" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/signup" className="flex-1 min-w-0">
+                  <Button className="w-full" trailingIcon={<ArrowRight className="h-4 w-4" />}>
+                    Get Started
                   </Button>
                 </Link>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <Card className="space-y-2">
-                  <Mic className="h-5 w-5 text-[var(--color-primary)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <Mic className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Voice-first
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Make responses feel natural from the first question.
                   </p>
                 </Card>
                 <Card className="space-y-2" variant="flat">
-                  <Languages className="h-5 w-5 text-[var(--color-info)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <Languages className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Multi-language
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Support diverse audiences without extra survey friction.
                   </p>
                 </Card>
                 <Card className="space-y-2">
-                  <ChartColumnBig className="h-5 w-5 text-[var(--color-success)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <ChartColumnBig className="h-5 w-5 text-[var(--success)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Insight-ready
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Review transcripts, activity, and response quality in one flow.
                   </p>
                 </Card>
@@ -138,7 +136,7 @@ export default function Home() {
                 <img
                   src={heroImage}
                   alt="Survica workspace preview"
-                  className="w-full rounded-[24px] object-cover"
+                  className="w-full rounded-[calc(var(--radius)+4px)] object-cover"
                   loading="eager"
                   decoding="async"
                   fetchPriority="high"
@@ -148,20 +146,20 @@ export default function Home() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Card className="space-y-3">
-                  <AudioWaveform className="h-5 w-5 text-[var(--color-primary)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <AudioWaveform className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Designed for clarity
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Every screen keeps the next action obvious, whether you're launching a survey or reviewing answers.
                   </p>
                 </Card>
                 <Card className="space-y-3" variant="flat">
-                  <ShieldCheck className="h-5 w-5 text-[var(--color-success)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <ShieldCheck className="h-5 w-5 text-[var(--success)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Built for trust
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Give respondents a calm experience that feels thoughtful from start to finish.
                   </p>
                 </Card>

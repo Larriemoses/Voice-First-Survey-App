@@ -25,12 +25,13 @@ const iconMap = {
 
 const styles = {
   success:
-    "border-[color:color-mix(in_srgb,var(--color-success)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--color-success)_12%,var(--color-surface-raised))] text-[var(--color-success)]",
+    "border-[color:color-mix(in_srgb,var(--success)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--success)_6%,var(--surface))] text-[var(--success)]",
   error:
-    "border-[color:color-mix(in_srgb,var(--color-danger)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--color-danger)_11%,var(--color-surface-raised))] text-[var(--color-danger)]",
+    "border-[color:color-mix(in_srgb,var(--danger)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--danger)_6%,var(--surface))] text-[var(--danger)]",
   warning:
-    "border-[color:color-mix(in_srgb,var(--color-warning)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--color-warning)_11%,var(--color-surface-raised))] text-[var(--color-warning)]",
-  info: "border-[color:color-mix(in_srgb,var(--color-info)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--color-info)_12%,var(--color-surface-raised))] text-[var(--color-info)]",
+    "border-[color:color-mix(in_srgb,var(--warning)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--warning)_6%,var(--surface))] text-[var(--warning)]",
+  info:
+    "border-[color:color-mix(in_srgb,var(--accent)_18%,var(--border))] bg-[color:color-mix(in_srgb,var(--accent)_6%,var(--surface))] text-[var(--accent)]",
 };
 
 export function Feedback({
@@ -47,7 +48,7 @@ export function Feedback({
   return (
     <div
       className={cn(
-        "flex gap-3 rounded-[24px] border px-4 py-3",
+        "flex gap-3 rounded-xl border px-4 py-3",
         styles[variant],
         className,
       )}
@@ -57,7 +58,7 @@ export function Feedback({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">{title}</p>
         {description ? (
-          <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+          <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
             {description}
           </p>
         ) : null}

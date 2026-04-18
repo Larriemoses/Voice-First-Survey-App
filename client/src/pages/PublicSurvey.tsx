@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  AudioWaveform,
-  ArrowRight,
-  Clock3,
-  Globe2,
-  Mic,
-  UserRound,
-} from "lucide-react";
+import { ArrowRight, Clock3, Mic, UserRound } from "lucide-react";
 import { getPublicSurveyById, getPublicSurveyQuestions } from "../lib/surveys";
 import { createRespondent } from "../lib/respondents";
 import PageMeta from "../components/PageMeta";
@@ -64,7 +57,7 @@ export default function PublicSurvey() {
         setError("");
 
         if (!surveyId) {
-          setError("That survey link looks incomplete.");
+          setError("This survey link is incomplete.");
           return;
         }
 
@@ -74,30 +67,53 @@ export default function PublicSurvey() {
         ]);
 
         if (!surveyData) {
-          setError("This survey isn't available right now.");
+          setError("This survey is no longer available.");
           return;
         }
 
         setSurvey(surveyData);
         setQuestions(questionData);
-      } catch (err) {
-        console.error("Public survey load error:", err);
+      } catch (loadError) {
+        console.error("Public survey load error:", loadError);
         setError("We couldn't load this survey right now.");
       } finally {
         setLoading(false);
       }
     }
 
-    load();
+    void load();
   }, [surveyId]);
 
-  async function handleStartSurvey(e: React.FormEvent) {
-    e.preventDefault();
+  const organizationName = useMemo(() => {
+    const organization = survey?.organization;
 
-    if (!surveyId || !survey) return;
+    if (!organization) return "";
+    if (Array.isArray(organization)) return organization[0]?.name?.trim() || "";
+    return organization.name?.trim() || "";
+  }, [survey]);
+
+  const estimatedMinutes = useMemo(() => {
+    if (questions.length === 0) {
+      return 1;
+    }
+
+    const totalSeconds = questions.reduce(
+      (sum, question) => sum + (question.max_duration_seconds || 60),
+      0,
+    );
+
+    return Math.max(1, Math.round(totalSeconds / 60));
+  }, [questions]);
+
+  async function handleStartSurvey(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!surveyId || !survey) {
+      return;
+    }
 
     if (!displayName.trim()) {
-      setError("Add your full name so we can connect your answers correctly.");
+      setError("Add your name before you start.");
       return;
     }
 
@@ -113,49 +129,30 @@ export default function PublicSurvey() {
       });
 
       navigate(`/take-survey/${surveyId}/respond/${respondent.id}`);
-    } catch (err) {
-      console.error("Create respondent error:", err);
-      setError(err instanceof Error ? err.message : "We couldn't start your survey.");
+    } catch (startError) {
+      console.error("Create respondent error:", startError);
+      setError("We couldn't start this survey right now.");
     } finally {
       setStarting(false);
     }
   }
-
-  const avgDuration = useMemo(() => {
-    if (questions.length === 0) return 60;
-    const total = questions.reduce(
-      (sum, question) => sum + (question.max_duration_seconds || 0),
-      0,
-    );
-    return Math.round(total / questions.length) || 60;
-  }, [questions]);
-  const organizationName = useMemo(() => {
-    const organization = survey?.organization;
-
-    if (!organization) return "";
-
-    if (Array.isArray(organization)) {
-      return organization[0]?.name?.trim() || "";
-    }
-
-    return organization.name?.trim() || "";
-  }, [survey]);
 
   if (loading) {
     return (
       <>
         <PageMeta title="Loading Survey | Survica" description="Loading your survey" />
         <div className="min-h-screen px-4 py-8">
-          <div className="mx-auto max-w-3xl space-y-4">
+          <div className="mx-auto max-w-xl space-y-4">
+            <Skeleton className="mx-auto h-7 w-28" />
             <Card className="space-y-4">
-              <Skeleton className="h-10 w-36 rounded-full" />
-              <Skeleton className="h-12 w-4/5 rounded-[20px]" />
-              <Skeleton className="h-24 rounded-[24px]" />
+              <Skeleton className="h-8 w-2/3" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-24 w-full" />
             </Card>
             <Card className="space-y-4">
-              <Skeleton className="h-12 rounded-[20px]" />
-              <Skeleton className="h-12 rounded-[20px]" />
-              <Skeleton className="h-12 rounded-[20px]" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </Card>
           </div>
         </div>
@@ -163,7 +160,7 @@ export default function PublicSurvey() {
     );
   }
 
-  if (error && !survey) {
+  if (!survey || error) {
     return (
       <>
         <PageMeta
@@ -173,9 +170,9 @@ export default function PublicSurvey() {
         <div className="flex min-h-screen items-center justify-center px-4 py-8">
           <Card className="w-full max-w-lg">
             <Feedback
-              variant="error"
-              title="This survey isn't available"
-              description={error}
+              variant="warning"
+              title="This survey is no longer available"
+              description={error || "The link may be closed, unpublished, or incorrect."}
             />
           </Card>
         </div>
@@ -188,140 +185,134 @@ export default function PublicSurvey() {
       <PageMeta
         title={
           organizationName
-            ? `${survey?.title || "Survey"} | ${organizationName}`
-            : `${survey?.title || "Survey"} | Survica`
+            ? `${survey.title || "Survey"} | ${organizationName}`
+            : `${survey.title || "Survey"} | Survica`
         }
         description={
-          survey?.header_text ||
-          survey?.description ||
+          survey.header_text ||
+          survey.description ||
           DEFAULT_PUBLIC_SURVEY_DESCRIPTION
         }
-        image={survey?.logo_url || BRAND_SHARE_IMAGE_URL}
-        imageAlt={survey?.title || "Survica survey"}
+        image={survey.logo_url || BRAND_SHARE_IMAGE_URL}
+        imageAlt={survey.title || "Survica survey"}
       />
 
-      <div className="min-h-screen px-4 py-6 sm:px-6 md:px-8">
-        <div className="mx-auto max-w-3xl space-y-4">
-          <Card className="space-y-5">
-            {survey?.logo_url ? (
-              <div className="flex justify-center">
-                <img
-                  src={survey.logo_url}
-                  alt={survey.title}
-                  className="h-14 w-auto max-w-[15rem] object-contain"
-                />
-              </div>
-            ) : null}
+      <div className="min-h-screen px-4 py-8">
+        <div className="mx-auto max-w-xl space-y-4">
+          {survey.logo_url ? (
+            <div className="mx-auto h-7 w-fit">
+              <img
+                src={survey.logo_url}
+                alt={survey.title}
+                className="h-full w-auto object-contain"
+              />
+            </div>
+          ) : null}
 
+          <Card className="space-y-5">
             <div className="space-y-3 text-center">
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                {organizationName ? (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                    <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                    From {organizationName}
-                  </div>
-                ) : null}
-                <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                  <Mic className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                  Voice survey
-                </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+                <Mic className="h-3.5 w-3.5 text-[var(--accent)]" />
+                Voice survey
               </div>
-              <h1 className="text-3xl font-semibold text-[var(--color-text)]">
-                {survey?.header_text || "We'd love to hear your response"}
-              </h1>
-              <p className="text-sm leading-7 text-[var(--color-text-muted)]">
-                {survey?.description ||
-                  "You'll answer each question in your own voice. There's no long form to fight with."}
-              </p>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-semibold text-[var(--text)] sm:text-3xl">
+                  {survey.header_text || survey.title}
+                </h1>
+                <p className="text-sm leading-6 text-[var(--text-muted)]">
+                  {survey.description ||
+                    "Answer each question in your own voice. No long form required."}
+                </p>
+              </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <Card variant="flat" className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
-                  Questions
-                </p>
-                <p className="text-2xl font-semibold text-[var(--color-text)]">
+              <Card className="p-4" variant="flat">
+                <p className="text-xs text-[var(--text-muted)]">Questions</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">
                   {questions.length}
                 </p>
               </Card>
-              <Card variant="flat" className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
-                  Format
-                </p>
-                <p className="inline-flex items-center gap-2 text-base font-semibold text-[var(--color-text)]">
-                  <AudioWaveform className="h-4 w-4 text-[var(--color-primary)]" />
-                  Voice
-                </p>
+              <Card className="p-4" variant="flat">
+                <p className="text-xs text-[var(--text-muted)]">Format</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--text)]">Voice</p>
               </Card>
-              <Card variant="flat" className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
-                  Avg time
-                </p>
-                <p className="inline-flex items-center gap-2 text-base font-semibold text-[var(--color-text)]">
-                  <Clock3 className="h-4 w-4 text-[var(--color-info)]" />
-                  {avgDuration}s
+              <Card className="p-4" variant="flat">
+                <p className="text-xs text-[var(--text-muted)]">Estimated time</p>
+                <p className="mt-1 inline-flex items-center gap-2 text-xl font-semibold text-[var(--text)]">
+                  <Clock3 className="h-4 w-4 text-[var(--accent)]" />
+                  {estimatedMinutes} min
                 </p>
               </Card>
             </div>
 
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-              <Globe2 className="h-3.5 w-3.5 text-[var(--color-info)]" />
-              You can answer naturally in the language that feels right to you
-            </div>
+            {organizationName ? (
+              <p className="text-center text-sm text-[var(--text-muted)]">
+                Sent by {organizationName}
+              </p>
+            ) : null}
           </Card>
 
-          <Card>
-            <div>
-              <h2 className="text-2xl font-semibold text-[var(--color-text)]">
-                Before you begin
-              </h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                Add your details so your responses stay linked correctly
-              </p>
-            </div>
+          {questions.length === 0 ? (
+            <Card>
+              <Feedback
+                variant="warning"
+                title="This survey isn't ready yet"
+                description="The survey is published, but it doesn't have any public questions available."
+              />
+            </Card>
+          ) : (
+            <Card>
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold text-[var(--text)]">
+                  Before you begin
+                </h2>
+                <p className="text-sm text-[var(--text-muted)]">
+                  Add your details so your answers stay attached to the right person.
+                </p>
+              </div>
 
-            <form onSubmit={handleStartSurvey} className="mt-5 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <form onSubmit={handleStartSurvey} className="mt-5 space-y-4">
                 <Input
                   label="Full name"
                   value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  onChange={(event) => setDisplayName(event.target.value)}
                   placeholder="e.g. Ada Lovelace"
                   leadingIcon={<UserRound className="h-4 w-4" />}
-                  containerClassName="sm:col-span-2"
                 />
-
                 <Input
                   label="Email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="you@example.com"
                 />
-
                 <Input
                   label="Phone"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(event) => setPhone(event.target.value)}
                   placeholder="+234 800 000 0000"
                 />
-              </div>
 
-              {error ? (
-                <Feedback variant="error" title="We couldn't start your survey" description={error} />
-              ) : null}
+                {error ? (
+                  <Feedback
+                    variant="error"
+                    title="Survey not started"
+                    description={error}
+                  />
+                ) : null}
 
-              <Button
-                type="submit"
-                loading={starting}
-                size="lg"
-                className="w-full sm:w-auto"
-                trailingIcon={!starting ? <ArrowRight className="h-4 w-4" /> : undefined}
-              >
-                {starting ? "Starting your survey" : "Start survey"}
-              </Button>
-            </form>
-          </Card>
+                <Button
+                  type="submit"
+                  loading={starting}
+                  className="w-full"
+                  trailingIcon={!starting ? <ArrowRight className="h-4 w-4" /> : undefined}
+                >
+                  {starting ? "Starting survey" : "Start survey"}
+                </Button>
+              </form>
+            </Card>
+          )}
         </div>
       </div>
     </>

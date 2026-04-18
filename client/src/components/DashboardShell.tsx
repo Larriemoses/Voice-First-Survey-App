@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  BadgePlus,
   Building2,
   ClipboardList,
   LayoutGrid,
@@ -9,9 +8,11 @@ import {
   UserRound,
 } from "lucide-react";
 import { getCurrentUser, signOutUser } from "../lib/auth";
+import { getMyOrganizationMembership } from "../lib/organization";
 import { cn } from "../utils/helpers";
 import AppLogo from "./AppLogo";
 import { Avatar } from "./ui/Avatar";
+import { ThemeToggle } from "./ui/ThemeToggle";
 import { Button } from "./ui/button";
 
 type Props = {
@@ -21,7 +22,6 @@ type Props = {
 const primaryNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/surveys", label: "Surveys", icon: ClipboardList },
-  { to: "/surveys/create", label: "Create", icon: BadgePlus },
   { to: "/profile", label: "Profile", icon: UserRound },
 ];
 
@@ -29,19 +29,50 @@ const secondaryNav = [
   { to: "/onboarding", label: "Workspace setup", icon: Building2 },
 ];
 
+function getPageTitle(pathname: string) {
+  if (pathname.startsWith("/surveys/create")) return "New Survey";
+  if (/^\/surveys\/[^/]+\/responses/.test(pathname)) return "Responses";
+  if (/^\/surveys\/[^/]+/.test(pathname)) return "Survey Builder";
+  if (pathname.startsWith("/surveys")) return "Surveys";
+  if (pathname.startsWith("/profile")) return "Profile";
+  if (pathname.startsWith("/onboarding")) return "Workspace";
+  return "Dashboard";
+}
+
+function isNavActive(pathname: string, to: string) {
+  if (to === "/dashboard") {
+    return pathname === "/dashboard";
+  }
+
+  if (to === "/surveys") {
+    return pathname.startsWith("/surveys");
+  }
+
+  if (to === "/profile") {
+    return pathname.startsWith("/profile");
+  }
+
+  return pathname === to;
+}
+
 export default function DashboardShell({ children }: Props) {
   const [accountLabel, setAccountLabel] = useState("Your workspace");
+  const [workspaceLabel, setWorkspaceLabel] = useState("No workspace yet");
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     async function loadUser() {
-      const user = await getCurrentUser();
+      const [user, membership] = await Promise.all([
+        getCurrentUser(),
+        getMyOrganizationMembership(),
+      ]);
       const fullName = user?.user_metadata?.full_name as string | undefined;
       setAccountLabel(fullName || user?.email || "Your workspace");
+      setWorkspaceLabel(membership?.organization?.name || "No workspace yet");
     }
 
-    loadUser();
+    void loadUser();
   }, []);
 
   async function handleLogout() {
@@ -49,34 +80,33 @@ export default function DashboardShell({ children }: Props) {
     navigate("/login");
   }
 
-  const activeMobileLabel = useMemo(() => {
-    const currentItem = primaryNav.find((item) =>
-      location.pathname.startsWith(item.to),
-    );
-
-    return currentItem?.label ?? "Workspace";
-  }, [location.pathname]);
+  const activeMobileLabel = useMemo(
+    () => getPageTitle(location.pathname),
+    [location.pathname],
+  );
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)] text-[var(--color-text)]">
-      <aside className="shell-noise fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/98 md:flex md:flex-col">
-        <div className="flex h-24 items-center justify-center px-6">
-          <AppLogo className="mx-auto" />
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[var(--border-sub)] bg-[var(--surface)]/95 md:flex md:flex-col">
+        <div className="flex h-14 items-center px-4">
+          <div className="h-6">
+            <AppLogo imageClassName="h-full w-auto" />
+          </div>
         </div>
 
-        <div className="flex flex-1 flex-col justify-between px-3 pb-4">
-          <div className="space-y-6">
+        <div className="flex flex-1 flex-col justify-between px-3 pb-4 pt-4">
+          <div className="space-y-4">
             <nav className="space-y-1">
               {primaryNav.map(({ to, label, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
-                  className={({ isActive }) =>
+                  className={() =>
                     cn(
-                      "flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition-all duration-200",
-                      isActive
-                        ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm"
-                        : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
+                      "flex min-h-11 items-center gap-3 rounded-[var(--radius)] px-3 text-sm font-medium",
+                      isNavActive(location.pathname, to)
+                        ? "bg-[var(--surface-muted)] text-[var(--text)]"
+                        : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]",
                     )
                   }
                 >
@@ -91,12 +121,12 @@ export default function DashboardShell({ children }: Props) {
                 <NavLink
                   key={to}
                   to={to}
-                  className={({ isActive }) =>
+                  className={() =>
                     cn(
-                      "flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition-all duration-200",
-                      isActive
-                        ? "bg-[var(--color-surface-raised)] text-[var(--color-text)]"
-                        : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
+                      "flex min-h-11 items-center gap-3 rounded-[var(--radius)] px-3 text-sm font-medium",
+                      location.pathname.startsWith(to)
+                        ? "bg-[var(--surface-muted)] text-[var(--text)]"
+                        : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]",
                     )
                   }
                 >
@@ -108,79 +138,71 @@ export default function DashboardShell({ children }: Props) {
           </div>
 
           <div className="space-y-3">
-            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 shadow-sm">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
               <div className="flex items-center gap-3">
                 <Avatar
                   name={accountLabel}
                   size="md"
-                  className="bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+                  className="bg-[color:color-mix(in_srgb,var(--accent)_12%,var(--surface-muted))] text-[var(--accent)]"
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[var(--color-text)]">
+                  <p className="truncate text-sm font-semibold text-[var(--text)]">
                     {accountLabel}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Signed in
+                  <p className="truncate text-xs text-[var(--text-muted)]">
+                    {workspaceLabel}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-sm">
-              <p className="text-sm font-semibold text-[var(--color-text)]">
-                Keep momentum
-              </p>
-              <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
-                Build your survey flow, publish it, then review responses in one place.
-              </p>
+            <div className="flex items-center gap-2">
+              <ThemeToggle className="w-full justify-center" />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full"
+                leadingIcon={<LogOut className="h-4 w-4" />}
+              >
+                Sign out
+              </Button>
             </div>
-
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleLogout}
-              className="w-full"
-              leadingIcon={<LogOut className="h-4 w-4" />}
-            >
-              Sign out
-            </Button>
           </div>
         </div>
       </aside>
 
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/98 px-4 py-3 backdrop-blur md:hidden">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleLogout}
-            leadingIcon={<LogOut className="h-4 w-4" />}
-          >
-            Sign out
-          </Button>
-          <AppLogo />
-          <div className="w-11 shrink-0" />
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-[var(--border-sub)] bg-[var(--surface)]/95 px-4 backdrop-blur md:hidden">
+        <div className="mx-auto flex h-12 max-w-5xl items-center gap-3">
+          <div className="h-5 shrink-0">
+            <AppLogo imageClassName="h-full w-auto" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-[var(--text)]">
+              {activeMobileLabel}
+            </p>
+          </div>
         </div>
       </div>
 
-      <main className="min-h-screen pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-20 transition-[padding] duration-200 md:pl-72 md:pt-0 md:pb-10">
+      <main className="min-h-screen pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-12 md:pl-64 md:pt-0 md:pb-10">
         <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 md:py-5 lg:px-8">
           <div className="w-full min-w-0">{children}</div>
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-md">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border-sub)] bg-[var(--surface)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-sm">
           {primaryNav.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
-              className={({ isActive }) =>
+              className={() =>
                 cn(
-                  "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-[20px] px-1 text-[11px] font-semibold transition-all duration-200",
-                  isActive
-                    ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-                    : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]",
+                  "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center rounded-[10px] px-1 text-[11px] font-medium",
+                  isNavActive(location.pathname, to)
+                    ? "bg-[var(--surface-muted)] text-[var(--text)]"
+                    : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]",
                 )
               }
             >
@@ -189,7 +211,7 @@ export default function DashboardShell({ children }: Props) {
             </NavLink>
           ))}
         </div>
-        <div className="px-2 pt-2 text-center text-[11px] text-[var(--color-text-muted)]">
+        <div className="px-2 pt-2 text-center text-[11px] text-[var(--text-muted)]">
           {activeMobileLabel}
         </div>
       </div>
