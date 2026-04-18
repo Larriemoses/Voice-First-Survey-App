@@ -21,8 +21,8 @@ export default function AppLogo({
         className={cn(
           "object-contain",
           collapsed
-            ? "h-9 w-auto max-w-[3rem]"
-            : "h-10 w-auto max-w-[10rem] sm:h-11 sm:max-w-[11.5rem] md:h-12 md:max-w-[13rem]",
+            ? "h-8 w-auto max-w-[2.75rem]"
+            : "h-8 w-auto max-w-[8.75rem] sm:h-9 sm:max-w-[10rem] md:h-10 md:max-w-[11.5rem]",
         )}
       />
     </div>

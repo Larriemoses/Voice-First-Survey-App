@@ -134,14 +134,7 @@ export function getSurveyOrganizationName(survey: SurveyPreview | null) {
 }
 
 function toBase64(bytes: Uint8Array) {
-  let binary = "";
-
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    const chunk = bytes.subarray(index, index + 0x8000);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return btoa(binary);
+  return Buffer.from(bytes).toString("base64");
 }
 
 export async function fetchImageDataUri(url: string) {
@@ -162,7 +155,12 @@ export async function resolveSurveyLogoDataUri(logoUrl?: string | null) {
     return await fetchImageDataUri(logoUrl || BRAND_FAVICON_URL);
   } catch (error) {
     console.error("resolveSurveyLogoDataUri failed", error);
-    return await fetchImageDataUri(BRAND_FAVICON_URL);
+    try {
+      return await fetchImageDataUri(BRAND_FAVICON_URL);
+    } catch (fallbackError) {
+      console.error("resolveSurveyLogoDataUri fallback failed", fallbackError);
+      return "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgZmlsbD0ibm9uZSI+PHJlY3Qgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHJ4PSI2NCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik02NCAxNDRDNjQgMTA4LjY1NCA5Mi42NTM4IDgwIDEyOCA4MEMxNjMuMzQ2IDgwIDE5MiAxMDguNjU0IDE5MiAxNDRDMTkyIDE3OS4zNDYgMTYzLjM0NiAyMDggMTI4IDIwOEM5Mi42NTM4IDIwOCA2NCAxNzkuMzQ2IDY0IDE0NFoiIGZpbGw9IiMyNDU3RjUiLz48L3N2Zz4=";
+    }
   }
 }
 

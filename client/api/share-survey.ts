@@ -1,7 +1,7 @@
 import {
+  BRAND_SHARE_IMAGE_URL,
   getSurveyPath,
   getSurveySharePath,
-  getSurveyShareImagePath,
 } from "../src/lib/branding";
 import {
   buildAppUrl,
@@ -88,8 +88,6 @@ export default async function handler(
   const sharePath = getSurveySharePath(surveyId);
   const surveyUrl = appUrl ? `${appUrl}${surveyPath}` : surveyPath;
   const shareUrl = appUrl ? `${appUrl}${sharePath}` : sharePath;
-  const shareImagePath = getSurveyShareImagePath(surveyId);
-  const shareImageUrl = appUrl ? `${appUrl}${shareImagePath}` : shareImagePath;
 
   let survey: SurveyPreview | null = null;
 
@@ -102,6 +100,7 @@ export default async function handler(
   const title = getShareTitle(survey);
   const description = getShareDescription(survey);
   const siteName = getShareSiteName(survey);
+  const imageUrl = survey?.logo_url || BRAND_SHARE_IMAGE_URL;
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader(
@@ -115,7 +114,7 @@ export default async function handler(
       siteName,
       title,
       description,
-      imageUrl: shareImageUrl,
+      imageUrl,
     }),
   );
 }
