@@ -1,4 +1,4 @@
-import type { ReactNode, TextareaHTMLAttributes } from "react";
+import { useId, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { cn } from "../../utils/helpers";
 
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -21,7 +21,9 @@ export function Textarea({
   id,
   ...props
 }: TextareaProps) {
-  const fieldId = id || props.name;
+  const generatedId = useId();
+  const fieldId = id || props.name || generatedId;
+  const messageId = `${fieldId}-message`;
 
   return (
     <div className={cn("space-y-2", containerClassName)}>
@@ -36,32 +38,38 @@ export function Textarea({
 
       <div
         className={cn(
-          "flex gap-3 rounded-2xl border bg-[var(--color-surface-raised)] px-3.5 transition duration-200",
+          "flex gap-3 rounded-[var(--radius)] border bg-[var(--surface)] px-3.5",
           error
-            ? "border-[var(--color-danger)]"
-            : "border-[var(--color-border)] focus-within:border-[var(--color-primary)] focus-within:bg-[var(--color-surface)]",
+            ? "border-[var(--danger)]"
+            : "border-[var(--border)] focus-within:border-[var(--accent)] focus-within:bg-[var(--surface)]",
         )}
       >
         {leadingIcon ? (
-          <span className="pt-3 text-[var(--color-text-muted)]">{leadingIcon}</span>
+          <span className="pt-3 text-[var(--text-muted)]">{leadingIcon}</span>
         ) : null}
         <textarea
           id={fieldId}
+          aria-invalid={!!error}
+          aria-describedby={helperText || error ? messageId : undefined}
           className={cn(
-            "min-h-28 w-full resize-y bg-transparent py-3 text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-disabled)]",
+            "min-h-28 w-full resize-y bg-transparent py-3 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-dim)]",
             className,
           )}
           {...props}
         />
         {trailingIcon ? (
-          <span className="pt-3 text-[var(--color-text-muted)]">{trailingIcon}</span>
+          <span className="pt-3 text-[var(--text-muted)]">{trailingIcon}</span>
         ) : null}
       </div>
 
       {error ? (
-        <p className="text-sm text-[var(--color-danger)]">{error}</p>
+        <p id={messageId} className="text-sm text-[var(--danger)]">
+          {error}
+        </p>
       ) : helperText ? (
-        <p className="text-sm text-[var(--color-text-muted)]">{helperText}</p>
+        <p id={messageId} className="text-sm text-[var(--text-muted)]">
+          {helperText}
+        </p>
       ) : null}
     </div>
   );

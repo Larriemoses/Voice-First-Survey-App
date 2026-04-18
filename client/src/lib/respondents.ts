@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { publicSupabase } from "./supabase";
 
 export type CreateRespondentInput = {
   survey_id: string;
@@ -26,7 +26,7 @@ export async function createRespondent(input: CreateRespondentInput) {
     phone: input.phone?.trim() || null,
   };
 
-  const { error } = await supabase.from("respondents").insert(payload);
+  const { error } = await publicSupabase.from("respondents").insert(payload);
 
   if (error) {
     console.error("Respondent insert error:", error);

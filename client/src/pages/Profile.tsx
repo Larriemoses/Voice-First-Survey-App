@@ -65,8 +65,8 @@ export default function Profile() {
   return (
     <DashboardShell>
       <PageHeader
-        title="Your Profile"
-        subtitle="Keep your account details up to date so your workspace stays clear and personal"
+        title="Profile"
+        subtitle="Keep your name current so teammates can see who owns each survey."
       />
 
       {loading ? (
@@ -115,19 +115,19 @@ export default function Profile() {
 
           <Card variant="flat" className="space-y-4">
             <div>
-              <h2 className="text-xl font-semibold text-[var(--color-text)]">
+              <h2 className="text-xl font-semibold text-[var(--text)]">
                 Keep this simple
               </h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
                 A clear profile helps your team know who's publishing and reviewing surveys
               </p>
             </div>
 
-            <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-              <p className="text-sm font-semibold text-[var(--color-text)]">
+            <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-4">
+              <p className="text-sm font-semibold text-[var(--text)]">
                 Best practice
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--color-text-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
                 Use the name your teammates recognize most often. It keeps shared survey workflows easier to scan.
               </p>
             </div>

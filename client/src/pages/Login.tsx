@@ -93,36 +93,36 @@ export default function Login() {
         <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-6 md:grid-cols-[1.1fr_0.9fr]">
           <section className="hidden md:block">
             <div className="max-w-xl space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
-                <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)]">
+                <Sparkles className="h-3.5 w-3.5 text-[var(--accent)]" />
                 Voice feedback, without the friction
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-5xl font-semibold text-[var(--color-text)]">
+                <h1 className="text-5xl font-semibold text-[var(--text)]">
                   Hear what people mean, not just what they typed
                 </h1>
-                <p className="max-w-lg text-base leading-7 text-[var(--color-text-muted)]">
+                <p className="max-w-lg text-base leading-7 text-[var(--text-muted)]">
                   Survica helps your team launch voice-first surveys, collect clear spoken responses, and review insights without chasing recordings across tools.
                 </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Card className="space-y-3">
-                  <ShieldCheck className="h-5 w-5 text-[var(--color-success)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <ShieldCheck className="h-5 w-5 text-[var(--success)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Built for trust
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Give respondents a flow that feels simple, private, and easy to finish.
                   </p>
                 </Card>
                 <Card className="space-y-3" variant="flat">
-                  <ArrowRight className="h-5 w-5 text-[var(--color-info)]" />
-                  <h2 className="text-lg font-semibold text-[var(--color-text)]">
+                  <ArrowRight className="h-5 w-5 text-[var(--accent)]" />
+                  <h2 className="text-lg font-semibold text-[var(--text)]">
                     Move faster
                   </h2>
-                  <p className="text-sm leading-6 text-[var(--color-text-muted)]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Publish faster, review transcripts sooner, and keep your team aligned.
                   </p>
                 </Card>
@@ -131,6 +131,7 @@ export default function Login() {
           </section>
 
           <AuthCard
+            mode="login"
             title="Welcome Back"
             subtitle="Sign in to pick up right where you left off"
           >
@@ -157,7 +158,7 @@ export default function Login() {
                   <div className="w-full border-t border-[var(--color-border)]" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-[var(--color-surface-raised)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+                  <span className="bg-[var(--surface)] px-3 text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-muted)]">
                     Or use email
                   </span>
                 </div>
@@ -209,7 +210,7 @@ export default function Login() {
 
               <p className="text-center text-sm text-[var(--color-text-muted)]">
                 New here?{" "}
-                <Link to="/signup" className="font-semibold text-[var(--color-primary)]">
+                <Link to="/signup" className="font-semibold text-[var(--accent)]">
                   Create your account
                 </Link>
               </p>

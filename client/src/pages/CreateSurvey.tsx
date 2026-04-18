@@ -65,10 +65,14 @@ export default function CreateSurvey() {
 
   return (
     <DashboardShell>
-      <PageHeader title="Create Survey" backHref="/surveys" />
+      <PageHeader
+        title="New Survey"
+        subtitle="Start with the basics, then finish the questions and branding in the builder."
+        backHref="/surveys"
+      />
 
       <div className="mx-auto max-w-3xl">
-        <Card>
+        <Card className="space-y-5">
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Survey title"
@@ -86,11 +90,11 @@ export default function CreateSurvey() {
             />
 
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-[var(--color-text)]">
+              <p className="text-sm font-semibold text-[var(--text)]">
                 Brand logo
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] transition hover:bg-[var(--color-surface)] sm:w-auto">
+                <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-muted)] sm:w-auto">
                   <Upload className="h-4 w-4" />
                   {logoUploading ? "Uploading logo" : "Add brand logo"}
                   <input
@@ -124,7 +128,7 @@ export default function CreateSurvey() {
             <Button
               type="submit"
               loading={loading}
-              size="lg"
+              className="w-full sm:w-auto"
               trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
             >
               {loading ? "Creating your survey" : "Continue to builder"}

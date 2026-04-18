@@ -8,37 +8,86 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-primary: #2457f5;
-    --color-primary-hover: #1c47cf;
-    --color-primary-foreground: #f8fbff;
-    --color-surface: #f7f9fc;
-    --color-surface-raised: #ffffff;
-    --color-surface-overlay: #ffffff;
-    --color-page: #ffffff;
-    --color-border: #dbe3ea;
-    --color-border-subtle: #e7edf2;
-    --color-text: #101828;
-    --color-text-muted: #52606d;
-    --color-text-disabled: #98a2b3;
-    --color-success: #0f9f6e;
-    --color-warning: #c77f05;
-    --color-danger: #d13b4f;
-    --color-info: #1d7af3;
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-muted: #f4f4f5;
+    --border: #e4e4e7;
+    --border-sub: #f1f1f4;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --text-dim: #a1a1aa;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-fg: #ffffff;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --info: #2563eb;
+    --radius: 12px;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+    /* Backwards-compatible aliases for existing components during the overhaul. */
+    --color-primary: var(--accent);
+    --color-primary-hover: var(--accent-hover);
+    --color-primary-foreground: var(--accent-fg);
+    --color-surface: var(--surface-muted);
+    --color-surface-raised: var(--surface);
+    --color-surface-overlay: rgba(255, 255, 255, 0.92);
+    --color-page: var(--bg);
+    --color-border: var(--border);
+    --color-border-subtle: var(--border-sub);
+    --color-text: var(--text);
+    --color-text-muted: var(--text-muted);
+    --color-text-disabled: var(--text-dim);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-danger: var(--danger);
+    --color-info: var(--info);
+  }
+
+  .dark {
+    color-scheme: dark;
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface-muted: #111114;
+    --border: #27272a;
+    --border-sub: #1f1f22;
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+    --text-dim: #52525b;
+    --color-surface-overlay: rgba(24, 24, 27, 0.92);
   }
 
   html {
     min-height: 100%;
+    background: var(--bg);
     scroll-behavior: smooth;
   }
 
   body {
     min-height: 100vh;
+    margin: 0;
     overflow-x: hidden;
-    background-color: var(--color-page);
-    color: var(--color-text);
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 7%, transparent), transparent 28%),
+      radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent) 5%, transparent), transparent 30%),
+      var(--bg);
+    color: var(--text);
     font-family: var(--font-body);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    min-width: 0;
+    border-color: var(--border);
   }
 
   h1,
@@ -48,38 +97,64 @@
   h5,
   h6 {
     font-family: var(--font-display);
+    font-weight: 600;
     letter-spacing: -0.03em;
   }
 
-  * {
-    border-color: var(--color-border-subtle);
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a,
+  button {
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease,
+      box-shadow 150ms ease,
+      opacity 150ms ease,
+      transform 150ms ease;
+  }
+
+  button:not(:disabled):active,
+  a:active {
+    transform: scale(0.98);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
   }
 
   *:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-primary) 68%, white);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
   }
 }
 
 @layer components {
-  .shell-noise {
-    background: var(--color-surface-overlay);
-  }
-
   .skeleton-shimmer {
-    background-color: color-mix(in srgb, var(--color-border-subtle) 70%, transparent);
+    background-color: color-mix(in srgb, var(--border) 72%, transparent);
     background-image: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0.3),
       transparent
     );
     background-size: 200% 100%;
     animation: shimmer 1.6s linear infinite;
+  }
+
+  .touch-target {
+    min-height: 44px;
   }
 }
 
@@ -96,7 +171,19 @@
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
 
   to {

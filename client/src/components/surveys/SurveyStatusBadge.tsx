@@ -7,11 +7,11 @@ type SurveyStatusBadgeProps = {
 
 export function SurveyStatusBadge({ status }: SurveyStatusBadgeProps) {
   if (status === "published") {
-    return <Badge variant="success" dot>Live</Badge>;
+    return <Badge variant="success" dot>Published</Badge>;
   }
 
   if (status === "closed") {
-    return <Badge variant="default">Closed</Badge>;
+    return <Badge variant="danger">Closed</Badge>;
   }
 
   return <Badge variant="warning" dot>Draft</Badge>;

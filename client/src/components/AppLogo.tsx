@@ -1,29 +1,29 @@
 import {
+  BRAND_FAVICON_URL,
   BRAND_LOGO_URL,
   BRAND_NAME,
 } from "../lib/branding";
 import { cn } from "../utils/helpers";
 
 type AppLogoProps = {
-  collapsed?: boolean;
   className?: string;
+  imageClassName?: string;
+  markOnly?: boolean;
+  alt?: string;
 };
 
 export default function AppLogo({
-  collapsed = false,
   className,
+  imageClassName,
+  markOnly = false,
+  alt,
 }: AppLogoProps) {
   return (
-    <div className={cn("flex w-full items-center justify-center", className)}>
+    <div className={cn("flex items-center", className)}>
       <img
-        src={BRAND_LOGO_URL}
-        alt={`${BRAND_NAME} logo`}
-        className={cn(
-          "object-contain",
-          collapsed
-            ? "h-8 w-auto max-w-[2.75rem]"
-            : "h-8 w-auto max-w-[8.75rem] sm:h-9 sm:max-w-[10rem] md:h-10 md:max-w-[11.5rem]",
-        )}
+        src={markOnly ? BRAND_FAVICON_URL : BRAND_LOGO_URL}
+        alt={alt || `${BRAND_NAME} logo`}
+        className={cn("h-full w-auto object-contain", imageClassName)}
       />
     </div>
   );
