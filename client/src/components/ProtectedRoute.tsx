@@ -31,7 +31,7 @@ export default function ProtectedRoute({ children }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen px-4 py-6 sm:px-6 md:px-8">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
           <Skeleton className="h-16 rounded-[28px]" />
           <Card className="space-y-4">

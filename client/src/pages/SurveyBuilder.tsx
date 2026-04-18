@@ -44,7 +44,6 @@ import { Textarea } from "../components/ui/Textarea";
 import { Tooltip } from "../components/ui/Tooltip";
 import { cn } from "../utils/helpers";
 import {
-  getSurveyPath,
   getSurveySharePath,
   trimTrailingSlash,
 } from "../lib/branding";
@@ -76,7 +75,7 @@ type GeneratedSurveyDraft = {
   questions: GeneratedQuestion[];
 };
 
-type BuilderSectionId = "branding" | "draft" | "question";
+type BuilderSectionId = "draft" | "question";
 
 type ConfirmationState =
   | {
@@ -152,7 +151,10 @@ function BuilderAccordionCard({
           </span>
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-text-muted)]">
             <ChevronDown
-              className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
+              className={cn(
+                "h-4 w-4 transition-transform duration-200",
+                open && "rotate-180",
+              )}
             />
           </span>
         </div>
@@ -212,7 +214,7 @@ function BuilderActionButton({
       title={label}
       aria-label={label}
       leadingIcon={!loading ? icon : undefined}
-      className="hidden lg:inline-flex"
+      className="hidden md:inline-flex"
     >
       {label}
     </Button>
@@ -222,11 +224,11 @@ function BuilderActionButton({
     <>
       <Tooltip content={label}>
         {href ? (
-          <a href={href} target="_blank" rel="noreferrer" className="lg:hidden">
+          <a href={href} target="_blank" rel="noreferrer" className="md:hidden">
             {compactButton}
           </a>
         ) : (
-          <span className="lg:hidden">{compactButton}</span>
+          <span className="md:hidden">{compactButton}</span>
         )}
       </Tooltip>
       {href ? (
@@ -241,9 +243,18 @@ function BuilderActionButton({
 }
 
 function SurveyStatusBadge({ status }: { status: Survey["status"] }) {
-  if (status === "published") return <Badge variant="success" dot>Live</Badge>;
+  if (status === "published")
+    return (
+      <Badge variant="success" dot>
+        Live
+      </Badge>
+    );
   if (status === "closed") return <Badge variant="default">Closed</Badge>;
-  return <Badge variant="warning" dot>Draft</Badge>;
+  return (
+    <Badge variant="warning" dot>
+      Draft
+    </Badge>
+  );
 }
 
 export default function SurveyBuilder() {
@@ -255,14 +266,18 @@ export default function SurveyBuilder() {
   const [prompt, setPrompt] = useState("");
   const [maxDuration, setMaxDuration] = useState("120");
   const [brief, setBrief] = useState("");
-  const [generatedDraft, setGeneratedDraft] = useState<GeneratedSurveyDraft | null>(null);
+  const [generatedDraft, setGeneratedDraft] =
+    useState<GeneratedSurveyDraft | null>(null);
   const [surveyTitle, setSurveyTitle] = useState("");
   const [surveyDescription, setSurveyDescription] = useState("");
   const [headerText, setHeaderText] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [editingInfo, setEditingInfo] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [savingBranding, setSavingBranding] = useState(false);
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
+    null,
+  );
   const [editingPrompt, setEditingPrompt] = useState("");
   const [editingDuration, setEditingDuration] = useState("120");
   const [loading, setLoading] = useState(true);
@@ -273,13 +288,18 @@ export default function SurveyBuilder() {
   const [addingGenerated, setAddingGenerated] = useState(false);
   const [closingSurvey, setClosingSurvey] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState(false);
-  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(null);
-  const [updatingQuestionId, setUpdatingQuestionId] = useState<string | null>(null);
+  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
+    null,
+  );
+  const [updatingQuestionId, setUpdatingQuestionId] = useState<string | null>(
+    null,
+  );
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationState>(null);
-  const [openSections, setOpenSections] = useState<Record<BuilderSectionId, boolean>>({
-    branding: true,
+  const [openSections, setOpenSections] = useState<
+    Record<BuilderSectionId, boolean>
+  >({
     draft: false,
     question: false,
   });
@@ -356,9 +376,12 @@ export default function SurveyBuilder() {
         logo_url: logoUrl || null,
       });
       setSurvey(updated);
+      setEditingInfo(false);
       setSuccessMessage("Your survey details are saved.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't save your changes.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't save your changes.",
+      );
     } finally {
       setSavingBranding(false);
     }
@@ -373,9 +396,13 @@ export default function SurveyBuilder() {
       setLogoUploading(true);
       const uploaded = await uploadSurveyLogo(surveyId, file);
       setLogoUrl(uploaded.signedUrl);
-      setSuccessMessage("Your logo is uploaded. Save the survey to apply it.");
+      setSuccessMessage(
+        "Your logo is uploaded. Save your survey info to apply it.",
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't upload that image.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't upload that image.",
+      );
     } finally {
       setLogoUploading(false);
     }
@@ -404,7 +431,9 @@ export default function SurveyBuilder() {
       setSuccessMessage("Your question is added.");
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't add that question.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't add that question.",
+      );
     } finally {
       setSaving(false);
     }
@@ -414,7 +443,9 @@ export default function SurveyBuilder() {
     clearFeedback();
 
     if (!brief.trim()) {
-      setError("Paste a short brief so we know what kind of survey to generate.");
+      setError(
+        "Paste a short brief so we know what kind of survey to generate.",
+      );
       return;
     }
 
@@ -430,7 +461,9 @@ export default function SurveyBuilder() {
       setSurveyDescription(draft.description || surveyDescription);
       setSuccessMessage("Your draft is ready to review.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't generate a draft.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't generate a draft.",
+      );
     } finally {
       setGenerating(false);
     }
@@ -460,7 +493,12 @@ export default function SurveyBuilder() {
   function handleRemoveGeneratedQuestion(index: number) {
     setGeneratedDraft((prev) =>
       prev
-        ? { ...prev, questions: prev.questions.filter((_, itemIndex) => itemIndex !== index) }
+        ? {
+            ...prev,
+            questions: prev.questions.filter(
+              (_, itemIndex) => itemIndex !== index,
+            ),
+          }
         : prev,
     );
   }
@@ -469,7 +507,9 @@ export default function SurveyBuilder() {
     if (!surveyId || !generatedDraft) return;
 
     clearFeedback();
-    const valid = generatedDraft.questions.filter((question) => question.prompt.trim());
+    const valid = generatedDraft.questions.filter((question) =>
+      question.prompt.trim(),
+    );
 
     if (!valid.length) {
       setError("Keep at least one generated question before adding the draft.");
@@ -490,7 +530,8 @@ export default function SurveyBuilder() {
           survey_id: surveyId,
           prompt: valid[index].prompt.trim(),
           order_index: questions.length + index + 1,
-          max_duration_seconds: Number(valid[index].max_duration_seconds) || 120,
+          max_duration_seconds:
+            Number(valid[index].max_duration_seconds) || 120,
         });
       }
 
@@ -499,7 +540,9 @@ export default function SurveyBuilder() {
       setSuccessMessage("Your generated questions are now in the survey.");
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't add those questions.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't add those questions.",
+      );
     } finally {
       setAddingGenerated(false);
     }
@@ -537,7 +580,11 @@ export default function SurveyBuilder() {
       setSuccessMessage("Your question is updated.");
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't update that question.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "We couldn't update that question.",
+      );
     } finally {
       setUpdatingQuestionId(null);
     }
@@ -553,7 +600,11 @@ export default function SurveyBuilder() {
       setSuccessMessage("That question is removed.");
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't delete that question.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "We couldn't delete that question.",
+      );
     } finally {
       setDeletingQuestionId(null);
     }
@@ -587,7 +638,9 @@ export default function SurveyBuilder() {
       setSurvey(updated);
       setSuccessMessage("Your survey is now live.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't publish your survey.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't publish your survey.",
+      );
     } finally {
       setPublishing(false);
     }
@@ -602,9 +655,13 @@ export default function SurveyBuilder() {
       setClosingSurvey(true);
       const updated = await closeSurvey(surveyId);
       setSurvey(updated);
-      setSuccessMessage("Your survey is closed. It won't accept new responses.");
+      setSuccessMessage(
+        "Your survey is closed. It won't accept new responses.",
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't close your survey.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't close your survey.",
+      );
     } finally {
       setClosingSurvey(false);
     }
@@ -620,7 +677,9 @@ export default function SurveyBuilder() {
       await deleteSurvey(surveyId);
       navigate("/surveys");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't delete your survey.");
+      setError(
+        err instanceof Error ? err.message : "We couldn't delete your survey.",
+      );
     } finally {
       setDeletingSurvey(false);
     }
@@ -632,7 +691,9 @@ export default function SurveyBuilder() {
     try {
       setCopying(true);
       await navigator.clipboard.writeText(shareLink);
-      setSuccessMessage("Your public link is copied with a preview-friendly share URL.");
+      setSuccessMessage(
+        "Your public link is copied with a preview-friendly share URL.",
+      );
     } catch {
       setError("We couldn't copy the public link.");
     } finally {
@@ -659,13 +720,13 @@ export default function SurveyBuilder() {
   }
 
   const appUrl = trimTrailingSlash(window.location.origin);
-  const publicPath = surveyId ? getSurveyPath(surveyId) : "";
-  const publicLink = publicPath ? `${appUrl}${publicPath}` : appUrl;
   const sharePath = surveyId ? getSurveySharePath(surveyId) : "";
   const shareLink = sharePath ? `${appUrl}${sharePath}` : appUrl;
 
   const validGeneratedCount = useMemo(
-    () => generatedDraft?.questions.filter((question) => question.prompt.trim()).length || 0,
+    () =>
+      generatedDraft?.questions.filter((question) => question.prompt.trim())
+        .length || 0,
     [generatedDraft],
   );
 
@@ -678,7 +739,11 @@ export default function SurveyBuilder() {
   if (loading) {
     return (
       <DashboardShell>
-        <PageHeader title="Survey Builder" subtitle="Loading your survey" backHref="/surveys" />
+        <PageHeader
+          title="Survey Builder"
+          subtitle="Loading your survey"
+          backHref="/surveys"
+        />
         <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-4">
             <Card className="space-y-4">
@@ -706,7 +771,14 @@ export default function SurveyBuilder() {
         backHref="/surveys"
         actions={
           <>
-            {survey?.status ? <SurveyStatusBadge status={survey.status} /> : null}
+            {survey?.status ? (
+              <SurveyStatusBadge status={survey.status} />
+            ) : null}
+            <BuilderActionButton
+              label="Edit info"
+              onClick={() => setEditingInfo(true)}
+              icon={<PencilLine className="h-4 w-4" />}
+            />
             <BuilderActionButton
               label="View responses"
               onClick={() => navigate(`/surveys/${surveyId}/responses`)}
@@ -723,7 +795,7 @@ export default function SurveyBuilder() {
                 />
                 <BuilderActionButton
                   label="Open survey"
-                  href={publicLink}
+                  href={shareLink}
                   variant="primary"
                   icon={<Link2 className="h-4 w-4" />}
                 />
@@ -767,7 +839,11 @@ export default function SurveyBuilder() {
 
       <div className="space-y-4">
         {error ? (
-          <Feedback variant="error" title="The builder hit a snag" description={error} />
+          <Feedback
+            variant="error"
+            title="The builder hit a snag"
+            description={error}
+          />
         ) : null}
 
         {successMessage ? (
@@ -780,76 +856,6 @@ export default function SurveyBuilder() {
 
         <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-4">
-            <BuilderAccordionCard
-              title="Survey branding"
-              description="Keep the title, intro, and logo tucked away until you need them."
-              icon={FileImage}
-              open={openSections.branding}
-              onToggle={() => toggleSection("branding")}
-            >
-              <div className="grid gap-4">
-                <Input
-                  label="Survey title"
-                  value={surveyTitle}
-                  onChange={(e) => setSurveyTitle(e.target.value)}
-                  placeholder="e.g. Customer Experience Survey"
-                />
-
-                <Input
-                  label="Header text"
-                  value={headerText}
-                  onChange={(e) => setHeaderText(e.target.value)}
-                  placeholder="e.g. We'd love to hear how your visit went"
-                />
-
-                <Textarea
-                  label="Description"
-                  value={surveyDescription}
-                  onChange={(e) => setSurveyDescription(e.target.value)}
-                  placeholder="Tell respondents what this survey is about and what kind of answers you're hoping to hear"
-                />
-
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-[var(--color-text)]">
-                    Survey logo
-                  </p>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] transition hover:bg-[var(--color-surface)] sm:w-auto">
-                      <Upload className="h-4 w-4" />
-                      {logoUploading ? "Uploading image" : "Upload logo"}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleLogoUpload(e.target.files?.[0] || null)}
-                      />
-                    </label>
-
-                    {logoUrl ? (
-                      <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
-                        <img
-                          src={logoUrl}
-                          alt="Survey logo"
-                          className="h-10 w-auto max-w-[7rem] object-contain"
-                        />
-                        <Badge variant="success" dot>
-                          Ready
-                        </Badge>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSaveBranding}
-                  loading={savingBranding}
-                  leadingIcon={!savingBranding ? <Save className="h-4 w-4" /> : undefined}
-                >
-                  Save survey details
-                </Button>
-              </div>
-            </BuilderAccordionCard>
-
             <BuilderAccordionCard
               title="Generate a draft"
               description="Turn a rough brief into a starting point, then edit the questions before you add them."
@@ -874,7 +880,9 @@ export default function SurveyBuilder() {
               <Button
                 onClick={handleGenerateSurvey}
                 loading={generating}
-                leadingIcon={!generating ? <WandSparkles className="h-4 w-4" /> : undefined}
+                leadingIcon={
+                  !generating ? <WandSparkles className="h-4 w-4" /> : undefined
+                }
               >
                 {generating ? "Generating your draft" : "Generate survey draft"}
               </Button>
@@ -887,7 +895,8 @@ export default function SurveyBuilder() {
                         Draft review
                       </p>
                       <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                        {validGeneratedCount} ready-to-add question{validGeneratedCount === 1 ? "" : "s"}
+                        {validGeneratedCount} ready-to-add question
+                        {validGeneratedCount === 1 ? "" : "s"}
                       </p>
                     </div>
                     <Badge variant="info" dot>
@@ -897,12 +906,20 @@ export default function SurveyBuilder() {
 
                   <div className="space-y-3">
                     {generatedDraft.questions.map((question, index) => (
-                      <Card key={`${question.prompt}-${index}`} variant="flat" className="space-y-3">
+                      <Card
+                        key={`${question.prompt}-${index}`}
+                        variant="flat"
+                        className="space-y-3"
+                      >
                         <Textarea
                           label={`Question ${index + 1}`}
                           value={question.prompt}
                           onChange={(e) =>
-                            handleGeneratedQuestionChange(index, "prompt", e.target.value)
+                            handleGeneratedQuestionChange(
+                              index,
+                              "prompt",
+                              e.target.value,
+                            )
                           }
                           placeholder="Add a clear voice-friendly question"
                         />
@@ -936,9 +953,15 @@ export default function SurveyBuilder() {
                   <Button
                     onClick={handleAddGeneratedQuestions}
                     loading={addingGenerated}
-                    leadingIcon={!addingGenerated ? <Sparkles className="h-4 w-4" /> : undefined}
+                    leadingIcon={
+                      !addingGenerated ? (
+                        <Sparkles className="h-4 w-4" />
+                      ) : undefined
+                    }
                   >
-                    {addingGenerated ? "Adding generated questions" : "Add generated questions"}
+                    {addingGenerated
+                      ? "Adding generated questions"
+                      : "Add generated questions"}
                   </Button>
                 </div>
               ) : null}
@@ -974,7 +997,9 @@ export default function SurveyBuilder() {
                 <Button
                   type="submit"
                   loading={saving}
-                  leadingIcon={!saving ? <ArrowRight className="h-4 w-4" /> : undefined}
+                  leadingIcon={
+                    !saving ? <ArrowRight className="h-4 w-4" /> : undefined
+                  }
                 >
                   {saving ? "Adding your question" : "Add question"}
                 </Button>
@@ -987,7 +1012,8 @@ export default function SurveyBuilder() {
                   Survey questions
                 </h2>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Review each question before you publish so the voice flow stays natural
+                  Review each question before you publish so the voice flow
+                  stays natural
                 </p>
               </div>
 
@@ -1003,17 +1029,25 @@ export default function SurveyBuilder() {
                     const isEditing = editingQuestionId === question.id;
 
                     return (
-                      <Card key={question.id} variant="flat" className="space-y-4">
+                      <Card
+                        key={question.id}
+                        variant="flat"
+                        className="space-y-4"
+                      >
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-2">
-                            <Badge variant="info">Question {question.order_index}</Badge>
+                            <Badge variant="info">
+                              Question {question.order_index}
+                            </Badge>
                             {!isEditing ? (
                               <>
                                 <p className="text-base font-semibold text-[var(--color-text)]">
                                   {question.prompt}
                                 </p>
                                 <p className="text-sm text-[var(--color-text-muted)]">
-                                  Respondents get up to {question.max_duration_seconds || 120} seconds for this answer.
+                                  Respondents get up to{" "}
+                                  {question.max_duration_seconds || 120} seconds
+                                  for this answer.
                                 </p>
                               </>
                             ) : null}
@@ -1032,7 +1066,10 @@ export default function SurveyBuilder() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() =>
-                                  setConfirmation({ type: "deleteQuestion", question })
+                                  setConfirmation({
+                                    type: "deleteQuestion",
+                                    question,
+                                  })
                                 }
                                 leadingIcon={<Trash2 className="h-4 w-4" />}
                               >
@@ -1054,7 +1091,9 @@ export default function SurveyBuilder() {
                               label="Max duration in seconds"
                               type="number"
                               value={editingDuration}
-                              onChange={(e) => setEditingDuration(e.target.value)}
+                              onChange={(e) =>
+                                setEditingDuration(e.target.value)
+                              }
                               containerClassName="sm:max-w-[14rem]"
                             />
                             <div className="flex flex-col gap-3 sm:flex-row">
@@ -1071,7 +1110,10 @@ export default function SurveyBuilder() {
                                   ? "Saving your edit"
                                   : "Save question"}
                               </Button>
-                              <Button variant="secondary" onClick={cancelEditingQuestion}>
+                              <Button
+                                variant="secondary"
+                                onClick={cancelEditingQuestion}
+                              >
                                 Cancel
                               </Button>
                             </div>
@@ -1096,7 +1138,9 @@ export default function SurveyBuilder() {
                     See the state of the survey at a glance
                   </p>
                 </div>
-                {survey?.status ? <SurveyStatusBadge status={survey.status} /> : null}
+                {survey?.status ? (
+                  <SurveyStatusBadge status={survey.status} />
+                ) : null}
               </div>
 
               <div className="grid grid-cols-2 gap-3 xl:grid-cols-1">
@@ -1125,7 +1169,8 @@ export default function SurveyBuilder() {
                   Public link
                 </h2>
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                  Share this once the survey is live. The copied URL includes a richer preview in supported apps.
+                  Share this once the survey is live. The copied URL includes a
+                  richer preview in supported apps.
                 </p>
               </div>
 
@@ -1139,12 +1184,17 @@ export default function SurveyBuilder() {
                       variant="secondary"
                       onClick={handleCopyLink}
                       loading={copying}
-                      leadingIcon={!copying ? <Copy className="h-4 w-4" /> : undefined}
+                      leadingIcon={
+                        !copying ? <Copy className="h-4 w-4" /> : undefined
+                      }
                     >
                       Copy public link
                     </Button>
-                    <a href={publicLink} target="_blank" rel="noreferrer">
-                      <Button className="w-full" leadingIcon={<Link2 className="h-4 w-4" />}>
+                    <a href={shareLink} target="_blank" rel="noreferrer">
+                      <Button
+                        className="w-full"
+                        leadingIcon={<Link2 className="h-4 w-4" />}
+                      >
                         Open public survey
                       </Button>
                     </a>
@@ -1186,7 +1236,8 @@ export default function SurveyBuilder() {
                   {surveyTitle || "Your survey title will show here"}
                 </p>
                 <p className="mt-2 text-2xl font-semibold text-[var(--color-text)]">
-                  {headerText || "Add a header that welcomes respondents in a warm, clear way"}
+                  {headerText ||
+                    "Add a header that welcomes respondents in a warm, clear way"}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-text-muted)]">
                   {surveyDescription ||
@@ -1198,6 +1249,84 @@ export default function SurveyBuilder() {
         </div>
       </div>
 
+      <Modal
+        open={editingInfo}
+        onClose={() => setEditingInfo(false)}
+        title="Edit survey info"
+        description="Update the title, welcome copy, description, and brand logo respondents see before the first question."
+        footer={
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button variant="secondary" onClick={() => setEditingInfo(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveBranding}
+              loading={savingBranding}
+              leadingIcon={
+                !savingBranding ? <Save className="h-4 w-4" /> : undefined
+              }
+            >
+              Save survey info
+            </Button>
+          </div>
+        }
+      >
+        <div className="grid gap-4">
+          <Input
+            label="Survey title"
+            value={surveyTitle}
+            onChange={(e) => setSurveyTitle(e.target.value)}
+            placeholder="e.g. Customer Experience Survey"
+          />
+
+          <Input
+            label="Header text"
+            value={headerText}
+            onChange={(e) => setHeaderText(e.target.value)}
+            placeholder="e.g. We'd love to hear how your visit went"
+          />
+
+          <Textarea
+            label="Description"
+            value={surveyDescription}
+            onChange={(e) => setSurveyDescription(e.target.value)}
+            placeholder="Tell respondents what this survey is about and what kind of answers you're hoping to hear"
+          />
+
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-[var(--color-text)]">
+              Survey logo
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] transition hover:bg-[var(--color-surface)] sm:w-auto">
+                <Upload className="h-4 w-4" />
+                {logoUploading ? "Uploading image" : "Upload logo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    handleLogoUpload(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+
+              {logoUrl ? (
+                <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+                  <img
+                    src={logoUrl}
+                    alt="Survey logo"
+                    className="h-10 w-auto max-w-[7rem] object-contain"
+                  />
+                  <Badge variant="success" dot>
+                    Ready
+                  </Badge>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </Modal>
       <Modal
         open={!!confirmation}
         onClose={() => setConfirmation(null)}

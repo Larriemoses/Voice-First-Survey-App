@@ -16,6 +16,14 @@ type Survey = {
   title: string;
   description: string | null;
   logo_url?: string | null;
+  organization?:
+    | {
+        name?: string | null;
+      }
+    | Array<{
+        name?: string | null;
+      }>
+    | null;
 };
 
 type Question = {
@@ -78,6 +86,17 @@ export default function RespondSurvey() {
     if (questions.length === 0) return 0;
     return ((currentIndex + 1) / questions.length) * 100;
   }, [currentIndex, questions.length]);
+  const organizationName = useMemo(() => {
+    const organization = survey?.organization;
+
+    if (!organization) return "";
+
+    if (Array.isArray(organization)) {
+      return organization[0]?.name?.trim() || "";
+    }
+
+    return organization.name?.trim() || "";
+  }, [survey]);
 
   function handleRecorded(
     audioBlob: Blob | null,
@@ -192,13 +211,17 @@ export default function RespondSurvey() {
   return (
     <>
       <PageMeta
-        title={`${survey.title || "Survey"} | Survica`}
+        title={
+          organizationName
+            ? `${survey.title || "Survey"} | ${organizationName}`
+            : `${survey.title || "Survey"} | Survica`
+        }
         description="Respond to this survey in your own voice"
         image={survey.logo_url || BRAND_SHARE_IMAGE_URL}
         imageAlt={survey.title || "Survica survey"}
       />
 
-      <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen px-4 py-6 sm:px-6 md:px-8">
         <div className="mx-auto max-w-4xl space-y-4">
           <Card className="space-y-5">
             {survey.logo_url ? (
@@ -235,9 +258,16 @@ export default function RespondSurvey() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-medium text-[var(--color-text-muted)]">
-                {survey.title}
-              </p>
+              <div className="space-y-1">
+                {organizationName ? (
+                  <p className="text-sm font-medium text-[var(--color-text-muted)]">
+                    From {organizationName}
+                  </p>
+                ) : null}
+                <p className="text-sm font-medium text-[var(--color-text-muted)]">
+                  {survey.title}
+                </p>
+              </div>
               <h1 className="text-3xl font-semibold leading-tight text-[var(--color-text)]">
                 {currentQuestion.prompt}
               </h1>

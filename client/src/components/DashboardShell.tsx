@@ -3,8 +3,6 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   BadgePlus,
   Building2,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   LayoutGrid,
   LogOut,
@@ -15,7 +13,6 @@ import { cn } from "../utils/helpers";
 import AppLogo from "./AppLogo";
 import { Avatar } from "./ui/Avatar";
 import { Button } from "./ui/button";
-import { Tooltip } from "./ui/Tooltip";
 
 type Props = {
   children: ReactNode;
@@ -33,7 +30,6 @@ const secondaryNav = [
 ];
 
 export default function DashboardShell({ children }: Props) {
-  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [accountLabel, setAccountLabel] = useState("Your workspace");
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,167 +59,120 @@ export default function DashboardShell({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-[var(--color-page)] text-[var(--color-text)]">
-      <aside
-        className={cn(
-          "shell-noise fixed inset-y-0 left-0 z-30 hidden border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/95 backdrop-blur lg:flex lg:flex-col",
-          desktopCollapsed ? "w-16" : "w-72",
-        )}
-      >
-        <div className="flex h-20 items-center justify-between px-5">
-          <AppLogo collapsed={desktopCollapsed} />
+      <aside className="shell-noise fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/98 md:flex md:flex-col">
+        <div className="flex h-24 items-center justify-center px-6">
+          <AppLogo className="mx-auto" />
         </div>
 
         <div className="flex flex-1 flex-col justify-between px-3 pb-4">
           <div className="space-y-6">
             <nav className="space-y-1">
-              {primaryNav.map(({ to, label, icon: Icon }) => {
-                const link = (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex min-h-11 items-center rounded-2xl px-3 text-sm font-medium transition-all duration-200",
-                        desktopCollapsed ? "justify-center" : "gap-3",
-                        isActive
-                          ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm"
-                          : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
-                      )
-                    }
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {!desktopCollapsed ? (
-                      <span className="truncate">{label}</span>
-                    ) : null}
-                  </NavLink>
-                );
-
-                return desktopCollapsed ? (
-                  <Tooltip key={to} content={label}>
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                );
-              })}
+              {primaryNav.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm"
+                        : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
+                    )
+                  }
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{label}</span>
+                </NavLink>
+              ))}
             </nav>
 
             <div className="space-y-1 border-t border-[var(--color-border-subtle)] pt-4">
-              {secondaryNav.map(({ to, label, icon: Icon }) => {
-                const link = (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex min-h-11 items-center rounded-2xl px-3 text-sm font-medium transition-all duration-200",
-                        desktopCollapsed ? "justify-center" : "gap-3",
-                        isActive
-                          ? "bg-[var(--color-surface-raised)] text-[var(--color-text)]"
-                          : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
-                      )
-                    }
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {!desktopCollapsed ? <span>{label}</span> : null}
-                  </NavLink>
-                );
-
-                return desktopCollapsed ? (
-                  <Tooltip key={to} content={label}>
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                );
-              })}
+              {secondaryNav.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-[var(--color-surface-raised)] text-[var(--color-text)]"
+                        : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-text)]",
+                    )
+                  }
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
             </div>
           </div>
 
           <div className="space-y-3">
-            <div
-              className={cn(
-                "rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 shadow-sm",
-                desktopCollapsed && "px-2",
-              )}
-            >
-              <div
-                className={cn(
-                  "flex items-center gap-3",
-                  desktopCollapsed && "justify-center",
-                )}
-              >
+            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 shadow-sm">
+              <div className="flex items-center gap-3">
                 <Avatar
                   name={accountLabel}
                   size="md"
                   className="bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
                 />
-                {!desktopCollapsed ? (
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-[var(--color-text)]">
-                      {accountLabel}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      Signed in
-                    </p>
-                  </div>
-                ) : null}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[var(--color-text)]">
+                    {accountLabel}
+                  </p>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    Signed in
+                  </p>
+                </div>
               </div>
             </div>
 
-            {!desktopCollapsed ? (
-              <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-sm">
-                <p className="text-sm font-semibold text-[var(--color-text)]">
-                  Keep momentum
-                </p>
-                <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
-                  Build your survey flow, publish it, then review responses in one place.
-                </p>
-              </div>
-            ) : null}
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDesktopCollapsed((current) => !current)}
-                className={cn("flex-1", desktopCollapsed && "flex-none")}
-                leadingIcon={
-                  desktopCollapsed ? (
-                    <ChevronRight className="h-4 w-4" />
-                  ) : (
-                    <ChevronLeft className="h-4 w-4" />
-                  )
-                }
-              >
-                {!desktopCollapsed ? "Collapse" : ""}
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleLogout}
-                className={cn("flex-1", desktopCollapsed && "flex-none")}
-                leadingIcon={<LogOut className="h-4 w-4" />}
-              >
-                {!desktopCollapsed ? "Sign out" : ""}
-              </Button>
+            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-sm">
+              <p className="text-sm font-semibold text-[var(--color-text)]">
+                Keep momentum
+              </p>
+              <p className="mt-1 text-sm leading-6 text-[var(--color-text-muted)]">
+                Build your survey flow, publish it, then review responses in one place.
+              </p>
             </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full"
+              leadingIcon={<LogOut className="h-4 w-4" />}
+            >
+              Sign out
+            </Button>
           </div>
         </div>
       </aside>
 
-      <main
-        className={cn(
-          "min-h-screen pb-[calc(5.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 lg:pb-10",
-          desktopCollapsed ? "lg:pl-16" : "lg:pl-72",
-        )}
-      >
-        <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/98 px-4 py-3 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleLogout}
+            iconOnly
+            title="Sign out"
+            aria-label="Sign out"
+            leadingIcon={<LogOut className="h-4 w-4" />}
+          >
+            Sign out
+          </Button>
+          <AppLogo />
+          <div className="w-11 shrink-0" />
+        </div>
+      </div>
+
+      <main className="min-h-screen pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-20 transition-[padding] duration-200 md:pl-72 md:pt-0 md:pb-10">
+        <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 md:py-5 lg:px-8">
           <div className="w-full min-w-0">{children}</div>
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-overlay)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-md">
           {primaryNav.map(({ to, label, icon: Icon }) => (
             <NavLink

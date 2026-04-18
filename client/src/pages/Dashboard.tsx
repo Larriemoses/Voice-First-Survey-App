@@ -195,7 +195,7 @@ export default function Dashboard() {
       />
 
       {loading ? (
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
           <Card className="space-y-4">
             <Skeleton className="h-6 w-28 rounded-full" />
             <Skeleton className="h-14 w-4/5" />
@@ -227,7 +227,7 @@ export default function Dashboard() {
         />
       ) : (
         <div className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
             <Card className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)]">
                 <AudioWaveform className="h-3.5 w-3.5 text-[var(--color-primary)]" />
@@ -308,7 +308,7 @@ export default function Dashboard() {
             })}
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold text-[var(--color-text)]">

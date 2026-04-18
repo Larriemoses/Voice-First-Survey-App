@@ -13,6 +13,14 @@ export type SurveyRecord = {
   created_at?: string;
   logo_url?: string | null;
   header_text?: string | null;
+  organization?:
+    | {
+        name?: string | null;
+      }
+    | Array<{
+        name?: string | null;
+      }>
+    | null;
 };
 
 export type GeneratedSurveyDraft = {
@@ -48,6 +56,7 @@ export async function getMySurveys() {
 export async function createSurvey(input: {
   title: string;
   description?: string;
+  logo_url?: string | null;
 }) {
   const [{ data: userData, error: userError }, membership] = await Promise.all([
     supabase.auth.getUser(),
@@ -68,6 +77,7 @@ export async function createSurvey(input: {
     .insert({
       title: input.title,
       description: input.description || null,
+      logo_url: input.logo_url || null,
       organization_id: membership.organization.id,
       created_by: user.id,
       status: "draft",
@@ -254,7 +264,7 @@ export async function closeSurvey(surveyId: string) {
 export async function getPublicSurveyById(surveyId: string) {
   const { data, error } = await supabase
     .from("surveys")
-    .select("*")
+    .select("*, organization:organizations(name)")
     .eq("id", surveyId)
     .eq("status", "published")
     .maybeSingle();

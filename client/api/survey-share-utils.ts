@@ -15,6 +15,14 @@ export type SurveyPreview = {
   description?: string | null;
   header_text?: string | null;
   logo_url?: string | null;
+  organization?:
+    | {
+        name?: string | null;
+      }
+    | Array<{
+        name?: string | null;
+      }>
+    | null;
 };
 
 export type ShareRequest = {
@@ -88,7 +96,7 @@ export async function fetchSurveyPreview(surveyId: string) {
   const requestUrl = new URL("/rest/v1/surveys", supabaseUrl);
   requestUrl.searchParams.set(
     "select",
-    "title,description,header_text,logo_url",
+    "title,description,header_text,logo_url,organization:organizations(name)",
   );
   requestUrl.searchParams.set("id", `eq.${surveyId}`);
   requestUrl.searchParams.set("status", "eq.published");
@@ -111,6 +119,18 @@ export async function fetchSurveyPreview(surveyId: string) {
 
 export function isPreviewBot(req: ShareRequest) {
   return PREVIEW_BOT_PATTERN.test(getHeader(req.headers["user-agent"]));
+}
+
+export function getSurveyOrganizationName(survey: SurveyPreview | null) {
+  const organization = survey?.organization;
+
+  if (!organization) return "";
+
+  if (Array.isArray(organization)) {
+    return organization[0]?.name?.trim() || "";
+  }
+
+  return organization.name?.trim() || "";
 }
 
 function toBase64(bytes: Uint8Array) {
@@ -147,15 +167,37 @@ export async function resolveSurveyLogoDataUri(logoUrl?: string | null) {
 }
 
 export function getShareDescription(survey: SurveyPreview | null) {
+  const organizationName = getSurveyOrganizationName(survey);
+
   return (
     survey?.header_text ||
     survey?.description ||
-    DEFAULT_PUBLIC_SURVEY_DESCRIPTION
+    (organizationName
+      ? `You've been invited to answer ${organizationName}'s voice survey`
+      : DEFAULT_PUBLIC_SURVEY_DESCRIPTION)
   );
 }
 
 export function getShareTitle(survey: SurveyPreview | null) {
-  return survey?.title || `Voice Survey on ${BRAND_NAME}`;
+  const organizationName = getSurveyOrganizationName(survey);
+
+  if (survey?.title && organizationName) {
+    return `${survey.title} | ${organizationName}`;
+  }
+
+  if (survey?.title) {
+    return survey.title;
+  }
+
+  if (organizationName) {
+    return `Voice Survey from ${organizationName}`;
+  }
+
+  return `Voice Survey on ${BRAND_NAME}`;
+}
+
+export function getShareSiteName(survey: SurveyPreview | null) {
+  return getSurveyOrganizationName(survey) || BRAND_NAME;
 }
 
 export function wrapSvgText(

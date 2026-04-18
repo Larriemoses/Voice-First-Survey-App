@@ -63,10 +63,10 @@ export default function Home() {
         description={DEFAULT_SHARE_DESCRIPTION}
       />
 
-      <div className="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen px-4 py-4 sm:px-6 md:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-8">
           <header className="flex flex-col gap-4 rounded-[30px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <Link to="/" className="flex w-full max-w-[13rem] items-center sm:w-auto">
+            <Link to="/" className="flex w-full max-w-[16rem] items-center sm:w-auto">
               <AppLogo className="max-w-none" />
             </Link>
 
@@ -84,7 +84,7 @@ export default function Home() {
             </div>
           </header>
 
-          <main className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <main className="grid gap-6 md:grid-cols-[1.05fr_0.95fr] md:items-center">
             <section className="space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-muted)] shadow-sm">
                 <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />

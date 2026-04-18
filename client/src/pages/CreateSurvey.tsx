@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowRight, ClipboardList } from "lucide-react";
+import { ArrowRight, ClipboardList, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "../components/DashboardShell";
-import { createSurvey } from "../lib/surveys";
+import { createSurvey, uploadSurveyLogo } from "../lib/surveys";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
 import { Feedback } from "../components/ui/Feedback";
@@ -14,8 +14,26 @@ export default function CreateSurvey() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [error, setError] = useState("");
+
+  async function handleLogoUpload(file: File | null) {
+    if (!file) return;
+
+    setError("");
+
+    try {
+      setLogoUploading(true);
+      const uploaded = await uploadSurveyLogo("draft", file);
+      setLogoUrl(uploaded.signedUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We couldn't upload that logo.");
+    } finally {
+      setLogoUploading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +46,11 @@ export default function CreateSurvey() {
 
     try {
       setLoading(true);
-      const survey = await createSurvey({ title, description });
+      const survey = await createSurvey({
+        title,
+        description,
+        logo_url: logoUrl || null,
+      });
       navigate(`/surveys/${survey.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "We couldn't create your survey.");
@@ -45,7 +67,7 @@ export default function CreateSurvey() {
         backHref="/surveys"
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_0.82fr]">
+      <div className="grid gap-4 md:grid-cols-[1fr_0.82fr]">
         <Card>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -62,6 +84,32 @@ export default function CreateSurvey() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell your team what this survey should uncover and who it's meant for"
             />
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-[var(--color-text)]">
+                Brand logo
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] transition hover:bg-[var(--color-surface)] sm:w-auto">
+                  <Upload className="h-4 w-4" />
+                  {logoUploading ? "Uploading logo" : "Add brand logo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleLogoUpload(e.target.files?.[0] || null)}
+                  />
+                </label>
+
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt="Selected brand logo"
+                    className="h-12 w-auto max-w-[10rem] object-contain"
+                  />
+                ) : null}
+              </div>
+            </div>
 
             {error ? (
               <Feedback variant="error" title="Your survey isn't ready yet" description={error} />
@@ -89,7 +137,7 @@ export default function CreateSurvey() {
               Good survey titles are specific
             </h2>
             <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-              A strong setup makes the builder feel easier from the first screen
+              A clear setup helps your team move into the builder with less friction
             </p>
           </div>
 

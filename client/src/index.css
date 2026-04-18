@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @theme inline {
   --font-display: "Space Grotesk", ui-sans-serif, sans-serif;
   --font-body: "Instrument Sans", ui-sans-serif, sans-serif;
@@ -13,10 +11,10 @@
     --color-primary: #2457f5;
     --color-primary-hover: #1c47cf;
     --color-primary-foreground: #f8fbff;
-    --color-surface: #fcfcfa;
+    --color-surface: #f7f9fc;
     --color-surface-raised: #ffffff;
-    --color-surface-overlay: #f8fafc;
-    --color-page: #f4f6f8;
+    --color-surface-overlay: #ffffff;
+    --color-page: #ffffff;
     --color-border: #dbe3ea;
     --color-border-subtle: #e7edf2;
     --color-text: #101828;
@@ -26,26 +24,6 @@
     --color-warning: #c77f05;
     --color-danger: #d13b4f;
     --color-info: #1d7af3;
-  }
-
-  .dark {
-    color-scheme: dark;
-    --color-primary: #78a4ff;
-    --color-primary-hover: #91b5ff;
-    --color-primary-foreground: #0d1320;
-    --color-surface: #0f1318;
-    --color-surface-raised: #151b22;
-    --color-surface-overlay: #111821;
-    --color-page: #0a0e13;
-    --color-border: #28313c;
-    --color-border-subtle: #1c2430;
-    --color-text: #eef2f6;
-    --color-text-muted: #9aa8b8;
-    --color-text-disabled: #677588;
-    --color-success: #46c694;
-    --color-warning: #f5b546;
-    --color-danger: #ff7a8d;
-    --color-info: #72b0ff;
   }
 
   html {
@@ -61,73 +39,6 @@
     font-family: var(--font-body);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(circle at top left, rgba(36, 87, 245, 0.08), transparent 24rem),
-      radial-gradient(circle at top right, rgba(29, 122, 243, 0.06), transparent 20rem);
-  }
-
-  .dark body {
-    background-image:
-      radial-gradient(circle at top left, rgba(99, 161, 255, 0.18), transparent 26rem),
-      radial-gradient(circle at top right, rgba(247, 145, 40, 0.18), transparent 24rem),
-      linear-gradient(180deg, #0a0e13 0%, #0d1219 100%);
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.3;
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
-    background-size: 26px 26px;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
-  }
-
-  .dark body::before {
-    opacity: 0.18;
-    background-image:
-      linear-gradient(rgba(96, 127, 170, 0.14) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(244, 146, 72, 0.08) 1px, transparent 1px);
-  }
-
-  body::after {
-    content: "";
-    position: fixed;
-    right: -8rem;
-    top: 14%;
-    z-index: -1;
-    height: 22rem;
-    width: 22rem;
-    pointer-events: none;
-    opacity: 0.38;
-    border-radius: 9999px;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--color-primary) 22%, transparent),
-      transparent 68%
-    );
-    filter: blur(12px);
-    animation: ambient-float 18s ease-in-out infinite;
-  }
-
-  .dark body::after {
-    opacity: 0.55;
-    background:
-      radial-gradient(
-        circle,
-        rgba(99, 161, 255, 0.3),
-        transparent 54%
-      ),
-      radial-gradient(
-        circle at 68% 38%,
-        rgba(247, 145, 40, 0.24),
-        transparent 42%
-      );
-    filter: blur(20px);
   }
 
   h1,
@@ -156,16 +67,7 @@
 
 @layer components {
   .shell-noise {
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--color-surface-raised) 96%, transparent), transparent),
-      radial-gradient(circle at top, rgba(36, 87, 245, 0.06), transparent 20rem);
-  }
-
-  .dark .shell-noise {
-    background:
-      linear-gradient(180deg, rgba(17, 24, 33, 0.96), transparent),
-      radial-gradient(circle at top left, rgba(99, 161, 255, 0.16), transparent 18rem),
-      radial-gradient(circle at top right, rgba(247, 145, 40, 0.12), transparent 16rem);
+    background: var(--color-surface-overlay);
   }
 
   .skeleton-shimmer {
@@ -188,17 +90,6 @@
 
   to {
     background-position: -200% 0;
-  }
-}
-
-@keyframes ambient-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(-1.25rem, 1rem, 0) scale(1.05);
   }
 }
 
