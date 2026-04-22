@@ -4,14 +4,17 @@ import { cn } from "../../utils/helpers";
 type TooltipProps = {
   content: ReactNode;
   children: ReactNode;
-  side?: "top" | "bottom";
+  side?: "top" | "bottom" | "right" | "left";
 };
 
-export function Tooltip({
-  content,
-  children,
-  side = "top",
-}: TooltipProps) {
+const sideClasses: Record<NonNullable<TooltipProps["side"]>, string> = {
+  top: "bottom-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2",
+  bottom: "left-1/2 top-[calc(100%+0.5rem)] -translate-x-1/2",
+  right: "left-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2",
+  left: "right-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2",
+};
+
+export function Tooltip({ content, children, side = "top" }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
 
@@ -29,8 +32,8 @@ export function Tooltip({
         id={id}
         role="tooltip"
         className={cn(
-          "pointer-events-none absolute left-1/2 z-50 w-max max-w-56 -translate-x-1/2 rounded-2xl bg-slate-950 px-3 py-2 text-xs font-medium text-white shadow-lg transition duration-150",
-          side === "top" ? "bottom-[calc(100%+0.5rem)]" : "top-[calc(100%+0.5rem)]",
+          "pointer-events-none absolute z-50 w-max max-w-56 rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white shadow-md transition-opacity duration-150",
+          sideClasses[side],
           open ? "opacity-100" : "opacity-0",
         )}
       >

@@ -1,66 +1,100 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-display: "Space Grotesk", ui-sans-serif, sans-serif;
-  --font-body: "Instrument Sans", ui-sans-serif, sans-serif;
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --color-primary-50: #eef4ff;
+  --color-primary-100: #dce8ff;
+  --color-primary-200: #b8ccff;
+  --color-primary-400: #5f86ff;
+  --color-primary-500: #2457f5;
+  --color-primary-600: #1d46d8;
+  --color-primary-700: #1736a8;
+  --color-primary-900: #101a59;
+
+  --color-accent-50: #fff5ed;
+  --color-accent-100: #ffe5d2;
+  --color-accent-400: #ff9452;
+  --color-accent-500: #ff6b1a;
+  --color-accent-600: #f05a0b;
+  --color-accent-700: #b93f05;
+
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-700: #374151;
+  --color-gray-900: #111827;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 30px;
+  --text-3xl: 36px;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 @layer base {
   :root {
     color-scheme: light;
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --surface-muted: #f4f4f5;
-    --border: #e4e4e7;
-    --border-sub: #f1f1f4;
-    --text: #18181b;
-    --text-muted: #71717a;
-    --text-dim: #a1a1aa;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
+    --bg-page: #f9fafb;
+    --bg-surface: #ffffff;
+    --bg-muted: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-hint: #9ca3af;
+    --border-default: #e5e7eb;
+    --border-focus: #2457f5;
+
+    /* Compatibility aliases for legacy files still included by TypeScript. */
+    --bg: var(--bg-page);
+    --surface: var(--bg-surface);
+    --surface-muted: var(--bg-muted);
+    --border: var(--border-default);
+    --border-sub: var(--border-default);
+    --text: var(--text-primary);
+    --text-muted: var(--text-secondary);
+    --text-dim: var(--text-hint);
+    --accent: var(--color-primary-500);
+    --accent-hover: var(--color-primary-600);
     --accent-fg: #ffffff;
-    --success: #16a34a;
-    --warning: #d97706;
-    --danger: #dc2626;
-    --info: #2563eb;
-    --radius: 12px;
-    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-
-    /* Backwards-compatible aliases for existing components during the overhaul. */
-    --color-primary: var(--accent);
-    --color-primary-hover: var(--accent-hover);
-    --color-primary-foreground: var(--accent-fg);
-    --color-surface: var(--surface-muted);
-    --color-surface-raised: var(--surface);
-    --color-surface-overlay: rgba(255, 255, 255, 0.92);
-    --color-page: var(--bg);
-    --color-border: var(--border);
-    --color-border-subtle: var(--border-sub);
-    --color-text: var(--text);
-    --color-text-muted: var(--text-muted);
-    --color-text-disabled: var(--text-dim);
-    --color-success: var(--success);
-    --color-warning: var(--warning);
-    --color-danger: var(--danger);
-    --color-info: var(--info);
-  }
-
-  .dark {
-    color-scheme: dark;
-    --bg: #09090b;
-    --surface: #18181b;
-    --surface-muted: #111114;
-    --border: #27272a;
-    --border-sub: #1f1f22;
-    --text: #fafafa;
-    --text-muted: #a1a1aa;
-    --text-dim: #52525b;
-    --color-surface-overlay: rgba(24, 24, 27, 0.92);
+    --success: var(--color-success);
+    --warning: var(--color-warning);
+    --danger: var(--color-danger);
+    --radius: var(--radius-md);
+    --color-primary: var(--color-primary-500);
+    --color-primary-hover: var(--color-primary-600);
+    --color-primary-foreground: #ffffff;
+    --color-surface: var(--bg-muted);
+    --color-surface-raised: var(--bg-surface);
+    --color-page: var(--bg-page);
+    --color-border: var(--border-default);
+    --color-border-subtle: var(--border-default);
+    --color-text: var(--text-primary);
+    --color-text-muted: var(--text-secondary);
+    --color-text-disabled: var(--text-hint);
+    --color-info: var(--color-primary-500);
   }
 
   html {
     min-height: 100%;
-    background: var(--bg);
+    background: var(--bg-page);
     scroll-behavior: smooth;
   }
 
@@ -68,12 +102,11 @@
     min-height: 100vh;
     margin: 0;
     overflow-x: hidden;
-    background:
-      radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 7%, transparent), transparent 28%),
-      radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent) 5%, transparent), transparent 30%),
-      var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 400;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
@@ -87,7 +120,7 @@
   *::after {
     box-sizing: border-box;
     min-width: 0;
-    border-color: var(--border);
+    border-color: var(--border-default);
   }
 
   h1,
@@ -96,9 +129,18 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 
   a,
@@ -109,74 +151,168 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  a,
   button {
+    font: inherit;
+  }
+
+  button,
+  a {
     transition:
       background-color 150ms ease,
       border-color 150ms ease,
       color 150ms ease,
       box-shadow 150ms ease,
-      opacity 150ms ease,
-      transform 150ms ease;
-  }
-
-  button:not(:disabled):active,
-  a:active {
-    transform: scale(0.98);
-  }
-
-  img {
-    display: block;
-    max-width: 100%;
+      opacity 150ms ease;
   }
 
   *:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    background: var(--color-primary-100);
   }
 }
 
 @layer components {
-  .skeleton-shimmer {
-    background-color: color-mix(in srgb, var(--border) 72%, transparent);
-    background-image: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.6s linear infinite;
+  .hero-cta-gradient {
+    background: linear-gradient(135deg, #ff7a2f, #f05a0b);
   }
 
-  .touch-target {
-    min-height: 44px;
+  .survica-hero-grid {
+    background-image:
+      linear-gradient(rgba(36, 87, 245, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(36, 87, 245, 0.07) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
+
+  .survica-glow {
+    background:
+      radial-gradient(circle at 25% 25%, rgba(36, 87, 245, 0.14), transparent 30%),
+      radial-gradient(circle at 78% 18%, rgba(255, 107, 26, 0.13), transparent 28%),
+      #fbfaf8;
+  }
+
+  .voice-orb {
+    animation: float-soft 5.5s ease-in-out infinite;
+    box-shadow:
+      0 20px 70px rgba(36, 87, 245, 0.22),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  }
+
+  .voice-wave-bar {
+    animation: wave-grow 1.15s ease-in-out infinite;
+    transform-origin: bottom;
+  }
+
+  .voice-wave-bar:nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .voice-wave-bar:nth-child(3) {
+    animation-delay: 220ms;
+  }
+
+  .voice-wave-bar:nth-child(4) {
+    animation-delay: 340ms;
+  }
+
+  .voice-wave-bar:nth-child(5) {
+    animation-delay: 460ms;
+  }
+
+  .float-card {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+
+  .float-card-slow {
+    animation: float-soft 7.5s ease-in-out infinite reverse;
+  }
+
+  .signal-line {
+    stroke-dasharray: 12 10;
+    animation: dash-flow 1.4s linear infinite;
+  }
+
+  .marquee-track {
+    animation: marquee 26s linear infinite;
+  }
+
+  .orbit-node {
+    animation: orbit-spin 16s linear infinite;
+    transform-origin: center;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+
+  .skeleton-pulse {
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+
+  .record-pulse::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border-radius: 9999px;
+    background: rgba(249, 115, 22, 0.2);
+    animation: record-pulse 1.5s ease-in-out infinite;
+  }
+
+  .ai-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 80;
+    height: 2px;
+    width: 35%;
+    background: var(--color-primary-500);
+    animation: ai-progress 1.2s ease-in-out infinite;
   }
 }
 
-@keyframes shimmer {
-  from {
-    background-position: 200% 0;
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    background-color: #f3f4f6;
   }
 
-  to {
-    background-position: -200% 0;
+  50% {
+    background-color: #e5e7eb;
   }
 }
 
-@keyframes page-in {
-  from {
+@keyframes record-pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.92);
+  }
+
+  100% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: scale(1.25);
+  }
+}
+
+@keyframes ai-progress {
+  0% {
+    transform: translateX(-100%);
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% {
+    transform: translateX(300%);
   }
 }
 
@@ -189,5 +325,79 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes wave-grow {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dash-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -44;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }

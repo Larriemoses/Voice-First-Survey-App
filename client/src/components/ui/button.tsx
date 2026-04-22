@@ -1,14 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/helpers";
-import { Spinner } from "./Spinner";
 
-export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "ghost"
-  | "danger"
-  | "link";
-
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -22,21 +15,17 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary:
-    "border border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-fg)] shadow-sm hover:border-[var(--accent-hover)] hover:bg-[var(--accent-hover)]",
-  secondary:
-    "border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-muted)]",
-  ghost:
-    "border border-transparent bg-transparent text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]",
-  danger:
-    "border border-[var(--danger)] bg-[var(--danger)] text-white shadow-sm hover:opacity-95",
-  link: "border border-transparent bg-transparent px-0 text-[var(--accent)] shadow-none hover:text-[var(--accent-hover)]",
+  primary: "border-primary-500 bg-primary-500 text-white hover:border-primary-600 hover:bg-primary-600",
+  secondary: "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
+  ghost: "border-transparent bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-900",
+  danger: "border-danger bg-danger text-white hover:opacity-90",
+  link: "border-transparent bg-transparent px-0 text-primary-500 hover:text-primary-600",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "min-h-11 rounded-[var(--radius)] px-3.5 text-sm",
-  md: "min-h-11 rounded-[var(--radius)] px-4 text-sm",
-  lg: "min-h-12 rounded-[var(--radius)] px-5 text-sm",
+  sm: "h-7 px-3 text-sm",
+  md: "h-9 px-4 text-base",
+  lg: "h-11 px-5 text-base",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -64,13 +53,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "touch-target inline-flex shrink-0 items-center justify-center gap-2 font-medium leading-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-55",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md border font-medium leading-none disabled:cursor-not-allowed disabled:opacity-55",
         variantClasses[variant],
-        iconOnly
-          ? size === "lg"
-            ? "h-12 w-12 rounded-[var(--radius)] p-0"
-            : "h-11 w-11 rounded-[var(--radius)] p-0"
-          : sizeClasses[size],
+        iconOnly ? "h-9 w-9 p-0" : sizeClasses[size],
         className,
       )}
       disabled={isDisabled}
@@ -78,7 +63,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       aria-busy={loading}
       {...props}
     >
-      {loading ? <Spinner size="sm" /> : leadingIcon}
+      {loading ? (
+        <span className="h-3 w-12 rounded-full bg-white/40 skeleton-pulse" aria-hidden />
+      ) : (
+        leadingIcon
+      )}
       <span className={iconOnly ? "sr-only" : "truncate"}>{children}</span>
       {!loading && !iconOnly ? trailingIcon : null}
     </button>

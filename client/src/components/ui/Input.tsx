@@ -30,47 +30,33 @@ export function Input({
   return (
     <div className={cn("space-y-2", containerClassName)}>
       {label ? (
-        <label
-          htmlFor={fieldId}
-          className="flex items-center justify-between gap-3 text-sm font-semibold text-[var(--color-text)]"
-        >
+        <label htmlFor={fieldId} className="flex items-center justify-between gap-3 text-sm font-medium text-gray-900">
           <span>{label}</span>
           {labelAction}
         </label>
       ) : null}
-
       <div
         className={cn(
-          "flex min-h-11 items-center gap-3 rounded-[var(--radius)] border bg-[var(--surface)] px-3.5",
-          error
-            ? "border-[var(--danger)]"
-            : "border-[var(--border)] focus-within:border-[var(--accent)] focus-within:bg-[var(--surface)]",
+          "flex h-9 items-center gap-2 rounded-md border bg-white px-3 text-base focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500",
+          error ? "border-danger" : "border-gray-200",
         )}
       >
-        {leadingIcon ? (
-          <span className="text-[var(--text-muted)]">{leadingIcon}</span>
-        ) : null}
+        {leadingIcon ? <span className="text-gray-400">{leadingIcon}</span> : null}
         <input
           id={fieldId}
           aria-invalid={!!error}
           aria-describedby={helperText || error ? messageId : undefined}
-          className={cn(
-            "w-full bg-transparent py-3 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-dim)]",
-            className,
-          )}
+          className={cn("h-full w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-400", className)}
           {...props}
         />
-        {trailingIcon ? (
-          <span className="text-[var(--text-muted)]">{trailingIcon}</span>
-        ) : null}
+        {trailingIcon ? <span className="text-gray-400">{trailingIcon}</span> : null}
       </div>
-
       {error ? (
-        <p id={messageId} className="text-sm text-[var(--danger)]">
+        <p id={messageId} className="text-sm text-danger">
           {error}
         </p>
       ) : helperText ? (
-        <p id={messageId} className="text-sm text-[var(--text-muted)]">
+        <p id={messageId} className="text-sm text-gray-500">
           {helperText}
         </p>
       ) : null}

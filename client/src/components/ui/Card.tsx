@@ -2,14 +2,14 @@ import type { HTMLAttributes } from "react";
 import { cn } from "../../utils/helpers";
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
-  variant?: "default" | "elevated" | "flat";
+  variant?: "default" | "elevated" | "flat" | "muted";
 };
 
-const variants = {
-  default: "border border-[var(--border)] bg-[var(--surface)]",
-  elevated: "border border-[var(--border)] bg-[var(--surface)] shadow-sm",
-  flat:
-    "border border-[var(--border-sub)] bg-[color:color-mix(in_srgb,var(--surface)_72%,var(--bg))]",
+const variants: Record<NonNullable<CardProps["variant"]>, string> = {
+  default: "border-gray-200 bg-white",
+  elevated: "border-gray-200 bg-white shadow-sm",
+  flat: "border-gray-200 bg-gray-50",
+  muted: "border-transparent bg-gray-100",
 };
 
 export function Card({
@@ -21,7 +21,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl p-5 sm:p-6",
+        "rounded-lg border px-5 py-4 transition-shadow duration-150 hover:shadow-sm",
         variants[variant],
         className,
       )}
