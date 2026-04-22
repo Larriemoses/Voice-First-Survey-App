@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, KeyRound, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  KeyRound,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import AuthCard from "../components/AuthCard";
 import PageMeta from "../components/PageMeta";
 import { signInWithGoogle, signInWithPassword } from "../lib/auth";
@@ -62,7 +68,9 @@ export default function Login() {
       }
 
       if (!data?.session) {
-        setError("We couldn't finish signing you in yet. Confirm your email first.");
+        setError(
+          "We couldn't finish signing you in yet. Confirm your email first.",
+        );
         return;
       }
 
@@ -103,7 +111,9 @@ export default function Login() {
                   Hear what people mean, not just what they typed
                 </h1>
                 <p className="max-w-lg text-base leading-7 text-[var(--text-muted)]">
-                  Survica helps your team launch voice-first surveys, collect clear spoken responses, and review insights without chasing recordings across tools.
+                  Survica helps your team launch voice-first surveys, collect
+                  clear spoken responses, and review insights without chasing
+                  recordings across tools.
                 </p>
               </div>
 
@@ -114,7 +124,8 @@ export default function Login() {
                     Built for trust
                   </h2>
                   <p className="text-sm leading-6 text-[var(--text-muted)]">
-                    Give respondents a flow that feels simple, private, and easy to finish.
+                    Give respondents a flow that feels simple, private, and easy
+                    to finish.
                   </p>
                 </Card>
                 <Card className="space-y-3" variant="flat">
@@ -123,7 +134,8 @@ export default function Login() {
                     Move faster
                   </h2>
                   <p className="text-sm leading-6 text-[var(--text-muted)]">
-                    Publish faster, review transcripts sooner, and keep your team aligned.
+                    Publish faster, review transcripts sooner, and keep your
+                    team aligned.
                   </p>
                 </Card>
               </div>
@@ -169,7 +181,7 @@ export default function Login() {
                   type="email"
                   label="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.tar.value)}
                   placeholder="you@company.com"
                   autoComplete="email"
                   leadingIcon={<Mail className="h-4 w-4" />}
@@ -186,7 +198,11 @@ export default function Login() {
                 />
 
                 {error ? (
-                  <Feedback variant="error" title="We couldn't sign you in" description={error} />
+                  <Feedback
+                    variant="error"
+                    title="We couldn't sign you in"
+                    description={error}
+                  />
                 ) : null}
 
                 {successMessage ? (
@@ -202,7 +218,9 @@ export default function Login() {
                   loading={loading}
                   size="lg"
                   className="w-full"
-                  trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
+                  trailingIcon={
+                    !loading ? <ArrowRight className="h-4 w-4" /> : undefined
+                  }
                 >
                   {loading ? "Signing you in" : "Sign in"}
                 </Button>
@@ -210,7 +228,10 @@ export default function Login() {
 
               <p className="text-center text-sm text-[var(--color-text-muted)]">
                 New here?{" "}
-                <Link to="/signup" className="font-semibold text-[var(--accent)]">
+                <Link
+                  to="/signup"
+                  className="font-semibold text-[var(--accent)]"
+                >
                   Create your account
                 </Link>
               </p>

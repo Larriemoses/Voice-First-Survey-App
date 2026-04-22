@@ -3,3 +3,4 @@ dist
 .env
 client/.env
 server/.env
+.logs/

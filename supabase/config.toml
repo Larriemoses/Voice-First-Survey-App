@@ -11,3 +11,27 @@ enabled = true
 verify_jwt = false
 entrypoint = "./functions/generate-survey-draft/index.ts"
 
+[functions.generate-survey-questions]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/generate-survey-questions/index.ts"
+
+[functions.generate-analytics-insights]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/generate-analytics-insights/index.ts"
+
+[functions.suggest-followup-question]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/suggest-followup-question/index.ts"
+
+[functions.score-response-quality]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/score-response-quality/index.ts"
+
+[functions.generate-survey-health]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/generate-survey-health/index.ts"

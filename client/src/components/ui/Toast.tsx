@@ -35,14 +35,10 @@ const iconMap = {
 } as const;
 
 const toneMap = {
-  success:
-    "border-[color:color-mix(in_srgb,var(--success)_22%,var(--border))] text-[var(--text)]",
-  error:
-    "border-[color:color-mix(in_srgb,var(--danger)_22%,var(--border))] text-[var(--text)]",
-  warning:
-    "border-[color:color-mix(in_srgb,var(--warning)_24%,var(--border))] text-[var(--text)]",
-  info:
-    "border-[color:color-mix(in_srgb,var(--accent)_20%,var(--border))] text-[var(--text)]",
+  success: "text-success",
+  error: "text-danger",
+  warning: "text-warning",
+  info: "text-primary-500",
 } as const;
 
 function ToastViewport({
@@ -52,45 +48,27 @@ function ToastViewport({
   toasts: ToastItem[];
   onDismiss: (id: string) => void;
 }) {
-  if (typeof document === "undefined") {
-    return null;
-  }
+  if (typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="pointer-events-none fixed inset-x-4 top-4 z-[70] flex flex-col gap-3 sm:inset-x-auto sm:right-4 sm:top-auto sm:bottom-4 sm:w-full sm:max-w-sm">
+    <div className="pointer-events-none fixed inset-x-4 bottom-4 z-[70] flex flex-col gap-3 sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm">
       {toasts.map((toast) => {
         const Icon = iconMap[toast.variant];
 
         return (
           <div
             key={toast.id}
-            className={cn(
-              "pointer-events-auto rounded-xl border bg-[var(--surface)] p-4 shadow-sm motion-safe:animate-[toast-in_180ms_ease-out]",
-              toneMap[toast.variant],
-            )}
+            className="pointer-events-auto rounded-lg border border-gray-200 bg-white p-4 shadow-md motion-safe:animate-[toast-in_200ms_ease-out]"
             role="status"
             aria-live="polite"
           >
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-[var(--accent)]">
-                <Icon className="h-4 w-4" />
-              </div>
+              <Icon className={cn("mt-0.5 h-4 w-4", toneMap[toast.variant])} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[var(--text)]">
-                  {toast.title}
-                </p>
-                {toast.description ? (
-                  <p className="mt-1 text-sm text-[var(--text-muted)]">
-                    {toast.description}
-                  </p>
-                ) : null}
+                <p className="text-base font-medium text-gray-900">{toast.title}</p>
+                {toast.description ? <p className="mt-1 text-sm text-gray-500">{toast.description}</p> : null}
               </div>
-              <button
-                type="button"
-                onClick={() => onDismiss(toast.id)}
-                className="rounded-full p-1 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
-                aria-label="Dismiss notification"
-              >
+              <button type="button" onClick={() => onDismiss(toast.id)} className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Dismiss notification">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -115,26 +93,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (toasts.length === 0) {
-      return undefined;
-    }
+    if (!toasts.length) return undefined;
 
-    const timers = toasts.map((toast) =>
-      window.setTimeout(() => dismissToast(toast.id), 4000),
-    );
-
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-    };
+    const timers = toasts.map((toast) => window.setTimeout(() => dismissToast(toast.id), 3000));
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [dismissToast, toasts]);
 
-  const value = useMemo<ToastContextValue>(
-    () => ({
-      showToast,
-      dismissToast,
-    }),
-    [dismissToast, showToast],
-  );
+  const value = useMemo<ToastContextValue>(() => ({ showToast, dismissToast }), [dismissToast, showToast]);
 
   return (
     <ToastContext.Provider value={value}>
