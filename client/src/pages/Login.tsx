@@ -181,7 +181,7 @@ export default function Login() {
                   type="email"
                   label="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.tar.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@company.com"
                   autoComplete="email"
                   leadingIcon={<Mail className="h-4 w-4" />}
