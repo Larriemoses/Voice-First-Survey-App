@@ -1,20 +1,27 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "../../utils/helpers";
 
-type ChipProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ChipProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   active?: boolean;
   children: ReactNode;
 };
 
-export function Chip({ active = false, children, className, type = "button", ...props }: ChipProps) {
+export function Chip({
+  active = false,
+  children,
+  className,
+  type = "button",
+  ...props
+}: ChipProps) {
   return (
     <button
       type={type}
+      aria-pressed={active}
       className={cn(
-        "inline-flex h-7 items-center rounded-full border px-3 text-sm font-medium transition-colors duration-150",
+        "inline-flex min-h-7 items-center rounded-full border px-3 text-sm font-medium leading-[1.4] transition-colors duration-150",
         active
-          ? "border-primary-500 bg-primary-50 text-primary-700"
-          : "border-gray-200 bg-white text-gray-500 hover:border-primary-200 hover:text-primary-600",
+          ? "border-brand-blue bg-brand-blue-light text-brand-blue"
+          : "border-border bg-surface-card text-text-secondary hover:border-border-strong hover:bg-surface-muted hover:text-text-primary",
         className,
       )}
       {...props}

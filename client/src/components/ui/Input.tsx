@@ -1,9 +1,9 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/helpers";
 
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
-  label?: string;
-  helperText?: string;
+export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
+  label?: ReactNode;
+  helperText?: ReactNode;
   error?: string;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
@@ -30,33 +30,50 @@ export function Input({
   return (
     <div className={cn("space-y-2", containerClassName)}>
       {label ? (
-        <label htmlFor={fieldId} className="flex items-center justify-between gap-3 text-sm font-medium text-gray-900">
+        <label
+          htmlFor={fieldId}
+          className="flex items-center justify-between gap-3 text-sm font-medium text-text-primary"
+        >
           <span>{label}</span>
           {labelAction}
         </label>
       ) : null}
       <div
         className={cn(
-          "flex h-9 items-center gap-2 rounded-md border bg-white px-3 text-base focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500",
-          error ? "border-danger" : "border-gray-200",
+          "flex h-[38px] items-center gap-2 rounded-md border bg-surface-card px-3 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
+          error
+            ? "border-status-danger focus-within:border-status-danger"
+            : "border-border focus-within:border-border-focus focus-within:shadow-focus",
+          props.disabled ? "bg-surface-muted text-text-hint" : "",
         )}
       >
-        {leadingIcon ? <span className="text-gray-400">{leadingIcon}</span> : null}
+        {leadingIcon ? (
+          <span className="shrink-0 text-text-hint" aria-hidden>
+            {leadingIcon}
+          </span>
+        ) : null}
         <input
           id={fieldId}
           aria-invalid={!!error}
           aria-describedby={helperText || error ? messageId : undefined}
-          className={cn("h-full w-full bg-transparent text-gray-900 outline-none placeholder:text-gray-400", className)}
+          className={cn(
+            "h-full w-full bg-transparent text-base text-text-primary outline-none placeholder:text-text-hint focus-visible:outline-none focus-visible:shadow-none disabled:cursor-not-allowed",
+            className,
+          )}
           {...props}
         />
-        {trailingIcon ? <span className="text-gray-400">{trailingIcon}</span> : null}
+        {trailingIcon ? (
+          <span className="shrink-0 text-text-hint" aria-hidden>
+            {trailingIcon}
+          </span>
+        ) : null}
       </div>
       {error ? (
-        <p id={messageId} className="text-sm text-danger">
+        <p id={messageId} className="text-sm text-status-danger">
           {error}
         </p>
       ) : helperText ? (
-        <p id={messageId} className="text-sm text-gray-500">
+        <p id={messageId} className="text-sm text-text-secondary">
           {helperText}
         </p>
       ) : null}

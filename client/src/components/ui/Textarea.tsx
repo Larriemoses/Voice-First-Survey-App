@@ -1,9 +1,9 @@
 import { useId, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { cn } from "../../utils/helpers";
 
-type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  label?: string;
-  helperText?: string;
+export type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  label?: ReactNode;
+  helperText?: ReactNode;
   error?: string;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
@@ -19,6 +19,7 @@ export function Textarea({
   className,
   containerClassName,
   id,
+  rows = 4,
   ...props
 }: TextareaProps) {
   const generatedId = useId();
@@ -28,32 +29,50 @@ export function Textarea({
   return (
     <div className={cn("space-y-2", containerClassName)}>
       {label ? (
-        <label htmlFor={fieldId} className="text-sm font-medium text-gray-900">
+        <label
+          htmlFor={fieldId}
+          className="text-sm font-medium text-text-primary"
+        >
           {label}
         </label>
       ) : null}
       <div
         className={cn(
-          "flex rounded-md border bg-white px-3 text-base focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500",
-          error ? "border-danger" : "border-gray-200",
+          "flex gap-2 rounded-md border bg-surface-card px-3 py-2.5 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
+          error
+            ? "border-status-danger focus-within:border-status-danger"
+            : "border-border focus-within:border-border-focus focus-within:shadow-focus",
+          props.disabled ? "bg-surface-muted text-text-hint" : "",
         )}
       >
-        {leadingIcon ? <span className="pt-2.5 text-gray-400">{leadingIcon}</span> : null}
+        {leadingIcon ? (
+          <span className="pt-1 text-text-hint" aria-hidden>
+            {leadingIcon}
+          </span>
+        ) : null}
         <textarea
           id={fieldId}
+          rows={rows}
           aria-invalid={!!error}
           aria-describedby={helperText || error ? messageId : undefined}
-          className={cn("min-h-28 w-full resize-y bg-transparent py-2.5 text-gray-900 outline-none placeholder:text-gray-400", className)}
+          className={cn(
+            "min-h-[120px] w-full resize-y bg-transparent text-base text-text-primary outline-none placeholder:text-text-hint focus-visible:outline-none focus-visible:shadow-none disabled:cursor-not-allowed",
+            className,
+          )}
           {...props}
         />
-        {trailingIcon ? <span className="pt-2.5 text-gray-400">{trailingIcon}</span> : null}
+        {trailingIcon ? (
+          <span className="pt-1 text-text-hint" aria-hidden>
+            {trailingIcon}
+          </span>
+        ) : null}
       </div>
       {error ? (
-        <p id={messageId} className="text-sm text-danger">
+        <p id={messageId} className="text-sm text-status-danger">
           {error}
         </p>
       ) : helperText ? (
-        <p id={messageId} className="text-sm text-gray-500">
+        <p id={messageId} className="text-sm text-text-secondary">
           {helperText}
         </p>
       ) : null}
