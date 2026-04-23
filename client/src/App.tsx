@@ -1,8 +1,9 @@
 import { Suspense, lazy } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Card } from "./components/ui/Card";
 import { SkeletonBlock } from "./components/ui/SkeletonBlock";
+import { sanitizeRedirectPath } from "./lib/auth";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -14,6 +15,14 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const OrgAnalyticsPage = lazy(() => import("./pages/OrgAnalyticsPage"));
 const TemplatesPage = lazy(() => import("./pages/TemplatesPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const OnboardingPage = lazy(() => import("./pages/Onboarding"));
+
+function AuthCallbackRedirect() {
+  const [searchParams] = useSearchParams();
+  const redirect = sanitizeRedirectPath(searchParams.get("redirect"));
+
+  return <Navigate to={redirect || "/dashboard"} replace />;
+}
 
 function AppFallback() {
   return (
@@ -46,7 +55,22 @@ export default function App() {
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/signup" element={<AuthPage mode="signup" />} />
-        <Route path="/auth-check" element={<ProtectedRoute><Navigate to="/dashboard" replace /></ProtectedRoute>} />
+        <Route
+          path="/auth-check"
+          element={
+            <ProtectedRoute requireOrg={false}>
+              <AuthCallbackRedirect />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute requireOrg={false} redirectAuthenticatedTo="/dashboard">
+              <OnboardingPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/analytics" element={<ProtectedRoute><OrgAnalyticsPage /></ProtectedRoute>} />
         <Route path="/dashboard/templates" element={<ProtectedRoute><TemplatesPage /></ProtectedRoute>} />
