@@ -16,8 +16,18 @@ export type BuilderNavProps = {
   statusLabel?: string;
   statusVariant?: BadgeVariant;
   primaryActionLabel?: string;
+  autosaveLabel?: string;
+  autosaveTone?: "default" | "saving" | "saved";
+  onPreview?: () => void;
+  onPrimaryAction?: () => void;
   className?: string;
 };
+
+const autosaveToneClasses = {
+  default: "text-text-hint",
+  saving: "text-brand-orange-dark",
+  saved: "text-status-success",
+} as const;
 
 function formatSurveyName(surveyId: string): string {
   return surveyId
@@ -64,6 +74,10 @@ export function BuilderNav({
   statusLabel = "Active",
   statusVariant = "active",
   primaryActionLabel = "Publish",
+  autosaveLabel,
+  autosaveTone = "default",
+  onPreview,
+  onPrimaryAction,
   className,
 }: BuilderNavProps) {
   const location = useLocation();
@@ -105,9 +119,21 @@ export function BuilderNav({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start lg:self-auto">
-            <Button variant="secondary">Preview</Button>
-            <Button>{primaryActionLabel}</Button>
+          <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+            {autosaveLabel ? (
+              <span
+                className={cn(
+                  "order-3 w-full text-xs sm:order-none sm:w-auto",
+                  autosaveToneClasses[autosaveTone],
+                )}
+              >
+                {autosaveLabel}
+              </span>
+            ) : null}
+            <Button variant="secondary" onClick={onPreview}>
+              Preview
+            </Button>
+            <Button onClick={onPrimaryAction}>{primaryActionLabel}</Button>
           </div>
         </div>
 
