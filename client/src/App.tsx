@@ -6,7 +6,6 @@ import { SkeletonBlock } from "./components/ui/SkeletonBlock";
 import { sanitizeRedirectPath } from "./lib/auth";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
-const AuthPage = lazy(() => import("./pages/AuthPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const BuilderPage = lazy(() => import("./pages/BuilderPage"));
 const SurveyPage = lazy(() => import("./pages/SurveyPage"));
@@ -15,7 +14,12 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const OrgAnalyticsPage = lazy(() => import("./pages/OrgAnalyticsPage"));
 const TemplatesPage = lazy(() => import("./pages/TemplatesPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
-const OnboardingPage = lazy(() => import("./pages/Onboarding"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const SignUpPage = lazy(() => import("./pages/auth/SignUpPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
+const AuthConfirmPage = lazy(() => import("./pages/auth/AuthConfirmPage"));
+const OnboardingPage = lazy(() => import("./pages/auth/OnboardingPage"));
 
 function AuthCallbackRedirect() {
   const [searchParams] = useSearchParams();
@@ -53,8 +57,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
-        <Route path="/login" element={<AuthPage mode="login" />} />
-        <Route path="/signup" element={<AuthPage mode="signup" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/auth/confirm" element={<AuthConfirmPage />} />
         <Route
           path="/auth-check"
           element={

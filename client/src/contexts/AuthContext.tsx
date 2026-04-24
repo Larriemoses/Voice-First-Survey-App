@@ -34,6 +34,8 @@ type SignInInput = {
 type SignUpInput = {
   email: string;
   password: string;
+  fullName?: string;
+  organizationName?: string;
 };
 
 type SignInResult = {
@@ -55,6 +57,7 @@ type AuthContextValue = {
   signUp: (input: SignUpInput) => Promise<AuthActionResult<SignUpResult>>;
   signOut: () => Promise<AuthActionResult>;
   resetPassword: (email: string) => Promise<AuthActionResult>;
+  refreshOrganization: () => Promise<AuthActionResult<Organization | null>>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -209,9 +212,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signUp = useCallback(
-    async ({ email, password }: SignUpInput) => {
+    async ({ email, password, fullName, organizationName }: SignUpInput) => {
       try {
-        const { data, error } = await signUpWithPassword(email, password);
+        const { data, error } = await signUpWithPassword(email, password, {
+          fullName,
+          organizationName,
+        });
 
         if (error) {
           return { data: null, error: error.message };
@@ -300,6 +306,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshOrganization = useCallback(async () => {
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        return {
+          data: null,
+          error: getErrorMessage(error, "We couldn't refresh your workspace."),
+        };
+      }
+
+      const nextState = await syncAuthState(session);
+
+      if (nextState.error) {
+        return { data: null, error: nextState.error };
+      }
+
+      return {
+        data: nextState.org,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        error: getErrorMessage(error, "We couldn't refresh your workspace."),
+      };
+    }
+  }, [syncAuthState]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -309,8 +347,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signOut,
       resetPassword,
+      refreshOrganization,
     }),
-    [loading, org, resetPassword, signIn, signOut, signUp, user],
+    [loading, org, refreshOrganization, resetPassword, signIn, signOut, signUp, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
