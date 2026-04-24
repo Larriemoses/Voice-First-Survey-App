@@ -68,9 +68,15 @@ export function BuilderNav({
 }: BuilderNavProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { id = "q4-customer-satisfaction" } = useParams();
-  const basePath = `/dashboard/surveys/${id}`;
-  const resolvedSurveyName = surveyName ?? formatSurveyName(id);
+  const { id } = useParams();
+  const isNewSurveyRoute = location.pathname === "/dashboard/surveys/new";
+  const resolvedSurveyId = id ?? (isNewSurveyRoute ? "new" : "q4-customer-satisfaction");
+  const basePath = isNewSurveyRoute
+    ? "/dashboard/surveys/new"
+    : `/dashboard/surveys/${resolvedSurveyId}`;
+  const resolvedSurveyName =
+    surveyName ??
+    (isNewSurveyRoute ? "New survey" : formatSurveyName(resolvedSurveyId));
   const tabs = getTabs(basePath);
 
   return (
