@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import AppLogo from "../AppLogo";
 import { Button } from "../ui/button";
 import { cn } from "../../utils/helpers";
 
@@ -45,7 +44,7 @@ export function TopNav({
     >
       <div className="survica-page-shell flex h-[60px] items-center justify-between">
         <Link to="/" className="flex h-7 items-center" aria-label="Survica home">
-          <AppLogo className="h-6" imageClassName="max-w-[88px]" />
+          <img src="/logo.svg" alt="Survica" className="h-8 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
