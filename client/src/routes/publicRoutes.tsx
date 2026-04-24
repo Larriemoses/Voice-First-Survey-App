@@ -5,7 +5,7 @@ import { sanitizeRedirectPath } from "../lib/auth";
 import { withProtectedPage, withPublicPage } from "./routeLoaders";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
-const SurveyPage = lazy(() => import("../pages/SurveyPage"));
+const PublicSurveyPage = lazy(() => import("../pages/PublicSurveyPage"));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 const SignUpPage = lazy(() => import("../pages/auth/SignUpPage"));
 const ForgotPasswordPage = lazy(
@@ -58,7 +58,7 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: "/s/:slug",
-    element: withPublicPage(<SurveyPage />, "public"),
+    element: withPublicPage(<PublicSurveyPage />, "public"),
   },
   {
     path: "/auth-check",
