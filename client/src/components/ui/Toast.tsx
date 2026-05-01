@@ -1,110 +1,174 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
-  useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { CheckCircle2, Info, TriangleAlert, X } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleAlert,
+  Info,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 import { cn } from "../../utils/helpers";
 
-type ToastVariant = "success" | "error" | "warning" | "info";
+export type ToastVariant = "success" | "error" | "info" | "warning";
 
-type ToastItem = {
-  id: string;
+export type ToastPayload = {
   title: string;
   description?: string;
+  variant?: ToastVariant;
+};
+
+type ToastItem = ToastPayload & {
+  id: string;
   variant: ToastVariant;
 };
 
 type ToastContextValue = {
-  showToast: (toast: Omit<ToastItem, "id">) => void;
+  showToast: (toast: ToastPayload) => string;
   dismissToast: (id: string) => void;
+  clearToasts: () => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const iconMap = {
   success: CheckCircle2,
-  error: TriangleAlert,
-  warning: TriangleAlert,
+  error: CircleAlert,
   info: Info,
-} as const;
+  warning: TriangleAlert,
+} satisfies Record<ToastVariant, typeof Info>;
 
-const toneMap = {
-  success: "text-success",
-  error: "text-danger",
-  warning: "text-warning",
-  info: "text-primary-500",
-} as const;
+const toneMap: Record<ToastVariant, string> = {
+  success: "border-l-status-success text-status-success",
+  error: "border-l-status-danger text-status-danger",
+  info: "border-l-brand-blue text-brand-blue",
+  warning: "border-l-brand-orange text-brand-orange-dark",
+};
 
-function ToastViewport({
-  toasts,
-  onDismiss,
-}: {
-  toasts: ToastItem[];
+function getToastId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+export type ToastProps = ToastItem & {
   onDismiss: (id: string) => void;
-}) {
-  if (typeof document === "undefined") return null;
+};
 
-  return createPortal(
-    <div className="pointer-events-none fixed inset-x-4 bottom-4 z-[70] flex flex-col gap-3 sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm">
-      {toasts.map((toast) => {
-        const Icon = iconMap[toast.variant];
+export function Toast({
+  id,
+  title,
+  description,
+  variant,
+  onDismiss,
+}: ToastProps) {
+  const Icon = iconMap[variant];
+  const liveMode = variant === "error" ? "assertive" : "polite";
 
-        return (
-          <div
-            key={toast.id}
-            className="pointer-events-auto rounded-lg border border-gray-200 bg-white p-4 shadow-md motion-safe:animate-[toast-in_200ms_ease-out]"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="flex items-start gap-3">
-              <Icon className={cn("mt-0.5 h-4 w-4", toneMap[toast.variant])} />
-              <div className="min-w-0 flex-1">
-                <p className="text-base font-medium text-gray-900">{toast.title}</p>
-                {toast.description ? <p className="mt-1 text-sm text-gray-500">{toast.description}</p> : null}
-              </div>
-              <button type="button" onClick={() => onDismiss(toast.id)} className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Dismiss notification">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>,
-    document.body,
+  return (
+    <div
+      className={cn(
+        "pointer-events-auto rounded-lg border border-border border-l-2 bg-surface-card p-4 shadow-md",
+        toneMap[variant],
+      )}
+      role={variant === "error" ? "alert" : "status"}
+      aria-live={liveMode}
+    >
+      <div className="flex items-start gap-3">
+        <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p className="text-base font-medium text-text-primary">{title}</p>
+          {description ? (
+            <p className="mt-1 text-sm text-text-secondary">{description}</p>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={() => onDismiss(id)}
+          className="rounded-md p-1 text-text-hint transition-colors duration-150 hover:bg-surface-muted hover:text-text-primary"
+          aria-label="Dismiss notification"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
   );
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const timersRef = useRef<Record<string, number>>({});
 
-  const dismissToast = useCallback((id: string) => {
+  function dismissToast(id: string) {
+    const timer = timersRef.current[id];
+
+    if (timer) {
+      window.clearTimeout(timer);
+      delete timersRef.current[id];
+    }
+
     setToasts((current) => current.filter((toast) => toast.id !== id));
-  }, []);
+  }
 
-  const showToast = useCallback((toast: Omit<ToastItem, "id">) => {
-    const id = crypto.randomUUID();
-    setToasts((current) => [...current, { ...toast, id }]);
-  }, []);
+  function clearToasts() {
+    Object.values(timersRef.current).forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = {};
+    setToasts([]);
+  }
+
+  function showToast({ title, description, variant = "info" }: ToastPayload) {
+    const id = getToastId();
+    const nextToast: ToastItem = { id, title, description, variant };
+
+    setToasts((current) => {
+      const next = [...current, nextToast];
+      const overflow = next.slice(0, Math.max(0, next.length - 3));
+
+      overflow.forEach((toast) => {
+        const timer = timersRef.current[toast.id];
+
+        if (timer) {
+          window.clearTimeout(timer);
+          delete timersRef.current[toast.id];
+        }
+      });
+
+      return next.slice(-3);
+    });
+
+    timersRef.current[id] = window.setTimeout(() => dismissToast(id), 4000);
+    return id;
+  }
 
   useEffect(() => {
-    if (!toasts.length) return undefined;
-
-    const timers = toasts.map((toast) => window.setTimeout(() => dismissToast(toast.id), 3000));
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [dismissToast, toasts]);
-
-  const value = useMemo<ToastContextValue>(() => ({ showToast, dismissToast }), [dismissToast, showToast]);
+    return () => {
+      Object.values(timersRef.current).forEach((timer) =>
+        window.clearTimeout(timer),
+      );
+    };
+  }, []);
 
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={{ showToast, dismissToast, clearToasts }}>
       {children}
-      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
+      {typeof document !== "undefined"
+        ? createPortal(
+            <div className="pointer-events-none fixed bottom-4 right-4 z-[80] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3">
+              {toasts.map((toast) => (
+                <Toast key={toast.id} {...toast} onDismiss={dismissToast} />
+              ))}
+            </div>,
+            document.body,
+          )
+        : null}
     </ToastContext.Provider>
   );
 }

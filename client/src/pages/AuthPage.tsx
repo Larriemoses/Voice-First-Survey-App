@@ -1,25 +1,27 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { PublicNav } from "../components/layout/PublicNav";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
-import { signInWithGoogle, signInWithPassword, signUpWithPassword } from "../lib/auth";
+import { signInWithGoogle } from "../lib/auth";
+import { useAuth } from "../hooks/useAuth";
 
 type AuthPageProps = {
   mode: "login" | "signup";
 };
 
 export default function AuthPage({ mode }: AuthPageProps) {
-  const navigate = useNavigate();
-  useParams();
+  const [searchParams] = useSearchParams();
+  const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const isSignup = mode === "signup";
+  const redirectPath = searchParams.get("redirect");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,21 +35,31 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
     try {
       setLoading(true);
-      const result = isSignup
-        ? await signUpWithPassword(email, password)
-        : await signInWithPassword(email, password);
+      if (isSignup) {
+        const result = await signUp({ email, password });
+
+        if (result.error) {
+          setError(result.error);
+          return;
+        }
+
+        if (result.data?.requiresEmailConfirmation) {
+          setMessage("Check your inbox to confirm your email, then sign in.");
+        }
+
+        return;
+      }
+
+      const result = await signIn({
+        email,
+        password,
+        redirectTo: redirectPath,
+      });
 
       if (result.error) {
-        setError(result.error.message);
+        setError(result.error);
         return;
       }
-
-      if (result.data.session) {
-        navigate("/dashboard");
-        return;
-      }
-
-      setMessage("Check your inbox to confirm your email, then sign in.");
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Authentication failed.");
     } finally {
@@ -58,7 +70,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
   async function handleGoogleAuth() {
     setMessage("");
     setError("");
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle(redirectPath);
     if (error) {
       setError(error.message);
     }

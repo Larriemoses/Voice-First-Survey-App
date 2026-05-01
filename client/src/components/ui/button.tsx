@@ -1,10 +1,17 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/helpers";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "link";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "orange"
+  | "gradient";
+
 export type ButtonSize = "sm" | "md" | "lg";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -15,17 +22,30 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "border-primary-500 bg-primary-500 text-white hover:border-primary-600 hover:bg-primary-600",
-  secondary: "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
-  ghost: "border-transparent bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-900",
-  danger: "border-danger bg-danger text-white hover:opacity-90",
-  link: "border-transparent bg-transparent px-0 text-primary-500 hover:text-primary-600",
+  primary:
+    "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
+  secondary:
+    "border-border bg-surface-card text-text-primary hover:border-border-strong hover:bg-surface-muted",
+  ghost:
+    "border-transparent bg-transparent text-text-secondary hover:bg-surface-muted hover:text-text-primary",
+  danger:
+    "border-status-danger bg-status-danger text-text-inverse hover:opacity-95",
+  orange:
+    "border-brand-orange bg-brand-orange text-text-inverse hover:border-brand-orange-dark hover:bg-brand-orange-dark",
+  gradient:
+    "border-transparent bg-[linear-gradient(135deg,#F97316,#C2410C)] text-text-inverse hover:opacity-95",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "h-7 px-3 text-sm",
-  md: "h-9 px-4 text-base",
-  lg: "h-11 px-5 text-base",
+  sm: "h-[30px] min-w-[30px] px-3 text-sm",
+  md: "h-[38px] min-w-[38px] px-4 text-base",
+  lg: "h-[46px] min-w-[46px] px-5 text-base",
+};
+
+const iconOnlySizeClasses: Record<ButtonSize, string> = {
+  sm: "h-[30px] w-[30px] p-0",
+  md: "h-[38px] w-[38px] p-0",
+  lg: "h-[46px] w-[46px] p-0",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -53,9 +73,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md border font-medium leading-none disabled:cursor-not-allowed disabled:opacity-55",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md border font-medium leading-[1.4] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60",
         variantClasses[variant],
-        iconOnly ? "h-9 w-9 p-0" : sizeClasses[size],
+        iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         className,
       )}
       disabled={isDisabled}
@@ -64,12 +84,28 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...props}
     >
       {loading ? (
-        <span className="h-3 w-12 rounded-full bg-white/40 skeleton-pulse" aria-hidden />
+        <>
+          <span
+            className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current/30 border-t-current"
+            aria-hidden
+          />
+          <span className={iconOnly ? "sr-only" : "truncate"}>Loading...</span>
+        </>
       ) : (
-        leadingIcon
+        <>
+          {leadingIcon ? (
+            <span className="shrink-0" aria-hidden>
+              {leadingIcon}
+            </span>
+          ) : null}
+          <span className={iconOnly ? "sr-only" : "truncate"}>{children}</span>
+          {!iconOnly && trailingIcon ? (
+            <span className="shrink-0" aria-hidden>
+              {trailingIcon}
+            </span>
+          ) : null}
+        </>
       )}
-      <span className={iconOnly ? "sr-only" : "truncate"}>{children}</span>
-      {!loading && !iconOnly ? trailingIcon : null}
     </button>
   );
 });

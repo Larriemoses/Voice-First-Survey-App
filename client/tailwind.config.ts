@@ -3,29 +3,46 @@ import type { Config } from "tailwindcss";
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    screens: {
+      xs: "320px",
+      sm: "480px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1440px",
+    },
     extend: {
       colors: {
-        primary: {
-          50: "#EEF4FF",
-          100: "#DCE8FF",
-          200: "#B8CCFF",
-          400: "#5F86FF",
-          500: "#2457F5",
-          600: "#1D46D8",
-          700: "#1736A8",
-          900: "#101A59",
+        brand: {
+          blue: "#1A56DB",
+          "blue-dark": "#1342B0",
+          "blue-light": "#EBF2FF",
+          orange: "#F97316",
+          "orange-dark": "#C2410C",
+          "orange-light": "#FFF4ED",
         },
-        accent: {
-          50: "#FFF5ED",
-          100: "#FFE5D2",
-          400: "#FF9452",
-          500: "#FF6B1A",
-          600: "#F05A0B",
-          700: "#B93F05",
+        surface: {
+          page: "#F8FAFC",
+          card: "#FFFFFF",
+          muted: "#F1F5F9",
+          overlay: "rgba(15,23,42,0.5)",
         },
-        success: "#10B981",
-        warning: "#F59E0B",
-        danger: "#EF4444",
+        text: {
+          primary: "#0F172A",
+          secondary: "#475569",
+          hint: "#94A3B8",
+          inverse: "#FFFFFF",
+        },
+        border: {
+          DEFAULT: "#E2E8F0",
+          strong: "#CBD5E1",
+          focus: "#1A56DB",
+        },
+        status: {
+          success: "#10B981",
+          warning: "#F59E0B",
+          danger: "#EF4444",
+        },
       },
       fontFamily: {
         sans: [
@@ -47,14 +64,21 @@ export default {
         "3xl": "36px",
       },
       borderRadius: {
-        sm: "6px",
+        sm: "4px",
         md: "8px",
         lg: "12px",
         xl: "16px",
+        "2xl": "20px",
+        full: "9999px",
       },
       boxShadow: {
-        sm: "0 1px 2px rgba(0,0,0,0.05)",
-        md: "0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06)",
+        sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
+        md: "0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06)",
+        lg: "0 12px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04)",
+        focus: "0 0 0 3px rgba(26, 86, 219, 0.18)",
+      },
+      maxWidth: {
+        content: "1440px",
       },
     },
   },

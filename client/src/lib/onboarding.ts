@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { getMyOrganizationMembership } from "./organization";
+import { getOrganizationByOwnerId, type Organization } from "./organization";
 
 function toSlug(value: string) {
   return value
@@ -10,48 +10,66 @@ function toSlug(value: string) {
     .replace(/-+/g, "-");
 }
 
-export async function createOrganization(input: {
+type CreateOrganizationInput = {
   name: string;
   slug?: string;
-}) {
-  const existingMembership = await getMyOrganizationMembership();
+};
 
-  if (existingMembership?.organization) {
-    throw new Error("You already belong to an organization.");
+type OrganizationInsertRow = {
+  id: string;
+  name: string;
+  slug: string | null;
+  owner_id: string | null;
+  created_at: string | null;
+};
+
+function mapOrganization(row: OrganizationInsertRow): Organization {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    ownerId: row.owner_id,
+    createdAt: row.created_at,
+  };
+}
+
+export async function createOrganization(
+  input: CreateOrganizationInput,
+): Promise<Organization> {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
   }
-
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError) throw userError;
-  const user = userData.user;
 
   if (!user) {
     throw new Error("You must be logged in.");
   }
 
+  const existingOrganization = await getOrganizationByOwnerId(user.id);
+
+  if (existingOrganization) {
+    throw new Error("You already own an organization.");
+  }
+
   const finalSlug = toSlug(input.slug || input.name);
 
-  const { data: organization, error: orgError } = await supabase
+  const { data, error } = await supabase
     .from("organizations")
     .insert({
-      name: input.name,
+      name: input.name.trim(),
       slug: finalSlug,
-      owner_user_id: user.id,
+      owner_id: user.id,
     })
-    .select()
-    .single();
+    .select("id, name, slug, owner_id, created_at")
+    .single<OrganizationInsertRow>();
 
-  if (orgError) throw orgError;
+  if (error) {
+    throw error;
+  }
 
-  const { error: memberError } = await supabase
-    .from("organization_members")
-    .insert({
-      organization_id: organization.id,
-      user_id: user.id,
-      role: "owner",
-    });
-
-  if (memberError) throw memberError;
-
-  return organization;
+  return mapOrganization(data);
 }

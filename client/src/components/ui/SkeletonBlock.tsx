@@ -1,21 +1,22 @@
 import { cn } from "../../utils/helpers";
 
-type SkeletonBlockProps = {
+export type SkeletonBlockProps = {
   className?: string;
   width?: string;
   height?: string;
 };
 
-export function SkeletonBlock({ className, width, height }: SkeletonBlockProps) {
-  const sizeClass = width || height ? "min-h-4" : "h-4 w-full";
-
+export function SkeletonBlock({
+  className,
+  width,
+  height,
+}: SkeletonBlockProps) {
   return (
     <div
       className={cn(
-        "rounded-md bg-gray-100 skeleton-pulse",
-        sizeClass,
-        width,
-        height,
+        "survica-skeleton rounded-md bg-surface-muted",
+        width ?? "w-full",
+        height ?? "h-4",
         className,
       )}
       aria-hidden

@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { Card } from "./Card";
+import { cn } from "../../utils/helpers";
 
-type EmptyStateProps = {
+export type EmptyStateProps = {
   icon?: ReactNode;
   title: string;
   description: string;
   action?: ReactNode;
+  className?: string;
 };
 
 export function EmptyState({
@@ -13,21 +15,26 @@ export function EmptyState({
   title,
   description,
   action,
+  className,
 }: EmptyStateProps) {
   return (
-    <Card className="py-10 text-center sm:py-12" variant="flat">
+    <Card
+      variant="muted"
+      className={cn(
+        "flex flex-col items-center justify-center gap-4 py-10 text-center sm:py-12",
+        className,
+      )}
+    >
       {icon ? (
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--accent)]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-brand-blue">
           {icon}
         </div>
       ) : null}
-      <h3 className="mt-4 text-lg font-semibold text-[var(--text)] sm:text-xl">
-        {title}
-      </h3>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-muted)]">
-        {description}
-      </p>
-      {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
+      <div className="space-y-2">
+        <h3 className="text-lg font-medium text-text-primary">{title}</h3>
+        <p className="max-w-md text-base text-text-secondary">{description}</p>
+      </div>
+      {action ? <div className="pt-1">{action}</div> : null}
     </Card>
   );
 }

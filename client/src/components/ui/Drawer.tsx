@@ -1,15 +1,19 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { getFocusableElements } from "../../utils/helpers";
+import { cn, getFocusableElements } from "../../utils/helpers";
 
-type DrawerProps = {
+const TRANSITION_MS = 200;
+
+export type DrawerProps = {
   open: boolean;
   onClose: () => void;
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
+  className?: string;
+  contentClassName?: string;
 };
 
 export function Drawer({
@@ -19,51 +23,141 @@ export function Drawer({
   description,
   children,
   footer,
+  className,
+  contentClassName,
 }: DrawerProps) {
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(open);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const previousActiveRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
-    if (!open || !panelRef.current) return;
+    if (open) {
+      previousActiveRef.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      setMounted(true);
+      const frame = window.requestAnimationFrame(() => setVisible(true));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    setVisible(false);
+    const timeout = window.setTimeout(() => setMounted(false), TRANSITION_MS);
+    return () => window.clearTimeout(timeout);
+  }, [open]);
+
+  useEffect(() => {
+    if (!mounted || !panelRef.current) {
+      return undefined;
+    }
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    getFocusableElements(panelRef.current)[0]?.focus();
+
+    const focusTimer = window.setTimeout(() => {
+      const focusable = getFocusableElements(panelRef.current as HTMLElement);
+      (focusable[0] ?? panelRef.current)?.focus();
+    }, 0);
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panelRef.current) {
+        return;
+      }
+
+      const focusable = getFocusableElements(panelRef.current);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        panelRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     }
 
     document.addEventListener("keydown", handleKeyDown);
+
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
+      previousActiveRef.current?.focus();
     };
-  }, [onClose, open]);
+  }, [mounted, onClose]);
 
-  if (!open) return null;
+  if (!mounted || typeof document === "undefined") {
+    return null;
+  }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 bg-gray-900/35">
-      <button type="button" className="absolute inset-0 cursor-default" aria-label="Close drawer overlay" onClick={onClose} />
+    <div
+      className={cn(
+        "fixed inset-0 z-[70] flex justify-end bg-surface-overlay transition-opacity duration-200",
+        visible ? "opacity-100" : "opacity-0",
+      )}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-xl border border-gray-200 bg-white shadow-md motion-safe:animate-[fade-in_200ms_ease] sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[360px] sm:rounded-none"
+        aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
+        tabIndex={-1}
+        className={cn(
+          "flex h-full w-full max-w-[360px] flex-col border-l border-border bg-surface-card shadow-lg outline-none transition-transform duration-200",
+          visible ? "translate-x-0" : "translate-x-full",
+          className,
+        )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
           <div className="min-w-0">
-            <h2 className="text-lg font-medium text-gray-900">{title}</h2>
-            {description ? <p className="mt-1 text-sm text-gray-500">{description}</p> : null}
+            <h2 id={titleId} className="text-lg font-medium text-text-primary">
+              {title}
+            </h2>
+            {description ? (
+              <div
+                id={descriptionId}
+                className="mt-1 text-sm text-text-secondary"
+              >
+                {description}
+              </div>
+            ) : null}
           </div>
-          <button type="button" onClick={onClose} className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Close drawer">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-2 text-text-hint transition-colors duration-150 hover:bg-surface-muted hover:text-text-primary"
+            aria-label="Close drawer"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
-        {footer ? <div className="border-t border-gray-200 px-5 py-4">{footer}</div> : null}
+        <div className={cn("flex-1 overflow-y-auto p-5", contentClassName)}>
+          {children}
+        </div>
+        {footer ? <div className="border-t border-border px-5 py-4">{footer}</div> : null}
       </div>
     </div>,
     document.body,
