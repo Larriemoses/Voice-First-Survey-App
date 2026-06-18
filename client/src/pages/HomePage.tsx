@@ -658,7 +658,7 @@ function FaqItem({
 
 function HeroMockup() {
   return (
-    <div className="mx-auto mt-14 w-full max-w-[940px] overflow-hidden rounded-xl border border-border bg-surface-card shadow-lg">
+    <div className="relative mx-auto mt-14 w-full max-w-[980px] overflow-hidden rounded-[24px] border border-white/80 bg-surface-card shadow-[0_32px_80px_rgba(55,48,163,0.18)]">
       <div className="flex h-9 items-center justify-between border-b border-border bg-white px-3">
         <div className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-brand-blue" />
@@ -712,7 +712,7 @@ function HeroMockup() {
                   <YAxis hide />
                   <Bar
                     dataKey="count"
-                    fill="#1A56DB"
+                    fill="#4F46E5"
                     radius={[3, 3, 0, 0]}
                     isAnimationActive={false}
                   />
@@ -827,31 +827,33 @@ export default function HomePage() {
         />
 
         <main>
-          <section className="relative overflow-hidden bg-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle,_#E2E8F0_1px,_transparent_1px)] [background-size:24px_24px]" />
-            <div className="relative mx-auto max-w-[1100px] px-6 pb-16 pt-24 sm:px-8 lg:px-10">
-              <div className="mx-auto max-w-[640px] text-center">
-                <span className="inline-flex rounded-full bg-brand-orange-light px-[14px] py-1 text-xs text-brand-orange">
-                  ✦ Now with AI analytics — built for African markets
+          <section className="relative overflow-hidden bg-[linear-gradient(180deg,#FFFFFF_0%,#F4F2FF_72%,#F7F7FB_100%)]">
+            <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-brand-orange/10 blur-3xl" />
+            <div className="absolute -right-24 top-0 h-[420px] w-[420px] rounded-full bg-brand-blue/15 blur-3xl" />
+            <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle,_#C9C7EC_1px,_transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
+            <div className="relative mx-auto max-w-[1180px] px-6 pb-20 pt-24 sm:px-8 sm:pt-28 lg:px-10">
+              <div className="mx-auto max-w-[780px] text-center">
+                <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/20 bg-white/80 px-4 py-2 text-xs font-semibold text-brand-orange shadow-sm backdrop-blur">
+                  <Sparkles className="h-3.5 w-3.5" /> Built for real voices, not checkbox answers
                 </span>
-                <h1 className="mt-6 text-[30px] font-medium leading-[1.15] tracking-[-0.5px] text-text-primary sm:text-[44px]">
-                  <span className="block">Collect spoken feedback.</span>
-                  <span className="block">Get structured insight.</span>
+                <h1 className="mt-7 text-[42px] font-semibold leading-[1.02] tracking-[-0.055em] text-text-primary sm:text-[64px] lg:text-[74px]">
+                  <span className="block">Hear the whole story.</span>
+                  <span className="mt-2 block bg-[linear-gradient(90deg,#4F46E5_10%,#7C3AED_55%,#F05A3C_100%)] bg-clip-text text-transparent">Understand what matters.</span>
                 </h1>
-                <p className="mx-auto mt-5 max-w-[520px] text-[15px] leading-[1.75] text-text-secondary sm:text-[17px]">
-                  Survica lets your customers, employees, and communities speak their minds — then automatically turns those voice responses into transcripts, sentiment scores, themes, and board-ready insight reports. No typing. No login. No friction.
+                <p className="mx-auto mt-7 max-w-[650px] text-base leading-8 text-text-secondary sm:text-lg">
+                  Ask better questions, collect natural voice responses, and let Survica turn every conversation into clear themes, sentiment, and shareable insight.
                 </p>
 
                 <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
                   <Button
-                    variant="gradient"
+                    variant="primary"
                     size="lg"
                     onClick={() => navigate("/signup")}
                     aria-label="Create your free Survica account"
                     title="Create your free Survica account — no card required"
                     className="w-full sm:w-auto"
                   >
-                    Start for free
+                    Create your first survey
                   </Button>
                   <Button
                     variant="secondary"
@@ -861,15 +863,15 @@ export default function HomePage() {
                     title="Jump to the how it works section"
                     className="w-full sm:w-auto"
                   >
-                    See how it works →
+                    Watch how it works →
                   </Button>
                 </div>
 
-                <p className="mt-4 text-xs tracking-[0.2px] text-text-hint">
-                  No credit card required · Set up in 2 minutes · Free plan available
+                <p className="mt-5 text-xs tracking-[0.2px] text-text-hint">
+                  Free to start · No respondent login · Publish in minutes
                 </p>
 
-                <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
                   <div className="flex items-center gap-1.5 text-xs text-text-hint">
                     <ShieldCheck className="h-3 w-3 text-brand-blue" />
                     <span>GDPR-ready</span>

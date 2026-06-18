@@ -14,29 +14,29 @@ export default {
     extend: {
       colors: {
         brand: {
-          blue: "#1A56DB",
-          "blue-dark": "#1342B0",
-          "blue-light": "#EBF2FF",
-          orange: "#F97316",
-          "orange-dark": "#C2410C",
-          "orange-light": "#FFF4ED",
+          blue: "#4F46E5",
+          "blue-dark": "#3730A3",
+          "blue-light": "#EEF2FF",
+          orange: "#F05A3C",
+          "orange-dark": "#C2412D",
+          "orange-light": "#FFF1ED",
         },
         surface: {
-          page: "#F8FAFC",
+          page: "#F7F7FB",
           card: "#FFFFFF",
-          muted: "#F1F5F9",
+          muted: "#F0F1F7",
           overlay: "rgba(15,23,42,0.5)",
         },
         text: {
-          primary: "#0F172A",
-          secondary: "#475569",
-          hint: "#94A3B8",
+          primary: "#17172B",
+          secondary: "#5C5E71",
+          hint: "#9294A7",
           inverse: "#FFFFFF",
         },
         border: {
-          DEFAULT: "#E2E8F0",
-          strong: "#CBD5E1",
-          focus: "#1A56DB",
+        DEFAULT: "#E3E4EC",
+          strong: "#CACBD8",
+          focus: "#4F46E5",
         },
         status: {
           success: "#10B981",

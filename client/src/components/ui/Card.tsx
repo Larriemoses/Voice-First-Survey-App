@@ -9,7 +9,7 @@ export type CardProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 const variants: Record<CardVariant, string> = {
-  default: "border-border bg-surface-card",
+  default: "border-border/90 bg-surface-card",
   elevated: "border-border bg-surface-card shadow-md",
   flat: "border-border bg-surface-card",
   muted: "border-transparent bg-surface-muted",
@@ -25,9 +25,9 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-lg border p-5 text-text-primary transition-shadow duration-150",
+        "rounded-xl border p-5 text-text-primary shadow-[0_1px_2px_rgba(30,30,70,0.025)] transition-all duration-200",
         variants[variant],
-        hoverable && variant !== "muted" ? "hover:shadow-sm" : "",
+        hoverable && variant !== "muted" ? "hover:-translate-y-0.5 hover:border-brand-blue/15 hover:shadow-md" : "",
         className,
       )}
       {...props}
