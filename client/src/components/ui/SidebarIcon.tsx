@@ -19,9 +19,9 @@ export function SidebarIcon({
     <Tooltip content={tooltip} side="right">
       <span
         className={cn(
-          "inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors duration-150",
+          "inline-flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-150",
           active
-            ? "bg-brand-blue-light text-brand-blue"
+            ? "bg-[#111111] text-white"
             : "text-text-hint hover:bg-surface-muted hover:text-text-secondary",
           className,
         )}

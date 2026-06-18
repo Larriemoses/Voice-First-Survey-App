@@ -78,8 +78,57 @@ export async function signInWithGoogle(redirectPath?: string | null) {
     provider: "google",
     options: {
       redirectTo: buildRedirectUrl(`/auth-check${query}`),
+      queryParams: {
+        prompt: "select_account",
+      },
     },
   });
+}
+
+export async function completeAuthRedirect(search: string) {
+  const params = new URLSearchParams(search);
+  const providerError = params.get("error_description") || params.get("error");
+
+  if (providerError) {
+    throw new Error(providerError);
+  }
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    throw sessionError;
+  }
+
+  if (sessionData.session) {
+    return sessionData.session;
+  }
+
+  const code = params.get("code");
+
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      throw error;
+    }
+
+    return data.session;
+  }
+
+  const tokenHash = params.get("token_hash");
+  const type = params.get("type");
+
+  if (tokenHash && type) {
+    const { data, error } = await verifyEmailOtp(tokenHash, type);
+
+    if (error) {
+      throw error;
+    }
+
+    return data.session;
+  }
+
+  throw new Error("This sign-in link is invalid or has expired.");
 }
 
 export function isGoogleOAuthEnabled() {

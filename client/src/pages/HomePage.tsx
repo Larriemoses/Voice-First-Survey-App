@@ -22,21 +22,13 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { TopNav } from "@/components/layout/TopNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/Card";
-import { ChartCard } from "@/components/ui/ChartCard";
-import { SkeletonBlock } from "@/components/ui/SkeletonBlock";
 import { Toggle } from "@/components/ui/Toggle";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { BRAND_LOGO_URL } from "@/lib/branding";
 import { cn } from "@/utils/helpers";
 
 type PricingFeature = {
@@ -60,16 +52,6 @@ type PricingPlan = {
   mobileOrderClassName?: string;
   buttonAriaLabel?: string;
 };
-
-const heroChartData = [
-  { day: "Mon", count: 8 },
-  { day: "Tue", count: 14 },
-  { day: "Wed", count: 11 },
-  { day: "Thu", count: 19 },
-  { day: "Fri", count: 24 },
-  { day: "Sat", count: 17 },
-  { day: "Sun", count: 21 },
-];
 
 const howItWorksCards: Array<{
   step: string;
@@ -657,108 +639,62 @@ function FaqItem({
 }
 
 function HeroMockup() {
+  const pins = [
+    {
+      label: "Customer love",
+      quote: "The delivery was faster than I expected, and the support felt genuinely human.",
+      meta: "42 voice responses",
+      tone: "bg-[#ffd9dc]",
+      height: "min-h-[250px]",
+    },
+    {
+      label: "Top theme",
+      quote: "People keep mentioning how easy the new experience feels.",
+      meta: "Positive · 86%",
+      tone: "bg-[#dcefe7]",
+      height: "min-h-[190px]",
+    },
+    {
+      label: "AI summary",
+      quote: "Speed, support quality, and simple onboarding are driving satisfaction this week.",
+      meta: "Updated 2m ago",
+      tone: "bg-[#fff0c9]",
+      height: "min-h-[230px]",
+    },
+    {
+      label: "Needs attention",
+      quote: "A few customers want clearer pricing before they commit.",
+      meta: "8 related responses",
+      tone: "bg-[#e6e0ff]",
+      height: "min-h-[180px]",
+    },
+  ];
+
   return (
-    <div className="relative mx-auto mt-14 w-full max-w-[980px] overflow-hidden rounded-[24px] border border-white/80 bg-surface-card shadow-[0_32px_80px_rgba(55,48,163,0.18)]">
-      <div className="flex h-9 items-center justify-between border-b border-border bg-white px-3">
-        <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-brand-blue" />
-          <span className="text-xs font-medium text-brand-blue">survica</span>
+    <div className="relative mx-auto mt-14 w-full max-w-[1020px] overflow-hidden rounded-[32px] bg-[#111111] p-4 shadow-[0_32px_80px_rgba(0,0,0,0.2)] sm:p-6">
+      <div className="mb-5 flex items-center justify-between gap-3 px-1 text-white">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Live insight board</p>
+          <p className="mt-1 text-lg font-semibold">What customers are saying</p>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-slate-200" />
-          <span className="h-2 w-2 rounded-full bg-slate-200" />
-          <span className="h-2 w-2 rounded-full bg-slate-200" />
-        </div>
-        <div className="flex items-center gap-2">
-          <SkeletonBlock className="h-2.5 w-10 rounded-full" />
-          <SkeletonBlock className="h-2.5 w-8 rounded-full" />
-        </div>
+        <span className="rounded-full bg-brand-blue px-4 py-2 text-xs font-semibold">128 responses</span>
       </div>
-
-      <div className="flex h-[220px] md:h-[320px]">
-        <div className="flex w-9 flex-col items-center justify-between border-r border-border bg-white py-3">
-          <span className="h-2.5 w-2.5 rounded-sm bg-brand-blue" />
-          <span className="h-2.5 w-2.5 rounded-sm bg-surface-muted" />
-          <span className="h-2.5 w-2.5 rounded-sm bg-surface-muted" />
-          <span className="h-2.5 w-2.5 rounded-sm bg-surface-muted" />
-        </div>
-        <div className="flex-1 overflow-hidden bg-surface-page p-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <MockMetricCard
-              label="Total responses"
-              value="128"
-              sub="+14 this week"
-              subClassName="text-status-success"
-            />
-            <MockMetricCard
-              label="Completion rate"
-              value="84%"
-              sub="↑ above avg"
-              subClassName="text-status-success"
-            />
-          </div>
-
-          <ChartCard
-            title="Response volume"
-            subtitle="Last 7 days"
-            className="mt-2 overflow-hidden rounded-lg border-border shadow-none"
-            headerClassName="border-b border-border px-3 py-2"
-            contentClassName="px-3 py-2"
+      <div className="columns-2 gap-3 md:columns-4">
+        {pins.map((pin) => (
+          <article
+            key={pin.label}
+            className={cn("mb-3 flex break-inside-avoid flex-col justify-between rounded-[24px] p-4 text-left", pin.tone, pin.height)}
           >
-            <div className="h-[120px]">
-              <ResponsiveContainer width="100%" height={120}>
-                <BarChart data={heroChartData}>
-                  <XAxis dataKey="day" hide />
-                  <YAxis hide />
-                  <Bar
-                    dataKey="count"
-                    fill="#4F46E5"
-                    radius={[3, 3, 0, 0]}
-                    isAnimationActive={false}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <span className="w-fit rounded-full bg-white/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-primary">
+              {pin.label}
+            </span>
+            <div>
+              <p className="text-sm font-semibold leading-6 text-text-primary sm:text-base">“{pin.quote}”</p>
+              <p className="mt-3 text-xs text-text-secondary">{pin.meta}</p>
             </div>
-          </ChartCard>
-
-          <div className="mt-2 hidden rounded-lg border-l-2 border-brand-orange bg-brand-orange-light p-2.5 sm:block">
-            <p className="text-[10px] font-medium text-brand-orange">✦ AI Summary</p>
-            <p className="mt-1 text-[11px] leading-4 text-text-primary">
-              Respondents highlighted fast delivery and friendly support as top themes.
-            </p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {["Fast delivery", "Support quality", "Pricing"].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full bg-brand-orange px-2 py-0.5 text-[10px] text-white"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+          </article>
+        ))}
       </div>
-    </div>
-  );
-}
-
-function MockMetricCard({
-  label,
-  value,
-  sub,
-  subClassName,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  subClassName?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-border bg-white p-2.5">
-      <p className="text-[10px] uppercase tracking-[0.14em] text-text-hint">{label}</p>
-      <p className="mt-1 text-lg font-medium text-text-primary">{value}</p>
-      <p className={cn("mt-1 text-[10px]", subClassName)}>{sub}</p>
     </div>
   );
 }
@@ -827,10 +763,10 @@ export default function HomePage() {
         />
 
         <main>
-          <section className="relative overflow-hidden bg-[linear-gradient(180deg,#FFFFFF_0%,#F4F2FF_72%,#F7F7FB_100%)]">
+          <section className="relative overflow-hidden bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF5F6_72%,#FFFFFF_100%)]">
             <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-brand-orange/10 blur-3xl" />
-            <div className="absolute -right-24 top-0 h-[420px] w-[420px] rounded-full bg-brand-blue/15 blur-3xl" />
-            <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle,_#C9C7EC_1px,_transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
+            <div className="absolute -right-24 top-0 h-[420px] w-[420px] rounded-full bg-brand-blue/10 blur-3xl" />
+            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle,_#E5C7CC_1px,_transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
             <div className="relative mx-auto max-w-[1180px] px-6 pb-20 pt-24 sm:px-8 sm:pt-28 lg:px-10">
               <div className="mx-auto max-w-[780px] text-center">
                 <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/20 bg-white/80 px-4 py-2 text-xs font-semibold text-brand-orange shadow-sm backdrop-blur">
@@ -838,7 +774,7 @@ export default function HomePage() {
                 </span>
                 <h1 className="mt-7 text-[42px] font-semibold leading-[1.02] tracking-[-0.055em] text-text-primary sm:text-[64px] lg:text-[74px]">
                   <span className="block">Hear the whole story.</span>
-                  <span className="mt-2 block bg-[linear-gradient(90deg,#4F46E5_10%,#7C3AED_55%,#F05A3C_100%)] bg-clip-text text-transparent">Understand what matters.</span>
+                  <span className="mt-2 block text-brand-blue">Understand what matters.</span>
                 </h1>
                 <p className="mx-auto mt-7 max-w-[650px] text-base leading-8 text-text-secondary sm:text-lg">
                   Ask better questions, collect natural voice responses, and let Survica turn every conversation into clear themes, sentiment, and shareable insight.
@@ -1233,7 +1169,9 @@ export default function HomePage() {
           <div className="mx-auto max-w-[1280px]">
             <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4 xl:gap-12">
               <div className="text-center md:text-left">
-                <img src="/logo-white.svg" alt="Survica" className="mx-auto mb-4 h-7 w-auto md:mx-0" />
+                <div className="mx-auto mb-4 w-fit rounded-full bg-white px-4 py-2 md:mx-0">
+                  <img src={BRAND_LOGO_URL} alt="Survica" className="h-7 w-auto" />
+                </div>
                 <p className="mx-auto max-w-[200px] text-[13px] leading-[1.7] text-[#94A3B8] md:mx-0">
                   Voice surveys. AI insights. Built for Africa and beyond.
                 </p>

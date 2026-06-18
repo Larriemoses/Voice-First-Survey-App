@@ -6,8 +6,8 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { SkeletonBlock } from "../../components/ui/SkeletonBlock";
 import { useToast } from "../../components/ui/Toast";
 import {
+  completeAuthRedirect,
   resendSignupConfirmationEmail,
-  verifyEmailOtp,
 } from "../../lib/auth";
 import { AuthShell } from "./AuthShell";
 import { mapAuthErrorMessage } from "./auth.utils";
@@ -24,23 +24,12 @@ export default function AuthConfirmPage() {
   const [resendMessage, setResendMessage] = useState("");
 
   const email = useMemo(() => searchParams.get("email"), [searchParams]);
-  const tokenHash = searchParams.get("token_hash");
-  const type = searchParams.get("type");
-
   useEffect(() => {
     let active = true;
 
     async function confirmEmail() {
       try {
-        if (!tokenHash || !type) {
-          throw new Error("This confirmation link is missing required details.");
-        }
-
-        const { error } = await verifyEmailOtp(tokenHash, type);
-
-        if (error) {
-          throw error;
-        }
+        await completeAuthRedirect(window.location.search);
 
         showToast({
           title: "Email confirmed",
@@ -48,7 +37,7 @@ export default function AuthConfirmPage() {
           variant: "success",
         });
 
-        navigate("/dashboard", { replace: true });
+        navigate("/auth-check", { replace: true });
       } catch (caughtError) {
         if (active) {
           setError(
@@ -69,7 +58,7 @@ export default function AuthConfirmPage() {
     return () => {
       active = false;
     };
-  }, [navigate, showToast, tokenHash, type]);
+  }, [navigate, showToast]);
 
   async function handleResend() {
     if (!email) {

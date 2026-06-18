@@ -86,16 +86,16 @@ export function Sidebar() {
   const { pathname } = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[52px] border-r border-border bg-surface-card md:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[72px] bg-surface-card md:flex">
       <div className="flex h-full w-full flex-col">
         <Link
           to="/"
-          className="flex h-[52px] items-center justify-center border-b border-border"
+          className="flex h-[72px] items-center justify-center"
           aria-label="Survica home"
         >
-          <AppLogo markOnly className="h-5" imageClassName="max-w-5" />
+          <AppLogo markOnly className="h-9" imageClassName="max-w-9 rounded-full" />
         </Link>
-        <nav className="flex flex-1 flex-col items-center justify-between py-3">
+        <nav className="flex flex-1 flex-col items-center justify-between py-4">
           <div className="flex flex-col gap-2">
             {middleItems.map((item) => {
               const href =

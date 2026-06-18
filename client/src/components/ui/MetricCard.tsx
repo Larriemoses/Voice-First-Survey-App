@@ -22,7 +22,7 @@ export function MetricCard({
   const TrendIcon = trendDirection === "up" ? TrendingUp : TrendingDown;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-xl border border-border/80 bg-white px-5 py-5 shadow-sm before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-[linear-gradient(90deg,#4F46E5,#8B5CF6,#F05A3C)]", className)}>
+    <div className={cn("relative overflow-hidden rounded-[24px] bg-surface-muted px-5 py-5 transition-transform duration-200 hover:-translate-y-1 before:absolute before:inset-x-0 before:top-0 before:h-1.5 before:bg-[linear-gradient(90deg,#E60023,#FF5A5F,#FFB3B8)]", className)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm text-text-secondary">{label}</p>
         {trend ? (

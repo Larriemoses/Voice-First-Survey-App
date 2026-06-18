@@ -40,7 +40,7 @@ export function Input({
       ) : null}
       <div
         className={cn(
-          "flex h-[38px] items-center gap-2 rounded-md border bg-surface-card px-3 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
+          "flex h-12 items-center gap-2 rounded-2xl border-2 bg-surface-card px-4 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
           error
             ? "border-status-danger focus-within:border-status-danger"
             : "border-border focus-within:border-border-focus focus-within:shadow-focus",

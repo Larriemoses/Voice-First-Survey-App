@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/helpers";
 import { useToast } from "@/hooks/useToast";
+import { BRAND_LOGO_URL } from "@/lib/branding";
 
 type RecordState = "idle" | "recording" | "recorded";
 
@@ -84,7 +85,7 @@ function buildPublicSurvey(slug?: string): PublicSurveyDefinition {
   return {
     companyName: fallbackCompany,
     surveyLabel: `${formatted} survey`,
-    logoSrc: resolvedSlug.includes("survica") ? "/logo.svg" : null,
+    logoSrc: resolvedSlug.includes("survica") ? BRAND_LOGO_URL : null,
     redirectUrl: resolvedSlug.includes("redirect")
       ? "https://survica.vercel.app"
       : null,
@@ -458,8 +459,8 @@ export default function PublicSurveyPage() {
 
   if (submitted) {
     return (
-      <main className="min-h-screen bg-surface-page px-4 py-6 md:flex md:items-center md:justify-center md:p-8">
-        <div className="w-full max-w-[480px] rounded-[24px] border border-border bg-surface-card shadow-lg">
+      <main className="min-h-screen bg-[#f3f3f3] px-4 py-6 md:flex md:items-center md:justify-center md:p-8">
+        <div className="w-full max-w-[520px] rounded-[32px] bg-surface-card shadow-lg">
           <div className="flex flex-col items-center px-6 py-10 text-center md:px-8 md:py-12">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
               {survey.logoSrc ? (
@@ -495,11 +496,11 @@ export default function PublicSurveyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-surface-page px-0 md:flex md:items-center md:justify-center md:bg-[radial-gradient(circle_at_top,#ffffff_0%,#f8fafc_55%,#eef4ff_100%)] md:p-6">
-      <div className="flex min-h-screen w-full max-w-[480px] flex-col bg-surface-card md:min-h-[760px] md:overflow-hidden md:rounded-[28px] md:border md:border-border md:shadow-lg">
-        <header className="border-b border-border bg-surface-card px-5 py-4 md:px-6">
+    <main className="min-h-screen bg-[#f3f3f3] px-0 md:flex md:items-center md:justify-center md:bg-[radial-gradient(circle_at_top_left,#ffd9dc_0%,transparent_32%),radial-gradient(circle_at_bottom_right,#dcefe7_0%,transparent_35%),#f3f3f3] md:p-6">
+      <div className="flex min-h-screen w-full max-w-[540px] flex-col bg-surface-card md:min-h-[760px] md:overflow-hidden md:rounded-[36px] md:shadow-lg">
+        <header className="bg-surface-card px-5 py-5 md:px-7">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
               {survey.logoSrc ? (
                 <img src={survey.logoSrc} alt={survey.companyName} className="h-7 w-auto object-contain" />
               ) : (
@@ -515,28 +516,28 @@ export default function PublicSurveyPage() {
           </div>
         </header>
 
-        <div className="border-b border-border px-5 py-3 md:px-6">
+        <div className="px-5 py-3 md:px-7">
           <div className="mb-2 flex items-center justify-between text-xs text-text-secondary">
             <span>
               Question {currentIndex + 1} of {survey.questions.length}
             </span>
             <span>{progressPercent}%</span>
           </div>
-          <div className="h-1 rounded-full bg-surface-muted">
+          <div className="h-2 rounded-full bg-surface-muted">
             <div
-              className="h-1 rounded-full bg-brand-blue transition-[width] duration-300 ease-in-out"
+              className="h-2 rounded-full bg-brand-blue transition-[width] duration-300 ease-in-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
         </div>
 
-        <section className="flex-1 px-5 py-6 md:px-6 md:py-7">
+        <section className="flex-1 px-5 py-7 md:px-7 md:py-8">
           <div className="space-y-5">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 {currentQuestion.required ? <Badge variant="pending">Required</Badge> : null}
               </div>
-              <h1 className="text-[18px] font-medium leading-[1.4] text-text-primary">
+              <h1 className="text-2xl font-semibold leading-[1.25] tracking-[-0.035em] text-text-primary sm:text-[28px]">
                 {currentQuestion.text}
               </h1>
               <p className="text-[13px] leading-[1.7] text-text-secondary">
@@ -544,7 +545,7 @@ export default function PublicSurveyPage() {
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-border bg-surface-muted px-5 py-8 text-center">
+            <div className="rounded-[28px] bg-surface-muted px-5 py-9 text-center">
               {recordState === "recorded" ? (
                 <div className="space-y-4">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-status-success/10 text-status-success">
@@ -577,7 +578,7 @@ export default function PublicSurveyPage() {
                     onMouseDown={handleMouseDown}
                     onTouchStart={handleTouchStart}
                     className={cn(
-                      "relative mx-auto flex h-[72px] w-[72px] items-center justify-center rounded-full text-white transition-colors duration-150",
+                      "relative mx-auto flex h-[88px] w-[88px] items-center justify-center rounded-full text-white shadow-[0_14px_30px_rgba(230,0,35,0.24)] transition-[background-color,transform] duration-150 hover:scale-105 active:scale-95",
                       recordState === "recording"
                         ? "bg-brand-orange-dark"
                         : "bg-brand-orange hover:bg-brand-orange-dark",
@@ -590,7 +591,7 @@ export default function PublicSurveyPage() {
                         <span className="absolute -inset-3 rounded-full border border-brand-orange/30" />
                       </>
                     ) : null}
-                    <Mic className="relative z-10 h-7 w-7" />
+                    <Mic className="relative z-10 h-9 w-9" />
                   </button>
 
                   <div className="space-y-2">
@@ -635,7 +636,7 @@ export default function PublicSurveyPage() {
           </div>
         </section>
 
-        <footer className="sticky bottom-0 mt-auto border-t border-border bg-surface-card px-5 py-3 md:px-6">
+        <footer className="sticky bottom-0 mt-auto bg-surface-card px-5 py-4 md:px-7">
           <div className="grid grid-cols-2 gap-3">
             <Button
               variant="secondary"
