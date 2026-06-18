@@ -3,36 +3,36 @@
 @layer base {
   :root {
     color-scheme: light;
-    --survica-brand-blue: #1a56db;
-    --survica-brand-blue-dark: #1342b0;
-    --survica-brand-blue-light: #ebf2ff;
-    --survica-brand-orange: #f97316;
-    --survica-brand-orange-dark: #c2410c;
-    --survica-brand-orange-light: #fff4ed;
-    --survica-surface-page: #f8fafc;
+    --survica-brand-blue: #4f46e5;
+    --survica-brand-blue-dark: #3730a3;
+    --survica-brand-blue-light: #eef2ff;
+    --survica-brand-orange: #f05a3c;
+    --survica-brand-orange-dark: #c2412d;
+    --survica-brand-orange-light: #fff1ed;
+    --survica-surface-page: #f7f7fb;
     --survica-surface-card: #ffffff;
-    --survica-surface-muted: #f1f5f9;
+    --survica-surface-muted: #f0f1f7;
     --survica-surface-overlay: rgba(15, 23, 42, 0.5);
-    --survica-text-primary: #0f172a;
-    --survica-text-secondary: #475569;
-    --survica-text-hint: #94a3b8;
+    --survica-text-primary: #17172b;
+    --survica-text-secondary: #5c5e71;
+    --survica-text-hint: #9294a7;
     --survica-text-inverse: #ffffff;
-    --survica-border-default: #e2e8f0;
-    --survica-border-strong: #cbd5e1;
-    --survica-border-focus: #1a56db;
+    --survica-border-default: #e3e4ec;
+    --survica-border-strong: #cacbd8;
+    --survica-border-focus: #4f46e5;
     --survica-status-success: #10b981;
     --survica-status-warning: #f59e0b;
     --survica-status-danger: #ef4444;
     --survica-radius-sm: 4px;
-    --survica-radius-md: 8px;
-    --survica-radius-lg: 12px;
-    --survica-radius-xl: 16px;
-    --survica-radius-2xl: 20px;
+    --survica-radius-md: 10px;
+    --survica-radius-lg: 14px;
+    --survica-radius-xl: 18px;
+    --survica-radius-2xl: 24px;
     --survica-radius-full: 9999px;
     --survica-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --survica-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
-    --survica-shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04);
-    --survica-shadow-focus: 0 0 0 3px rgba(26, 86, 219, 0.18);
+    --survica-shadow-md: 0 8px 24px rgba(30, 30, 70, 0.07), 0 2px 6px rgba(30, 30, 70, 0.04);
+    --survica-shadow-lg: 0 24px 60px rgba(35, 32, 90, 0.13), 0 8px 20px rgba(35, 32, 90, 0.06);
+    --survica-shadow-focus: 0 0 0 3px rgba(79, 70, 229, 0.18);
   }
 
   *,
@@ -56,10 +56,11 @@
     font-family:
       -apple-system,
       BlinkMacSystemFont,
+      "Avenir Next",
       "Segoe UI",
       system-ui,
       sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     line-height: 1.6;
     text-rendering: optimizeLegibility;
@@ -78,7 +79,7 @@
   h6 {
     margin: 0;
     font-size: inherit;
-    font-weight: 500;
+    font-weight: 650;
     line-height: 1.2;
     letter-spacing: -0.02em;
   }

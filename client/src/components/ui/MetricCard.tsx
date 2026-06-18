@@ -22,7 +22,7 @@ export function MetricCard({
   const TrendIcon = trendDirection === "up" ? TrendingUp : TrendingDown;
 
   return (
-    <div className={cn("rounded-md bg-surface-muted px-4 py-3.5", className)}>
+    <div className={cn("relative overflow-hidden rounded-xl border border-border/80 bg-white px-5 py-5 shadow-sm before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-[linear-gradient(90deg,#4F46E5,#8B5CF6,#F05A3C)]", className)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm text-text-secondary">{label}</p>
         {trend ? (
@@ -39,10 +39,10 @@ export function MetricCard({
           </span>
         ) : null}
       </div>
-      <p className="mt-2 text-[22px] font-medium leading-none text-text-primary">
+      <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.04em] text-text-primary">
         {value}
       </p>
-      {sub ? <p className="mt-2 text-xs text-text-hint">{sub}</p> : null}
+      {sub ? <p className="mt-3 text-xs leading-5 text-text-hint">{sub}</p> : null}
     </div>
   );
 }

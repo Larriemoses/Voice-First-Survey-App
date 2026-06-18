@@ -23,9 +23,9 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
+    "border-brand-blue bg-brand-blue text-text-inverse shadow-[0_6px_16px_rgba(79,70,229,0.22)] hover:-translate-y-0.5 hover:border-brand-blue-dark hover:bg-brand-blue-dark hover:shadow-[0_10px_24px_rgba(79,70,229,0.26)]",
   secondary:
-    "border-border bg-surface-card text-text-primary hover:border-border-strong hover:bg-surface-muted",
+    "border-border-strong bg-surface-card text-text-primary shadow-sm hover:-translate-y-0.5 hover:border-brand-blue/30 hover:bg-brand-blue-light/40",
   ghost:
     "border-transparent bg-transparent text-text-secondary hover:bg-surface-muted hover:text-text-primary",
   danger:
@@ -33,13 +33,13 @@ const variantClasses: Record<ButtonVariant, string> = {
   orange:
     "border-brand-orange bg-brand-orange text-text-inverse hover:border-brand-orange-dark hover:bg-brand-orange-dark",
   gradient:
-    "border-transparent bg-[linear-gradient(135deg,#F97316,#C2410C)] text-text-inverse hover:opacity-95",
+    "border-transparent bg-[linear-gradient(135deg,#F05A3C,#D9482B)] text-text-inverse shadow-[0_7px_18px_rgba(240,90,60,0.22)] hover:-translate-y-0.5 hover:shadow-[0_11px_28px_rgba(240,90,60,0.28)]",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "h-[30px] min-w-[30px] px-3 text-sm",
-  md: "h-[38px] min-w-[38px] px-4 text-base",
-  lg: "h-[46px] min-w-[46px] px-5 text-base",
+  sm: "h-9 min-w-9 px-3.5 text-sm",
+  md: "h-11 min-w-11 px-5 text-base",
+  lg: "h-12 min-w-12 px-6 text-base",
 };
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md border font-medium leading-[1.4] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border font-semibold leading-[1.4] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
         variantClasses[variant],
         iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         className,

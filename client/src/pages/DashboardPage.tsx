@@ -424,23 +424,30 @@ export default function DashboardPage() {
       {loading ? (
         <DashboardSkeleton />
       ) : (
-        <div className="survica-page-shell py-6">
-          <div className="space-y-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="survica-page-shell py-8 lg:py-10">
+          <div className="space-y-8">
+            <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(125deg,#24205F_0%,#4F46E5_62%,#6D5CE7_100%)] px-6 py-7 text-white shadow-lg sm:px-8 sm:py-9">
+              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full border-[36px] border-white/10" />
+              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-orange/25 blur-2xl" />
+              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h1 className="text-lg font-medium text-text-primary">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Your workspace</p>
+                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
                   {greeting}, {firstName}
                 </h1>
-                <p className="mt-1 text-sm text-text-secondary">
-                  Here's what's happening across your surveys.
+                <p className="mt-2 text-sm text-white/70 sm:text-base">
+                  Your audience is speaking. Here’s the clearest view of what they’re saying.
                 </p>
               </div>
               <Button
                 leadingIcon={<Plus className="h-4 w-4" />}
+                variant="gradient"
+                className="border-white/10"
                 onClick={() => navigate("/dashboard/surveys/new")}
               >
                 New survey
               </Button>
+              </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -476,9 +483,12 @@ export default function DashboardPage() {
               />
             </div>
 
-            <section className="space-y-4">
+            <section className="space-y-5 rounded-2xl border border-border/80 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-lg font-medium text-text-primary">My surveys</h2>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue">Library</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-text-primary">My surveys</h2>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {filters.map((item) => (
                     <Chip
