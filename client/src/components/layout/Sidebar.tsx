@@ -107,7 +107,7 @@ export function Sidebar() {
   const { pathname } = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[232px] border-r border-border bg-surface-card px-4 md:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[232px] bg-surface-card px-4 shadow-sm md:flex">
       <div className="flex h-full w-full flex-col">
         <Link
           to="/"
@@ -142,7 +142,7 @@ export function Sidebar() {
               );
             })}
           </div>
-          <div className="flex flex-col gap-1.5 border-t border-border pt-4">
+          <div className="flex flex-col gap-1.5 pt-4">
             {bottomItems.map((item) => (
               <Link
                 key={item.label}

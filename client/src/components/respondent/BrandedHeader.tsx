@@ -5,7 +5,7 @@ type BrandedHeaderProps = {
 
 export function BrandedHeader({ companyName, surveyLabel }: BrandedHeaderProps) {
   return (
-    <header className="border-b border-gray-200 bg-white px-5 py-4">
+    <header className="bg-white px-5 py-4 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-700">AC</div>
         <div>

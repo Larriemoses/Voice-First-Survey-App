@@ -10,7 +10,7 @@ type RespondentRowProps = {
 
 export function RespondentRow({ response }: RespondentRowProps) {
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-100">
+    <tr className="hover:bg-surface-muted">
       <td className="px-5 py-4">
         <div className="flex items-center gap-3">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-700">{response.respondent.slice(-2)}</span>
@@ -36,7 +36,7 @@ export function RespondentRow({ response }: RespondentRowProps) {
 
 export function RespondentMobileCard({ response }: RespondentRowProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="rounded-xl bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-medium text-gray-900">{response.respondent}</p>

@@ -22,9 +22,9 @@ export default {
           "orange-light": "#FFFBEB",
         },
         surface: {
-          page: "#F8FAFC",
+          page: "#F7F7FC",
           card: "#FFFFFF",
-          muted: "#F6F7FB",
+          muted: "#F3F2FC",
           overlay: "rgba(15,23,42,0.5)",
         },
         text: {
@@ -34,8 +34,8 @@ export default {
           inverse: "#FFFFFF",
         },
         border: {
-          DEFAULT: "#E2E8F0",
-          strong: "#CBD5E1",
+          DEFAULT: "transparent",
+          strong: "transparent",
           focus: "#6366F1",
         },
         status: {
@@ -73,9 +73,9 @@ export default {
         full: "9999px",
       },
       boxShadow: {
-        sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
-        md: "0 8px 24px rgba(23, 23, 22, 0.07)",
-        lg: "0 18px 50px rgba(23, 23, 22, 0.10)",
+        sm: "0 2px 10px rgba(79, 70, 229, 0.06)",
+        md: "0 8px 28px rgba(30, 41, 59, 0.07)",
+        lg: "0 18px 55px rgba(30, 41, 59, 0.10)",
         focus: "0 0 0 3px rgba(99, 102, 241, 0.16)",
       },
       maxWidth: {

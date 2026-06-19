@@ -7,7 +7,7 @@ type ThankYouScreenProps = {
 export function ThankYouScreen({ companyName }: ThankYouScreenProps) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-5">
-      <div className="w-full max-w-[480px] rounded-lg border border-gray-200 bg-white px-5 py-10 text-center">
+      <div className="w-full max-w-[480px] rounded-xl bg-white px-5 py-10 text-center shadow-md">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-700">AC</div>
         <div className="mx-auto mt-8 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-success">
           <CheckCircle2 className="h-9 w-9" />

@@ -42,7 +42,7 @@ export function BottomTabBar() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-3 bottom-3 z-50 rounded-2xl bg-white/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-lg backdrop-blur-xl md:hidden">
       <div className="mx-auto grid max-w-sm grid-cols-3 gap-1">
         {items.map((item) => {
           const active = item.isActive(pathname);

@@ -267,7 +267,7 @@ function SurveyListRow({ survey }: { survey: DashboardSurveyRow }) {
         type="button"
         onClick={action.onClick}
         className={cn(
-          "relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-border bg-white p-4 text-left transition-[border-color,box-shadow] duration-200 hover:border-border-strong hover:shadow-sm",
+          "relative flex w-full items-center gap-3 overflow-hidden rounded-xl bg-white p-4 text-left shadow-sm transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-md",
         )}
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-blue-light text-brand-blue">
@@ -477,7 +477,7 @@ export default function DashboardPage() {
 
             <div className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
               <Card hoverable={false} className="p-5">
-                <div className="flex items-center justify-between"><div><h2 className="text-base font-semibold">Response overview</h2><p className="mt-1 text-xs text-text-hint">Responses collected over time</p></div><span className="rounded-md border border-border px-2.5 py-1.5 text-xs text-text-secondary">This month</span></div>
+                <div className="flex items-center justify-between"><div><h2 className="text-base font-semibold">Response overview</h2><p className="mt-1 text-xs text-text-hint">Responses collected over time</p></div><span className="rounded-md bg-surface-muted px-2.5 py-1.5 text-xs text-text-secondary">This month</span></div>
                 <div className="mt-6 h-[220px] w-full">
                   <svg viewBox="0 0 640 220" className="h-full w-full" role="img" aria-label="Response activity trend">
                     {[35, 80, 125, 170].map((y) => <line key={y} x1="30" y1={y} x2="620" y2={y} stroke="#E2E8F0" strokeWidth="1" />)}
@@ -489,7 +489,7 @@ export default function DashboardPage() {
               </Card>
               <Card hoverable={false} className="p-5">
                 <div className="flex items-center justify-between"><h2 className="text-base font-semibold">Quick actions</h2><span className="text-xs text-brand-blue">Research tools</span></div>
-                <div className="mt-4 divide-y divide-border">
+                <div className="mt-4 space-y-1">
                   {[
                     ["Create a new survey", handleCreateSurvey],
                     ["Browse survey templates", () => navigate("/dashboard/templates")],
@@ -562,8 +562,8 @@ export default function DashboardPage() {
                 <>
                   <div className="grid gap-4 sm:grid-cols-2 lg:hidden">{filteredRows.map((survey) => <SurveyListRow key={survey.id} survey={survey} />)}</div>
                   <Card hoverable={false} className="hidden overflow-hidden p-0 lg:block">
-                    <div className="grid grid-cols-[minmax(220px,1.5fr)_110px_110px_130px_90px] border-b border-border bg-surface-muted px-5 py-3 text-xs font-medium text-text-hint"><span>Survey name</span><span>Responses</span><span>Completion</span><span>Last updated</span><span>Status</span></div>
-                    <div className="divide-y divide-border">
+                    <div className="grid grid-cols-[minmax(220px,1.5fr)_110px_110px_130px_90px] bg-surface-muted px-5 py-3 text-xs font-medium text-text-hint"><span>Survey name</span><span>Responses</span><span>Completion</span><span>Last updated</span><span>Status</span></div>
+                    <div>
                       {filteredRows.map((survey) => (
                         <button key={survey.id} type="button" onClick={() => navigate(`/dashboard/surveys/${survey.id}`)} className="grid w-full grid-cols-[minmax(220px,1.5fr)_110px_110px_130px_90px] items-center px-5 py-4 text-left text-sm hover:bg-surface-muted/60">
                           <span className="truncate font-medium text-text-primary">{survey.title}</span><span className="text-text-secondary">{survey.respondentCount}</span><span className="text-text-secondary">{survey.respondentCount ? Math.min(100, Math.round((survey.answerCount / Math.max(1, survey.respondentCount * Math.max(1, survey.questionCount))) * 100)) : 0}%</span><span className="text-text-secondary">{survey.lastActivityAt ? formatRelativeDate(survey.lastActivityAt) : "Recently"}</span><span className="w-fit rounded-full bg-brand-blue-light px-2 py-1 text-xs font-medium capitalize text-brand-blue">{survey.displayStatus}</span>
@@ -638,7 +638,7 @@ export default function DashboardPage() {
           </div>
         }
       >
-        <div className="rounded-xl border border-border bg-surface-muted p-5">
+        <div className="rounded-xl bg-surface-muted p-5">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
               <Building2 className="h-5 w-5" />

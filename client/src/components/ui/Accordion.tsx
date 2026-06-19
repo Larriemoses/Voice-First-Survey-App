@@ -18,7 +18,7 @@ export function AccordionCard({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white">
+    <section className="rounded-xl bg-white shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
@@ -30,7 +30,7 @@ export function AccordionCard({
         </span>
         <ChevronDown className={cn("h-4 w-4 text-gray-400 transition-transform duration-150", open ? "rotate-180" : "")} />
       </button>
-      {open ? <div className="border-t border-gray-200 px-5 py-4">{children}</div> : null}
+      {open ? <div className="px-5 pb-4">{children}</div> : null}
     </section>
   );
 }

@@ -25,7 +25,7 @@ export function TeamTab() {
         </div>
         <Button leadingIcon={<Plus className="h-4 w-4" />} onClick={() => setOpen(true)}>Invite member</Button>
       </div>
-      <Card className="divide-y divide-gray-200 p-0">
+      <Card className="p-0">
         {members.map((member) => (
           <div key={member.email} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3">

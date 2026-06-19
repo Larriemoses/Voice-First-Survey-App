@@ -96,7 +96,7 @@ export function BuilderNav({
   return (
     <div
       className={cn(
-        "sticky top-0 z-30 border-b border-border bg-surface-card/95 backdrop-blur-xl",
+        "sticky top-0 z-30 bg-surface-card/95 shadow-sm backdrop-blur-xl",
         className,
       )}
     >
@@ -137,7 +137,7 @@ export function BuilderNav({
           </div>
         </div>
 
-        <div className="-mx-4 overflow-x-auto border-t border-border px-4 md:mx-0 md:px-0">
+        <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
           <div className="flex min-w-max items-center gap-1">
             {tabs.map((tab) => {
               const active = tab.active(

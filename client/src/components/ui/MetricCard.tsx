@@ -22,7 +22,7 @@ export function MetricCard({
   const TrendIcon = trendDirection === "up" ? TrendingUp : TrendingDown;
 
   return (
-    <div className={cn("rounded-2xl border border-border bg-surface-card px-5 py-5", className)}>
+    <div className={cn("rounded-xl bg-surface-card px-5 py-5 shadow-sm", className)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm text-text-secondary">{label}</p>
         {trend ? (

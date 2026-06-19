@@ -27,7 +27,7 @@ export function QuestionItem({
   return (
     <div className="space-y-2">
       <button type="button" onClick={onSelect} className="w-full text-left">
-        <Card className={cn("p-3", selected ? "border-primary-500" : "border-gray-200")}>
+        <Card className={cn("p-3", selected ? "bg-brand-blue-light ring-2 ring-brand-blue/20" : "bg-white")}>
           <p className="text-xs text-gray-400">{label}</p>
           <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-gray-900">{text}</p>
         </Card>

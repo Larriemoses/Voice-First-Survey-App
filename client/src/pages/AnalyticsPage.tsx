@@ -24,7 +24,7 @@ function LoadingCharts() {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className="rounded-lg border border-gray-200 bg-white p-5">
+        <div key={index} className="rounded-xl bg-white p-5 shadow-sm">
           <SkeletonBlock className="h-5 w-44" />
           <SkeletonBlock className="mt-3 h-4 w-28" />
           <SkeletonBlock className="mt-6 h-64" />
@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
 
       <Modal open={shareOpen} onClose={() => setShareOpen(false)} title="Share analytics report" description="Public reports exclude individual respondent data.">
         <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center justify-between rounded-xl bg-surface-muted p-4">
             <div>
               <p className="text-sm font-medium text-gray-900">Enable public link</p>
               <p className="mt-1 text-sm text-gray-500">Anyone with the URL can view summary charts and themes.</p>

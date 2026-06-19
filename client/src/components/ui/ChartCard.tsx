@@ -32,13 +32,13 @@ export function ChartCard({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-2xl border border-border bg-surface-card",
+        "overflow-hidden rounded-xl bg-surface-card shadow-sm",
         className,
       )}
     >
       <div
         className={cn(
-          "flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
+          "flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
           headerClassName,
         )}
       >
