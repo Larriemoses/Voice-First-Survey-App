@@ -14,7 +14,10 @@ const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 export const protectedRoutes: RouteObject[] = [
   {
     path: "/dashboard",
-    element: withProtectedPage(<DashboardPage />, { variant: "app" }),
+    element: withProtectedPage(<DashboardPage />, {
+      variant: "app",
+      requireOrg: false,
+    }),
   },
   {
     path: "/dashboard/surveys/new",

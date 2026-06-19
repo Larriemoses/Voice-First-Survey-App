@@ -1166,8 +1166,8 @@ export default function HomePage() {
 
         <footer className="bg-white px-6 pb-8 pt-14 text-text-secondary sm:px-8 lg:px-10 [&_a]:text-text-secondary [&_a:hover]:text-brand-blue">
           <div className="mx-auto max-w-[1280px]">
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4 xl:gap-12">
-              <div className="text-center md:text-left">
+            <div className="grid gap-10 md:grid-cols-2 md:items-start">
+          <div className="text-center md:text-left">
                 <div className="mx-auto mb-4 w-fit rounded-full bg-white px-4 py-2 md:mx-0">
                   <img src={BRAND_LOGO_URL} alt="Survica" className="h-7 w-auto" />
                 </div>
@@ -1186,7 +1186,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="text-center md:text-left">
+          <div className="text-center md:text-left">
                   <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
                   Product
                 </p>
@@ -1221,7 +1221,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="text-center md:text-left">
+          <div className="hidden">
                   <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
                   Company
                 </p>
@@ -1259,7 +1259,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="text-center md:text-left">
+          <div className="hidden">
                   <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
                   Support
                 </p>
@@ -1305,7 +1305,7 @@ export default function HomePage() {
               <p className="hidden text-xs text-[#475569] md:block">
                 Made with care for African voices
               </p>
-              <div className="flex items-center gap-4">
+              <div className="hidden items-center gap-4">
                 <Link
                   to="/privacy"
                   className="text-xs text-[#64748B] transition-colors duration-150 hover:text-[#94A3B8]"

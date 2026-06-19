@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import AppLogo from "../AppLogo";
@@ -59,13 +59,6 @@ export function TopNav({
             </a>
           ))}
         </nav>
-
-        <div className="hidden min-w-0 flex-1 items-center justify-center md:flex lg:max-w-md">
-          <div className="flex h-12 w-full items-center gap-3 rounded-full bg-surface-muted px-4 text-text-hint">
-            <Search className="h-5 w-5" />
-            <span className="truncate text-sm">Search surveys, responses, and insights</span>
-          </div>
-        </div>
 
         <div className="hidden items-center gap-2 md:flex">
           <Button variant="ghost" onClick={() => navigate(loginHref)}>

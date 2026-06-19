@@ -4,8 +4,15 @@ type OrganizationRow = {
   id: string;
   name: string;
   slug: string | null;
-  owner_id: string | null;
+  owner_user_id: string | null;
   created_at: string | null;
+};
+
+type MembershipRow = {
+  id: string;
+  role: string;
+  created_at: string | null;
+  organization: OrganizationRow | OrganizationRow[] | null;
 };
 
 export type Organization = {
@@ -18,15 +25,9 @@ export type Organization = {
 
 export type OrganizationMembership = {
   id: string;
-  role: "owner";
+  role: string;
   created_at: string | null;
-  organization: {
-    id: string;
-    name: string;
-    slug: string | null;
-    owner_id: string | null;
-    created_at: string | null;
-  };
+  organization: Organization;
 };
 
 function mapOrganization(row: OrganizationRow): Organization {
@@ -34,26 +35,9 @@ function mapOrganization(row: OrganizationRow): Organization {
     id: row.id,
     name: row.name,
     slug: row.slug,
-    ownerId: row.owner_id,
+    ownerId: row.owner_user_id,
     createdAt: row.created_at,
   };
-}
-
-export async function getOrganizationByOwnerId(
-  userId: string,
-): Promise<Organization | null> {
-  const { data, error } = await supabase
-    .from("organizations")
-    .select("id, name, slug, owner_id, created_at")
-    .eq("owner_id", userId)
-    .order("created_at", { ascending: true })
-    .maybeSingle<OrganizationRow>();
-
-  if (error) {
-    throw error;
-  }
-
-  return data ? mapOrganization(data) : null;
 }
 
 export async function getMyOrganizationMembership(): Promise<OrganizationMembership | null> {
@@ -62,30 +46,44 @@ export async function getMyOrganizationMembership(): Promise<OrganizationMembers
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
-    throw userError;
-  }
+  if (userError) throw userError;
+  if (!user) return null;
 
-  if (!user) {
-    return null;
-  }
+  const { data, error } = await supabase
+    .from("organization_members")
+    .select(
+      `
+      id,
+      role,
+      created_at,
+      organization:organizations (
+        id,
+        name,
+        slug,
+        owner_user_id,
+        created_at
+      )
+    `,
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .returns<MembershipRow[]>();
 
-  const organization = await getOrganizationByOwnerId(user.id);
+  if (error) throw error;
+  if (!data?.length) return null;
 
-  if (!organization) {
-    return null;
-  }
+  const membership = data[0];
+  const organization = Array.isArray(membership.organization)
+    ? membership.organization[0]
+    : membership.organization;
+
+  if (!organization) return null;
 
   return {
-    id: organization.id,
-    role: "owner",
-    created_at: organization.createdAt,
-    organization: {
-      id: organization.id,
-      name: organization.name,
-      slug: organization.slug,
-      owner_id: organization.ownerId,
-      created_at: organization.createdAt,
-    },
+    id: membership.id,
+    role: membership.role,
+    created_at: membership.created_at,
+    organization: mapOrganization(organization),
   };
 }
