@@ -71,9 +71,9 @@ export default function Profile() {
 
       {loading ? (
         <Card className="space-y-4">
-          <Skeleton className="h-12 rounded-[20px]" />
-          <Skeleton className="h-12 rounded-[20px]" />
-          <Skeleton className="h-12 w-40 rounded-[20px]" />
+          <Skeleton className="h-12 rounded-xl" />
+          <Skeleton className="h-12 rounded-xl" />
+          <Skeleton className="h-12 w-40 rounded-xl" />
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-[1fr_0.82fr]">

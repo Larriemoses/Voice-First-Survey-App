@@ -70,8 +70,8 @@ export default function AuthGate() {
                 This should only take a moment
               </p>
             </div>
-            <Skeleton className="h-12 rounded-[20px]" />
-            <Skeleton className="h-24 rounded-[24px]" />
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
           </Card>
         </div>
       </>

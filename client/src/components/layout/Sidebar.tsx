@@ -2,9 +2,12 @@ import {
   BarChart3,
   CircleHelp,
   Copy,
+  Home,
   LayoutGrid,
   Radio,
   Settings,
+  Users,
+  Plug,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import AppLogo from "../AppLogo";
@@ -40,13 +43,19 @@ function isSurveyBuilderRoute(pathname: string): boolean {
 
 const middleItems: SidebarItem[] = [
   {
-    label: "Surveys",
+    label: "Dashboard",
     href: "/dashboard",
-    icon: LayoutGrid,
-    isActive: (pathname) => pathname === "/dashboard" || isSurveyBuilderRoute(pathname),
+    icon: Home,
+    isActive: (pathname) => pathname === "/dashboard",
   },
   {
-    label: "Analytics",
+    label: "Surveys",
+    href: "/dashboard#surveys",
+    icon: LayoutGrid,
+    isActive: (pathname) => isSurveyBuilderRoute(pathname),
+  },
+  {
+    label: "Analysis",
     href: "/dashboard/analytics",
     icon: BarChart3,
     isActive: (pathname) =>
@@ -60,6 +69,12 @@ const middleItems: SidebarItem[] = [
     isActive: (pathname) => pathname.endsWith("/results"),
   },
   {
+    label: "Participants",
+    href: "/dashboard#participants",
+    icon: Users,
+    isActive: () => false,
+  },
+  {
     label: "Templates",
     href: "/dashboard/templates",
     icon: Copy,
@@ -68,6 +83,12 @@ const middleItems: SidebarItem[] = [
 ];
 
 const bottomItems: SidebarItem[] = [
+  {
+    label: "Integrations",
+    href: "/dashboard/settings/integrations",
+    icon: Plug,
+    isActive: (pathname) => pathname.endsWith("/integrations"),
+  },
   {
     label: "Settings",
     href: "/dashboard/settings",
@@ -93,7 +114,7 @@ export function Sidebar() {
           className="flex h-[76px] items-center px-2"
           aria-label="Survica home"
         >
-          <AppLogo className="h-9 max-w-[136px]" imageClassName="max-w-full" />
+          <AppLogo className="h-8 max-w-[126px]" imageClassName="max-w-full" />
         </Link>
         <nav className="flex flex-1 flex-col justify-between pb-5 pt-3">
           <div className="flex flex-col gap-1.5">

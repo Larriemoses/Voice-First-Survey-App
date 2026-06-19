@@ -170,9 +170,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#20201E] py-20 text-white lg:py-24">
+        <section className="border-t border-border bg-brand-blue-light py-20 text-text-primary lg:py-24">
           <div className="survica-page-shell grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div className="max-w-3xl"><div className="flex items-center gap-2 text-sm font-semibold text-[#FF9AAF]"><ShieldCheck className="h-4 w-4" />Responsible by design</div><h2 className="mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">Make space for the full answer.</h2><p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">Give respondents a natural way to speak, and give your team a disciplined way to turn those voices into decisions.</p></div>
+            <div className="max-w-3xl"><div className="flex items-center gap-2 text-sm font-semibold text-brand-blue"><ShieldCheck className="h-4 w-4" />Responsible by design</div><h2 className="mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">Make space for the full answer.</h2><p className="mt-5 max-w-2xl text-lg leading-8 text-text-secondary">Give respondents a natural way to speak, and give your team a disciplined way to turn those voices into decisions.</p></div>
             <Button size="lg" className="w-fit" onClick={() => navigate("/signup")} trailingIcon={<ArrowRight className="h-4 w-4" />}>Create your workspace</Button>
           </div>
         </section>

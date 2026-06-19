@@ -137,8 +137,8 @@ export function BuilderNav({
           </div>
         </div>
 
-        <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
-          <div className="flex min-w-max items-center gap-2 pb-1">
+        <div className="-mx-4 overflow-x-auto border-t border-border px-4 md:mx-0 md:px-0">
+          <div className="flex min-w-max items-center gap-1">
             {tabs.map((tab) => {
               const active = tab.active(
                 location.pathname,
@@ -151,6 +151,12 @@ export function BuilderNav({
                   key={tab.label}
                   active={active}
                   onClick={() => navigate(tab.href)}
+                  className={cn(
+                    "min-h-10 rounded-none border-0 border-b-2 bg-transparent px-3",
+                    active
+                      ? "border-brand-blue bg-transparent text-brand-blue"
+                      : "border-transparent text-text-secondary hover:bg-transparent",
+                  )}
                 >
                   {tab.label}
                 </Chip>

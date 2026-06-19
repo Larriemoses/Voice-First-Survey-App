@@ -33,7 +33,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   orange:
     "border-brand-orange bg-brand-orange text-text-inverse hover:border-brand-orange-dark hover:bg-brand-orange-dark",
   gradient:
-    "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
+    "border-transparent bg-[linear-gradient(135deg,#6366F1,#7C3AED)] text-text-inverse shadow-sm hover:brightness-95",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

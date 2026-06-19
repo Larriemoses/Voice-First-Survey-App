@@ -3,36 +3,36 @@
 @layer base {
   :root {
     color-scheme: light;
-    --survica-brand-blue: #d7193f;
-    --survica-brand-blue-dark: #a90f2e;
-    --survica-brand-blue-light: #fff1f4;
-    --survica-brand-orange: #d97706;
-    --survica-brand-orange-dark: #b45309;
-    --survica-brand-orange-light: #fff7ed;
-    --survica-surface-page: #f8f8f6;
+    --survica-brand-blue: #6366f1;
+    --survica-brand-blue-dark: #4f46e5;
+    --survica-brand-blue-light: #eef2ff;
+    --survica-brand-orange: #f59e0b;
+    --survica-brand-orange-dark: #d97706;
+    --survica-brand-orange-light: #fffbeb;
+    --survica-surface-page: #f8fafc;
     --survica-surface-card: #ffffff;
-    --survica-surface-muted: #f1f1ee;
+    --survica-surface-muted: #f6f7fb;
     --survica-surface-overlay: rgba(15, 23, 42, 0.5);
-    --survica-text-primary: #171716;
-    --survica-text-secondary: #62615d;
-    --survica-text-hint: #8b8983;
+    --survica-text-primary: #0f172a;
+    --survica-text-secondary: #64748b;
+    --survica-text-hint: #94a3b8;
     --survica-text-inverse: #ffffff;
-    --survica-border-default: #e5e4df;
-    --survica-border-strong: #cfcdc6;
-    --survica-border-focus: #d7193f;
+    --survica-border-default: #e2e8f0;
+    --survica-border-strong: #cbd5e1;
+    --survica-border-focus: #6366f1;
     --survica-status-success: #10b981;
     --survica-status-warning: #f59e0b;
     --survica-status-danger: #ef4444;
     --survica-radius-sm: 6px;
-    --survica-radius-md: 10px;
-    --survica-radius-lg: 14px;
-    --survica-radius-xl: 14px;
-    --survica-radius-2xl: 16px;
+    --survica-radius-md: 8px;
+    --survica-radius-lg: 10px;
+    --survica-radius-xl: 12px;
+    --survica-radius-2xl: 12px;
     --survica-radius-full: 9999px;
     --survica-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --survica-shadow-md: 0 8px 24px rgba(23, 23, 22, 0.07);
     --survica-shadow-lg: 0 18px 50px rgba(23, 23, 22, 0.1);
-    --survica-shadow-focus: 0 0 0 3px rgba(215, 25, 63, 0.14);
+    --survica-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.16);
   }
 
   *,
@@ -156,7 +156,7 @@
 @layer utilities {
   .survica-content-width {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1440px;
     margin-inline: auto;
   }
 
@@ -166,7 +166,7 @@
 
   .survica-page-shell {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1440px;
     margin-inline: auto;
     @apply px-5 md:px-8 lg:px-10;
   }
