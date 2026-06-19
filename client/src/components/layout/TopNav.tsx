@@ -93,7 +93,7 @@ export function TopNav({
       <div
         id="top-nav-mobile-drawer"
         className={cn(
-          "overflow-hidden border-t border-border bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
+          "overflow-hidden bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
           open ? "max-h-80 opacity-100" : "max-h-0 opacity-0",
         )}
       >

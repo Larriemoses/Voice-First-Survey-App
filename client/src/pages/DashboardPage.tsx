@@ -445,23 +445,23 @@ export default function DashboardPage() {
       ) : (
         <div className="survica-page-shell py-8 lg:py-10">
           <div className="space-y-8">
-            <div className="relative overflow-hidden rounded-[32px] bg-[#111111] px-6 py-7 text-white sm:px-8 sm:py-9">
-              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full border-[36px] border-white/10" />
-              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-blue/60 blur-2xl" />
+            <div className="relative overflow-hidden rounded-[32px] bg-brand-blue-light px-6 py-7 text-text-primary sm:px-8 sm:py-9">
+              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full bg-white/70" />
+              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-blue/15 blur-2xl" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Your workspace</p>
-                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue">Your workspace</p>
+                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-text-primary sm:text-3xl">
                   {greeting}, {firstName}
                 </h1>
-                <p className="mt-2 text-sm text-white/70 sm:text-base">
+                <p className="mt-2 text-sm text-text-secondary sm:text-base">
                   Your audience is speaking. Here’s the clearest view of what they’re saying.
                 </p>
               </div>
               <Button
                 leadingIcon={<Plus className="h-4 w-4" />}
                 variant="gradient"
-                className="border-white/10"
+                className="border-transparent"
                 onClick={() => navigate("/dashboard/surveys/new")}
               >
                 New survey

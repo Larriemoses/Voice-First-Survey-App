@@ -41,7 +41,7 @@ export function Textarea({
           "flex gap-2 rounded-md border bg-surface-card px-3 py-2.5 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
           error
             ? "border-status-danger focus-within:border-status-danger"
-            : "border-border focus-within:border-border-focus focus-within:shadow-focus",
+            : "border-transparent bg-surface-muted focus-within:bg-white focus-within:shadow-focus",
           props.disabled ? "bg-surface-muted text-text-hint" : "",
         )}
       >

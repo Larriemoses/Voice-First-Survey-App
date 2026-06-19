@@ -67,7 +67,9 @@ export default function LoginPage() {
 
       if (googleError) {
         setError(mapAuthErrorMessage(googleError.message, "login"));
-      } else if (!data.url) {
+      } else if (data.url) {
+        window.location.assign(data.url);
+      } else {
         setError("Google sign-in could not be started. Please try email and password.");
       }
     } finally {

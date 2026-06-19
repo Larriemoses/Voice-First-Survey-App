@@ -82,7 +82,7 @@ export function AuthShell({
                 <p className="text-base text-text-secondary">{description}</p>
               </div>
             </div>
-            <Card className={cn("border border-border/70 p-6 shadow-lg sm:p-8", cardClassName)}>{children}</Card>
+            <Card className={cn("p-6 shadow-lg sm:p-8", cardClassName)}>{children}</Card>
             {footer ? <div className="text-center">{footer}</div> : null}
           </div>
         </main>
@@ -95,13 +95,13 @@ export function AuthShell({
       <TopNav />
       <main className="min-h-[calc(100vh-72px)] bg-[#f7f7f7] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="mx-auto grid max-w-[1320px] gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(390px,480px)] lg:items-stretch">
-          <section className="relative hidden min-h-[720px] overflow-hidden rounded-[32px] bg-[#111111] p-7 text-white lg:block">
+          <section className="relative hidden min-h-[720px] overflow-hidden rounded-[32px] bg-brand-blue-light p-7 text-text-primary lg:block">
             <div className="relative z-10 max-w-xl space-y-3">
-              <Badge className="bg-white/15 text-white">{eyebrow}</Badge>
+              <Badge className="bg-white text-brand-blue">{eyebrow}</Badge>
               <h1 className="text-4xl font-semibold leading-tight tracking-[-0.045em] xl:text-5xl">
                 {helperTitle}
               </h1>
-              <p className="max-w-lg text-base leading-7 text-white/65">
+              <p className="max-w-lg text-base leading-7 text-text-secondary">
                 {helperDescription}
               </p>
             </div>

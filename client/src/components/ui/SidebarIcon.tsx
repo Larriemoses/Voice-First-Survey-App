@@ -21,7 +21,7 @@ export function SidebarIcon({
         className={cn(
           "inline-flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-150",
           active
-            ? "bg-[#111111] text-white"
+            ? "bg-brand-blue text-white"
             : "text-text-hint hover:bg-surface-muted hover:text-text-secondary",
           className,
         )}

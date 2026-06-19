@@ -74,10 +74,14 @@ export async function signInWithGoogle(redirectPath?: string | null) {
     ? `?redirect=${encodeURIComponent(redirect)}`
     : "";
 
+  // Prevent a stale browser session from bypassing Google's account chooser.
+  await supabase.auth.signOut({ scope: "local" });
+
   return supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: buildRedirectUrl(`/auth-check${query}`),
+      skipBrowserRedirect: true,
       queryParams: {
         prompt: "select_account",
       },

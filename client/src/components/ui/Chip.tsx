@@ -20,8 +20,8 @@ export function Chip({
       className={cn(
         "inline-flex min-h-7 items-center rounded-full border px-3 text-sm font-medium leading-[1.4] transition-colors duration-150",
         active
-          ? "border-brand-blue bg-brand-blue-light text-brand-blue"
-          : "border-border bg-surface-card text-text-secondary hover:border-border-strong hover:bg-surface-muted hover:text-text-primary",
+          ? "border-transparent bg-brand-blue text-white"
+          : "border-transparent bg-surface-muted text-text-secondary hover:bg-[#e2e2e2] hover:text-text-primary",
         className,
       )}
       {...props}

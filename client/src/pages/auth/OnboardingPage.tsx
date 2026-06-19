@@ -124,19 +124,19 @@ export default function OnboardingPage() {
                 <div
                   key={label}
                   className={cn(
-                    "rounded-lg border p-3 text-left",
+                    "rounded-[20px] border border-transparent p-3 text-left",
                     active
-                      ? "border-brand-blue bg-brand-blue-light"
+                      ? "bg-brand-blue text-white"
                       : complete
-                        ? "border-status-success/30 bg-status-success/10"
-                        : "border-border bg-surface-page",
+                        ? "bg-status-success/10"
+                        : "bg-surface-muted",
                   )}
                 >
                   <p
                     className={cn(
                       "text-sm font-medium",
                       active
-                        ? "text-brand-blue"
+                        ? "text-white"
                         : complete
                           ? "text-status-success"
                           : "text-text-secondary",
@@ -144,7 +144,7 @@ export default function OnboardingPage() {
                   >
                     Step {index + 1}
                   </p>
-                  <p className="mt-1 text-sm text-text-primary">{label}</p>
+                  <p className={cn("mt-1 text-sm", active ? "text-white" : "text-text-primary")}>{label}</p>
                 </div>
               );
             })}
@@ -219,7 +219,7 @@ export default function OnboardingPage() {
                   onChange={(event) => setInviteDraft(event.target.value)}
                 />
                 {inviteList.length > 0 ? (
-                  <div className="rounded-lg border border-border bg-surface-card p-4">
+                  <div className="rounded-[20px] bg-surface-card p-4">
                     <p className="text-sm font-medium text-text-primary">
                       {inviteList.length} teammate{inviteList.length === 1 ? "" : "s"} ready
                     </p>
@@ -230,7 +230,7 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-lg border border-dashed border-border-strong bg-surface-card p-4 text-sm text-text-secondary">
+                  <div className="rounded-[20px] bg-surface-card p-4 text-sm text-text-secondary">
                     Leave this blank if you want to finish setup first and invite your team later.
                   </div>
                 )}

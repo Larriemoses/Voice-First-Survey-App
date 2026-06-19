@@ -484,7 +484,7 @@ export default function PublicSurveyPage() {
             </p>
             <p className="mt-6 text-xs text-text-hint">{survey.companyName}</p>
             {survey.redirectUrl ? (
-              <div className="mt-6 rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-text-secondary">
+              <div className="mt-6 rounded-[20px] bg-surface-muted px-4 py-3 text-sm text-text-secondary">
                 Redirecting in {redirectCountdown} second
                 {redirectCountdown === 1 ? "" : "s"}.
               </div>
@@ -559,7 +559,7 @@ export default function PublicSurveyPage() {
                       {currentDurationMs ? formatDuration(currentDurationMs) : "Voice answer"}
                     </p>
                   </div>
-                  <div className="rounded-xl border border-border bg-surface-card px-3 py-3">
+                  <div className="rounded-[20px] bg-surface-card px-3 py-3">
                     <audio controls src={currentAudioUrl ?? undefined} className="w-full" />
                   </div>
                   <button
@@ -607,7 +607,7 @@ export default function PublicSurveyPage() {
                     </p>
                   </div>
 
-                  <div className="overflow-hidden rounded-xl border border-border bg-surface-card px-3 py-3">
+                  <div className="overflow-hidden rounded-[20px] bg-surface-card px-3 py-3">
                     {recordState === "recording" ? (
                       <div className="flex h-8 items-center justify-center gap-1">
                         {Array.from({ length: 16 }, (_, index) => (
