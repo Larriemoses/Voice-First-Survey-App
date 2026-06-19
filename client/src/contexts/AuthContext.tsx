@@ -174,10 +174,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         const nextState = await syncAuthState(data.session);
 
-        if (nextState.error) {
-          return { data: null, error: nextState.error };
-        }
-
         if (!nextState.user) {
           return {
             data: null,
@@ -236,10 +232,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setLoading(true);
         const nextState = await syncAuthState(data.session);
-
-        if (nextState.error) {
-          return { data: null, error: nextState.error };
-        }
 
         if (!nextState.org) {
           navigate("/onboarding", { replace: true });

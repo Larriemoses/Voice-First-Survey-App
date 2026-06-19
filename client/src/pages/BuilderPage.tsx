@@ -1009,12 +1009,12 @@ export default function BuilderPage() {
         onChange={handleUploadLogo}
       />
 
-      <div className="grid min-h-[calc(100vh-84px)] grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)_200px]">
-        <aside className="hidden border-r border-border bg-surface-muted/70 md:block">
+      <div className="grid min-h-[calc(100vh-84px)] grid-cols-1 gap-3 bg-[#f3f3f3] p-3 md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)_220px]">
+        <aside className="hidden overflow-hidden rounded-[24px] bg-white md:block">
           <QuestionsPanel {...panelProps} />
         </aside>
 
-        <section className="min-w-0 bg-surface-card">
+        <section className="min-w-0 rounded-[24px] bg-surface-card">
           <div className="flex flex-col gap-5 p-4 md:p-6">
             <div className="flex items-center gap-2 lg:hidden">
               <Button
@@ -1038,7 +1038,7 @@ export default function BuilderPage() {
 
             {selectedQuestion ? (
               <>
-                <Card className="space-y-6">
+                <Card className="space-y-6 bg-surface-muted">
                   <div className="space-y-1">
                     <p className="text-[11px] uppercase tracking-[0.16em] text-text-hint">
                       Editing Q
@@ -1099,7 +1099,7 @@ export default function BuilderPage() {
                     placeholder="Guide respondents toward the detail you need"
                   />
 
-                  <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface-muted px-4 py-3">
+                  <div className="flex items-center justify-between gap-4 rounded-[20px] bg-white px-4 py-3">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-text-primary">Required</p>
                       <p className="text-sm text-text-secondary">
@@ -1118,7 +1118,7 @@ export default function BuilderPage() {
                   </div>
 
                   {selectedQuestion.responseType === "voice" ? (
-                    <div className="space-y-3 rounded-xl border border-border bg-surface-muted px-4 py-4">
+                    <div className="space-y-3 rounded-[20px] bg-white px-4 py-4">
                       <div className="flex items-start gap-3">
                         <div className="rounded-lg bg-brand-blue-light p-2 text-brand-blue">
                           <Mic className="h-4 w-4" />
@@ -1158,7 +1158,7 @@ export default function BuilderPage() {
                     </h2>
                   </div>
 
-                  <div className="space-y-4 rounded-xl border border-border bg-surface-muted p-4">
+                  <div className="space-y-4 rounded-[24px] bg-surface-muted p-4">
                     <div className="flex items-center gap-3 border-b border-border pb-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
                         {companyName.trim().slice(0, 2).toUpperCase() || "SV"}
@@ -1178,8 +1178,8 @@ export default function BuilderPage() {
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-surface-card p-4">
-                      <div className="mx-auto flex h-[72px] w-[72px] items-center justify-center rounded-full bg-brand-orange text-white shadow-md">
+                    <div className="rounded-[24px] bg-surface-card p-5">
+                      <div className="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-brand-blue text-white shadow-[0_14px_28px_rgba(230,0,35,0.22)]">
                         <Mic className="h-6 w-6" />
                       </div>
                       <p className="mt-3 text-center text-sm font-medium text-text-primary">
@@ -1205,7 +1205,7 @@ export default function BuilderPage() {
           </div>
         </section>
 
-        <aside className="hidden border-l border-border bg-surface-muted/70 lg:block">
+        <aside className="hidden overflow-hidden rounded-[24px] bg-white lg:block">
           <SettingsPanel {...settingsPanelProps} />
         </aside>
       </div>

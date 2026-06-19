@@ -23,9 +23,9 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "border-brand-blue bg-brand-blue text-text-inverse shadow-[0_6px_16px_rgba(79,70,229,0.22)] hover:-translate-y-0.5 hover:border-brand-blue-dark hover:bg-brand-blue-dark hover:shadow-[0_10px_24px_rgba(79,70,229,0.26)]",
+    "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
   secondary:
-    "border-border-strong bg-surface-card text-text-primary shadow-sm hover:-translate-y-0.5 hover:border-brand-blue/30 hover:bg-brand-blue-light/40",
+    "border-transparent bg-surface-muted text-text-primary hover:bg-[#e2e2e2]",
   ghost:
     "border-transparent bg-transparent text-text-secondary hover:bg-surface-muted hover:text-text-primary",
   danger:
@@ -33,7 +33,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   orange:
     "border-brand-orange bg-brand-orange text-text-inverse hover:border-brand-orange-dark hover:bg-brand-orange-dark",
   gradient:
-    "border-transparent bg-[linear-gradient(135deg,#F05A3C,#D9482B)] text-text-inverse shadow-[0_7px_18px_rgba(240,90,60,0.22)] hover:-translate-y-0.5 hover:shadow-[0_11px_28px_rgba(240,90,60,0.28)]",
+    "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border font-semibold leading-[1.4] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-full border font-semibold leading-[1.4] transition-[background-color,color,transform] duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
         variantClasses[variant],
         iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         className,

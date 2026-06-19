@@ -207,10 +207,14 @@ export default function SignUpPage() {
     setGoogleLoading(true);
 
     try {
-      const { error } = await signInWithGoogle("/onboarding");
+      const { data, error } = await signInWithGoogle("/onboarding");
 
       if (error) {
         setFormError(mapAuthErrorMessage(error.message, "signup"));
+      } else if (data.url) {
+        window.location.assign(data.url);
+      } else {
+        setFormError("Google sign-up could not be started. Please use the email form.");
       }
     } finally {
       setGoogleLoading(false);
@@ -258,8 +262,8 @@ export default function SignUpPage() {
 
   return (
     <AuthShell
-      title="Create your Survica workspace"
-      description="Set up your account, confirm your email, and continue into workspace onboarding."
+      title="Join Survica"
+      description="Create a home for the feedback, ideas, and stories your audience shares."
       footer={
         <p className="text-center text-sm text-text-secondary">
           Already have an account?{" "}
@@ -378,7 +382,7 @@ export default function SignUpPage() {
           />
 
           <div className="space-y-2">
-            <label className="flex items-start gap-3 rounded-lg border border-border bg-surface-page p-4 text-sm text-text-secondary">
+            <label className="flex items-start gap-3 rounded-[20px] bg-surface-muted p-4 text-sm text-text-secondary">
               <input
                 type="checkbox"
                 className="mt-0.5 h-4 w-4 rounded border-border text-brand-blue focus:ring-brand-blue"

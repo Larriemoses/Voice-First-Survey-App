@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { ArrowRight, Eye, EyeOff, KeyRound } from "lucide-react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/Input";
@@ -63,10 +63,14 @@ export default function LoginPage() {
     setGoogleLoading(true);
 
     try {
-      const { error: googleError } = await signInWithGoogle(redirect);
+      const { data, error: googleError } = await signInWithGoogle(redirect);
 
       if (googleError) {
         setError(mapAuthErrorMessage(googleError.message, "login"));
+      } else if (data.url) {
+        window.location.assign(data.url);
+      } else {
+        setError("Google sign-in could not be started. Please try email and password.");
       }
     } finally {
       setGoogleLoading(false);
@@ -75,8 +79,8 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Log in to your workspace"
-      description="Access surveys, transcripts, analytics, and exports from one protected Survica workspace."
+      title="Welcome back"
+      description="Log in to keep collecting voices and discovering what matters."
       footer={
         <p className="text-center text-sm text-text-secondary">
           New to Survica?{" "}
@@ -160,21 +164,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="rounded-lg border border-border bg-surface-page p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue-light text-brand-blue">
-              <KeyRound className="h-4 w-4" />
-            </div>
-            <div className="space-y-1">
-              <h2 className="text-sm font-medium text-text-primary">
-                Sign-in redirects stay predictable
-              </h2>
-              <p className="text-sm text-text-secondary">
-                If you followed a protected deep link, Survica returns you there after login. New accounts without a workspace continue to onboarding.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </AuthShell>
   );

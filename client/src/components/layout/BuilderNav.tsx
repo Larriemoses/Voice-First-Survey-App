@@ -96,16 +96,16 @@ export function BuilderNav({
   return (
     <div
       className={cn(
-        "sticky top-0 z-30 border-b border-border bg-surface-card",
+        "sticky top-0 z-30 bg-surface-card/95 backdrop-blur-xl",
         className,
       )}
     >
-      <div className="survica-page-shell flex min-h-[52px] flex-col gap-3 py-3">
+      <div className="survica-page-shell flex min-h-[64px] flex-col gap-3 py-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-w-0 flex-wrap items-center gap-3">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1 text-sm text-text-secondary transition-colors duration-150 hover:text-brand-blue"
+              className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-text-secondary transition-colors duration-150 hover:bg-surface-muted hover:text-text-primary"
             >
               <ArrowLeft className="h-4 w-4" />
               My surveys

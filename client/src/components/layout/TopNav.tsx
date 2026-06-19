@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import AppLogo from "../AppLogo";
 import { cn } from "../../utils/helpers";
 
 export type TopNavItem = {
@@ -38,26 +39,33 @@ export function TopNav({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b border-border bg-surface-card/95 backdrop-blur-sm",
+        "sticky top-0 z-50 bg-surface-card/95 backdrop-blur-xl",
         className,
       )}
     >
-      <div className="survica-page-shell flex h-[60px] items-center justify-between">
-        <Link to="/" className="flex h-7 items-center" aria-label="Survica home">
-          <img src="/logo.svg" alt="Survica" className="h-8 w-auto" />
+      <div className="survica-page-shell flex h-[72px] items-center justify-between gap-4">
+        <Link to="/" className="flex h-10 items-center" aria-label="Survica home">
+          <AppLogo className="h-9 max-w-[138px]" imageClassName="max-w-full" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-2 lg:flex">
           {items.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="text-base text-text-secondary transition-colors duration-150 hover:text-brand-blue"
+              className="rounded-full px-4 py-3 text-sm font-semibold text-text-primary transition-colors duration-150 hover:bg-surface-muted"
             >
               {item.label}
             </a>
           ))}
         </nav>
+
+        <div className="hidden min-w-0 flex-1 items-center justify-center md:flex lg:max-w-md">
+          <div className="flex h-12 w-full items-center gap-3 rounded-full bg-surface-muted px-4 text-text-hint">
+            <Search className="h-5 w-5" />
+            <span className="truncate text-sm">Search surveys, responses, and insights</span>
+          </div>
+        </div>
 
         <div className="hidden items-center gap-2 md:flex">
           <Button variant="ghost" onClick={() => navigate(loginHref)}>
@@ -85,7 +93,7 @@ export function TopNav({
       <div
         id="top-nav-mobile-drawer"
         className={cn(
-          "overflow-hidden border-t border-border bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
+          "overflow-hidden bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
           open ? "max-h-80 opacity-100" : "max-h-0 opacity-0",
         )}
       >

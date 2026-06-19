@@ -3,23 +3,23 @@
 @layer base {
   :root {
     color-scheme: light;
-    --survica-brand-blue: #4f46e5;
-    --survica-brand-blue-dark: #3730a3;
-    --survica-brand-blue-light: #eef2ff;
-    --survica-brand-orange: #f05a3c;
-    --survica-brand-orange-dark: #c2412d;
-    --survica-brand-orange-light: #fff1ed;
-    --survica-surface-page: #f7f7fb;
+    --survica-brand-blue: #e60023;
+    --survica-brand-blue-dark: #ad081b;
+    --survica-brand-blue-light: #fff0f3;
+    --survica-brand-orange: #ff5a5f;
+    --survica-brand-orange-dark: #d92f45;
+    --survica-brand-orange-light: #fff1f2;
+    --survica-surface-page: #ffffff;
     --survica-surface-card: #ffffff;
-    --survica-surface-muted: #f0f1f7;
+    --survica-surface-muted: #f3f3f3;
     --survica-surface-overlay: rgba(15, 23, 42, 0.5);
-    --survica-text-primary: #17172b;
-    --survica-text-secondary: #5c5e71;
-    --survica-text-hint: #9294a7;
+    --survica-text-primary: #111111;
+    --survica-text-secondary: #5f5f5f;
+    --survica-text-hint: #8a8a8a;
     --survica-text-inverse: #ffffff;
-    --survica-border-default: #e3e4ec;
-    --survica-border-strong: #cacbd8;
-    --survica-border-focus: #4f46e5;
+    --survica-border-default: #e9e9e9;
+    --survica-border-strong: #d4d4d4;
+    --survica-border-focus: #e60023;
     --survica-status-success: #10b981;
     --survica-status-warning: #f59e0b;
     --survica-status-danger: #ef4444;
@@ -30,9 +30,9 @@
     --survica-radius-2xl: 24px;
     --survica-radius-full: 9999px;
     --survica-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --survica-shadow-md: 0 8px 24px rgba(30, 30, 70, 0.07), 0 2px 6px rgba(30, 30, 70, 0.04);
-    --survica-shadow-lg: 0 24px 60px rgba(35, 32, 90, 0.13), 0 8px 20px rgba(35, 32, 90, 0.06);
-    --survica-shadow-focus: 0 0 0 3px rgba(79, 70, 229, 0.18);
+    --survica-shadow-md: 0 8px 28px rgba(0, 0, 0, 0.08);
+    --survica-shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.14);
+    --survica-shadow-focus: 0 0 0 4px rgba(230, 0, 35, 0.12);
   }
 
   *,
@@ -65,6 +65,11 @@
     line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
   }
 
   #root {

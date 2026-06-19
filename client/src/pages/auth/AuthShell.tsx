@@ -3,7 +3,6 @@ import {
   AudioLines,
   ChartColumnBig,
   FileText,
-  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 import { TopNav } from "../../components/layout/TopNav";
@@ -48,6 +47,12 @@ const defaultFeatures: AuthFeature[] = [
   },
 ];
 
+const pinStyles = [
+  "min-h-44 bg-[#ffd7d9]",
+  "min-h-64 bg-[#d9efe6]",
+  "min-h-52 bg-[#ffe7bd]",
+] as const;
+
 export function AuthShell({
   title,
   description,
@@ -55,8 +60,8 @@ export function AuthShell({
   children,
   centered = false,
   footer,
-  helperTitle = "Keep survey operations inside the workspace",
-  helperDescription = "Respondents can answer public links without an account. Creation, analytics, exports, and team controls stay behind authenticated access.",
+  helperTitle = "Save every voice. Discover the pattern.",
+  helperDescription = "Collect natural answers, organise them into clear themes, and keep the insights your team wants to revisit.",
   helperFeatures = defaultFeatures,
   cardClassName,
 }: AuthShellProps) {
@@ -64,20 +69,20 @@ export function AuthShell({
     return (
       <div className="min-h-screen bg-surface-page">
         <TopNav />
-        <main className="survica-page-shell flex min-h-[calc(100vh-60px)] items-center justify-center py-8 md:py-10">
-          <div className="w-full max-w-lg space-y-5">
+        <main className="survica-page-shell flex min-h-[calc(100vh-72px)] items-center justify-center bg-[radial-gradient(circle_at_15%_15%,#fff0f3_0%,transparent_28%),radial-gradient(circle_at_85%_75%,#f3f3f3_0%,transparent_32%)] py-8 md:py-10">
+          <div className="w-full max-w-2xl space-y-5">
             <div className="space-y-3 text-center">
               <Badge variant="done" className="mx-auto">
                 {eyebrow}
               </Badge>
               <div className="space-y-2">
-                <h1 className="text-2xl font-medium text-text-primary sm:text-3xl">
+                <h1 className="text-3xl font-semibold tracking-[-0.04em] text-text-primary sm:text-4xl">
                   {title}
                 </h1>
                 <p className="text-base text-text-secondary">{description}</p>
               </div>
             </div>
-            <Card className={cn("shadow-md", cardClassName)}>{children}</Card>
+            <Card className={cn("p-6 shadow-lg sm:p-8", cardClassName)}>{children}</Card>
             {footer ? <div className="text-center">{footer}</div> : null}
           </div>
         </main>
@@ -88,79 +93,64 @@ export function AuthShell({
   return (
     <div className="min-h-screen bg-surface-page">
       <TopNav />
-      <main className="survica-page-shell py-8 md:py-10 lg:py-12">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(380px,440px)] lg:items-stretch">
-          <section className="hidden rounded-xl border border-border bg-surface-card p-6 lg:flex lg:flex-col lg:justify-between">
-            <div className="space-y-5">
-              <Badge variant="done">{eyebrow}</Badge>
-              <div className="space-y-3">
-                <h1 className="max-w-2xl text-3xl font-medium text-text-primary xl:text-[34px]">
-                  {helperTitle}
-                </h1>
-                <p className="max-w-xl text-base text-text-secondary">
-                  {helperDescription}
-                </p>
-              </div>
-              <div className="grid gap-3">
+      <main className="min-h-[calc(100vh-72px)] bg-[#f7f7f7] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <div className="mx-auto grid max-w-[1320px] gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(390px,480px)] lg:items-stretch">
+          <section className="relative hidden min-h-[720px] overflow-hidden rounded-[32px] bg-brand-blue-light p-7 text-text-primary lg:block">
+            <div className="relative z-10 max-w-xl space-y-3">
+              <Badge className="bg-white text-brand-blue">{eyebrow}</Badge>
+              <h1 className="text-4xl font-semibold leading-tight tracking-[-0.045em] xl:text-5xl">
+                {helperTitle}
+              </h1>
+              <p className="max-w-lg text-base leading-7 text-text-secondary">
+                {helperDescription}
+              </p>
+            </div>
+
+            <div className="absolute inset-x-7 bottom-[-70px] top-[250px] columns-3 gap-3 overflow-hidden">
                 {helperFeatures.map((feature) => {
                   const Icon = feature.icon;
+                  const index = helperFeatures.indexOf(feature);
 
                   return (
                     <div
                       key={feature.title}
-                      className="rounded-lg border border-border bg-surface-page p-4"
+                      className={cn(
+                        "mb-3 break-inside-avoid rounded-[28px] p-5 text-text-primary shadow-lg",
+                        pinStyles[index % pinStyles.length],
+                      )}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-blue-light text-brand-blue">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/75 text-brand-blue">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <div className="space-y-1">
-                          <h2 className="text-base font-medium text-text-primary">
+                        <div className="mt-8 space-y-2">
+                          <h2 className="text-lg font-semibold">
                             {feature.title}
                           </h2>
-                          <p className="text-sm text-text-secondary">
+                          <p className="text-sm leading-6 text-text-secondary">
                             {feature.description}
                           </p>
                         </div>
-                      </div>
                     </div>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border bg-surface-page p-5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-orange-light text-brand-orange-dark">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div className="space-y-1">
-                  <h2 className="text-base font-medium text-text-primary">
-                    Professional by default
-                  </h2>
-                  <p className="text-sm text-text-secondary">
-                    Email redirects, protected routes, and workspace checks are enforced in the auth layer, not scattered across pages.
-                  </p>
-                </div>
-              </div>
             </div>
           </section>
 
-          <section className="space-y-5">
-            <div className="space-y-3 lg:pt-6">
-              <Badge variant="done">{eyebrow}</Badge>
+          <section className="flex flex-col justify-center rounded-[32px] bg-white p-6 shadow-sm sm:p-9 lg:p-10">
+            <div className="space-y-6">
+              <Badge variant="done" className="w-fit">{eyebrow}</Badge>
               <div className="space-y-2">
-                <h1 className="text-2xl font-medium text-text-primary sm:text-3xl">
+                <h1 className="text-3xl font-semibold tracking-[-0.045em] text-text-primary sm:text-4xl">
                   {title}
                 </h1>
-                <p className="max-w-xl text-base text-text-secondary">
+                <p className="max-w-xl text-base leading-7 text-text-secondary">
                   {description}
                 </p>
               </div>
-            </div>
 
-            <Card className={cn("shadow-md", cardClassName)}>{children}</Card>
+            <div className={cn("pt-2", cardClassName)}>{children}</div>
             {footer ? <div>{footer}</div> : null}
+            </div>
           </section>
         </div>
       </main>

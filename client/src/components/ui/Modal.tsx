@@ -126,12 +126,12 @@ export function Modal({
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         className={cn(
-          "flex w-full max-w-[520px] flex-col rounded-xl border border-border bg-surface-card shadow-lg outline-none transition-[opacity,transform] duration-200",
+          "flex w-full max-w-[520px] flex-col rounded-[28px] bg-surface-card shadow-lg outline-none transition-[opacity,transform] duration-200",
           visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-3 scale-[0.98] opacity-0",
           className,
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+        <div className="flex items-start justify-between gap-4 px-5 py-4">
           <div className="min-w-0">
             <h2 id={titleId} className="text-lg font-medium text-text-primary">
               {title}
@@ -157,7 +157,7 @@ export function Modal({
         <div className={cn("max-h-[70vh] overflow-y-auto p-5", contentClassName)}>
           {children}
         </div>
-        {footer ? <div className="border-t border-border px-5 py-4">{footer}</div> : null}
+        {footer ? <div className="px-5 py-4">{footer}</div> : null}
       </div>
     </div>,
     document.body,

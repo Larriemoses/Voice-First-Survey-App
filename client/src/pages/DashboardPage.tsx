@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from "lucide-react";
+import { ArrowUpRight, Mic2, MoreHorizontal, Plus, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/layout/AppShell";
@@ -260,46 +260,65 @@ function SurveyListRow({ survey }: { survey: DashboardSurveyRow }) {
             onClick: () => navigate(`/dashboard/surveys/${survey.id}`),
           };
 
+  const previewTones = [
+    "bg-[#ffd9dc]",
+    "bg-[#dcefe7]",
+    "bg-[#fff0c9]",
+    "bg-[#e5e0ff]",
+  ];
+  const tone = previewTones[survey.title.length % previewTones.length];
+  const previewHeight = survey.questionCount % 2 === 0 ? "min-h-52" : "min-h-64";
+
   return (
-    <Card
-      className={cn(
-        "group flex flex-col gap-4 rounded-xl transition-shadow duration-150 sm:flex-row sm:items-center sm:justify-between",
-        survey.status === "closed" ? "opacity-60" : "",
-      )}
-    >
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="truncate text-base font-medium text-text-primary">
+    <article className={cn("group mb-5 break-inside-avoid", survey.status === "closed" && "opacity-60")}>
+      <button
+        type="button"
+        onClick={action.onClick}
+        className={cn(
+          "relative flex w-full flex-col justify-between overflow-hidden rounded-[28px] p-5 text-left transition-transform duration-200 hover:scale-[1.015]",
+          previewHeight,
+          tone,
+        )}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <Badge variant={getStatusVariant(survey.displayStatus)}>{statusLabel}</Badge>
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-text-primary opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
+            <MoreHorizontal className="h-5 w-5" />
+          </span>
+        </div>
+
+        <div className="py-8">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/75 text-brand-blue shadow-sm">
+            <Mic2 className="h-6 w-6" />
+          </div>
+          <h3 className="text-2xl font-semibold leading-tight tracking-[-0.035em] text-text-primary">
             {survey.title}
           </h3>
-          <Badge variant={getStatusVariant(survey.displayStatus)}>{statusLabel}</Badge>
+          <p className="mt-3 text-sm leading-6 text-text-secondary">
+            {survey.questionCount} questions · {survey.respondentCount} voice responses
+          </p>
         </div>
-        <p className="mt-1 text-sm text-text-secondary">
-          {survey.questionCount} questions · {survey.respondentCount} responses
+
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-text-primary">
+          {action.label} <ArrowUpRight className="h-4 w-4" />
+        </span>
+      </button>
+
+      <div className="flex items-center justify-between gap-3 px-2 pt-3">
+        <p className="truncate text-xs text-text-secondary">
+          Updated {survey.lastActivityAt ? formatRelativeDate(survey.lastActivityAt) : "recently"}
         </p>
         {survey.status === "published" ? (
           <button
             type="button"
             onClick={() => navigate(`/dashboard/surveys/${survey.id}/analytics`)}
-            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand-orange transition-opacity duration-150 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+            className="text-xs font-semibold text-brand-blue hover:text-brand-blue-dark"
           >
-            View analytics →
+            Insights
           </button>
         ) : null}
       </div>
-
-      <div className="flex flex-col gap-3 sm:items-end">
-        <p className="text-sm text-text-secondary">
-          Last activity{" "}
-          <span className="text-text-primary">
-            {survey.lastActivityAt ? formatRelativeDate(survey.lastActivityAt) : "recently"}
-          </span>
-        </p>
-        <Button variant={action.variant} onClick={action.onClick}>
-          {action.label}
-        </Button>
-      </div>
-    </Card>
+    </article>
   );
 }
 
@@ -426,23 +445,23 @@ export default function DashboardPage() {
       ) : (
         <div className="survica-page-shell py-8 lg:py-10">
           <div className="space-y-8">
-            <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(125deg,#24205F_0%,#4F46E5_62%,#6D5CE7_100%)] px-6 py-7 text-white shadow-lg sm:px-8 sm:py-9">
-              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full border-[36px] border-white/10" />
-              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-orange/25 blur-2xl" />
+            <div className="relative overflow-hidden rounded-[32px] bg-brand-blue-light px-6 py-7 text-text-primary sm:px-8 sm:py-9">
+              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full bg-white/70" />
+              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-blue/15 blur-2xl" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Your workspace</p>
-                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue">Your workspace</p>
+                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-text-primary sm:text-3xl">
                   {greeting}, {firstName}
                 </h1>
-                <p className="mt-2 text-sm text-white/70 sm:text-base">
+                <p className="mt-2 text-sm text-text-secondary sm:text-base">
                   Your audience is speaking. Here’s the clearest view of what they’re saying.
                 </p>
               </div>
               <Button
                 leadingIcon={<Plus className="h-4 w-4" />}
                 variant="gradient"
-                className="border-white/10"
+                className="border-transparent"
                 onClick={() => navigate("/dashboard/surveys/new")}
               >
                 New survey
@@ -483,11 +502,11 @@ export default function DashboardPage() {
               />
             </div>
 
-            <section className="space-y-5 rounded-2xl border border-border/80 bg-white p-5 shadow-sm sm:p-6">
+            <section className="space-y-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue">Library</p>
-                  <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-text-primary">My surveys</h2>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue">Your ideas</p>
+                  <h2 className="mt-1 text-2xl font-semibold tracking-[-0.035em] text-text-primary">Survey boards</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {filters.map((item) => (
@@ -540,7 +559,7 @@ export default function DashboardPage() {
                   }
                 />
               ) : (
-                <div className="grid gap-3">
+                <div className="columns-1 gap-5 sm:columns-2 xl:columns-3">
                   {filteredRows.map((survey) => (
                     <SurveyListRow key={survey.id} survey={survey} />
                   ))}

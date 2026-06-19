@@ -126,12 +126,12 @@ export function Drawer({
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         className={cn(
-          "flex h-full w-full max-w-[360px] flex-col border-l border-border bg-surface-card shadow-lg outline-none transition-transform duration-200",
+          "flex h-full w-full max-w-[360px] flex-col bg-surface-card shadow-lg outline-none transition-transform duration-200",
           visible ? "translate-x-0" : "translate-x-full",
           className,
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+        <div className="flex items-start justify-between gap-4 px-5 py-4">
           <div className="min-w-0">
             <h2 id={titleId} className="text-lg font-medium text-text-primary">
               {title}
@@ -157,7 +157,7 @@ export function Drawer({
         <div className={cn("flex-1 overflow-y-auto p-5", contentClassName)}>
           {children}
         </div>
-        {footer ? <div className="border-t border-border px-5 py-4">{footer}</div> : null}
+        {footer ? <div className="px-5 py-4">{footer}</div> : null}
       </div>
     </div>,
     document.body,
