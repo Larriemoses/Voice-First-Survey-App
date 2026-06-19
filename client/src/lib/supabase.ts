@@ -49,6 +49,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export const publicSupabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
+    storageKey: "survica-public-auth",
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false,

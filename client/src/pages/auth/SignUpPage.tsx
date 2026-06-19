@@ -207,7 +207,7 @@ export default function SignUpPage() {
     setGoogleLoading(true);
 
     try {
-      const { data, error } = await signInWithGoogle("/onboarding");
+      const { data, error } = await signInWithGoogle("/dashboard");
 
       if (error) {
         setFormError(mapAuthErrorMessage(error.message, "signup"));

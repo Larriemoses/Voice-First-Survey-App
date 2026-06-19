@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import AppLogo from "../AppLogo";
-import { SidebarIcon } from "../ui/SidebarIcon";
+import { cn } from "../../utils/helpers";
 
 type SidebarItem = {
   label: string;
@@ -86,17 +86,17 @@ export function Sidebar() {
   const { pathname } = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[72px] bg-surface-card md:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[220px] bg-surface-card px-3 md:flex">
       <div className="flex h-full w-full flex-col">
         <Link
           to="/"
-          className="flex h-[72px] items-center justify-center"
+          className="flex h-[72px] items-center px-3"
           aria-label="Survica home"
         >
-          <AppLogo markOnly className="h-9" imageClassName="max-w-9 rounded-full" />
+          <AppLogo className="h-9 max-w-[136px]" imageClassName="max-w-full" />
         </Link>
-        <nav className="flex flex-1 flex-col items-center justify-between py-4">
-          <div className="flex flex-col gap-2">
+        <nav className="flex flex-1 flex-col justify-between py-4">
+          <div className="flex flex-col gap-1">
             {middleItems.map((item) => {
               const href =
                 item.label === "Responses"
@@ -104,26 +104,38 @@ export function Sidebar() {
                   : item.href;
 
               return (
-                <Link key={item.label} to={href} aria-label={item.label}>
-                  <SidebarIcon
-                    icon={<item.icon className="h-4 w-4" />}
-                    active={item.isActive(pathname)}
-                    tooltip={item.label}
-                    aria-current={item.isActive(pathname) ? "page" : undefined}
-                  />
+                <Link
+                  key={item.label}
+                  to={href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition-colors",
+                    item.isActive(pathname)
+                      ? "bg-brand-blue text-white"
+                      : "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
+                  )}
+                  aria-current={item.isActive(pathname) ? "page" : undefined}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {bottomItems.map((item) => (
-              <Link key={item.label} to={item.href} aria-label={item.label}>
-                <SidebarIcon
-                  icon={<item.icon className="h-4 w-4" />}
-                  active={item.isActive(pathname)}
-                  tooltip={item.label}
-                  aria-current={item.isActive(pathname) ? "page" : undefined}
-                />
+              <Link
+                key={item.label}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition-colors",
+                  item.isActive(pathname)
+                    ? "bg-brand-blue text-white"
+                    : "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
+                )}
+                aria-current={item.isActive(pathname) ? "page" : undefined}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.label}</span>
               </Link>
             ))}
           </div>

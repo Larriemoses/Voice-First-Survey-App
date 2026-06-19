@@ -1,4 +1,4 @@
-import { ArrowUpRight, Mic2, MoreHorizontal, Plus, Sparkles } from "lucide-react";
+import { ArrowUpRight, Building2, Mic2, MoreHorizontal, Plus, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/layout/AppShell";
@@ -8,6 +8,7 @@ import { Card } from "../components/ui/Card";
 import { Chip } from "../components/ui/Chip";
 import { EmptyState } from "../components/ui/EmptyState";
 import { MetricCard } from "../components/ui/MetricCard";
+import { Modal } from "../components/ui/Modal";
 import { SkeletonBlock } from "../components/ui/SkeletonBlock";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../lib/supabase";
@@ -260,24 +261,13 @@ function SurveyListRow({ survey }: { survey: DashboardSurveyRow }) {
             onClick: () => navigate(`/dashboard/surveys/${survey.id}`),
           };
 
-  const previewTones = [
-    "bg-[#ffd9dc]",
-    "bg-[#dcefe7]",
-    "bg-[#fff0c9]",
-    "bg-[#e5e0ff]",
-  ];
-  const tone = previewTones[survey.title.length % previewTones.length];
-  const previewHeight = survey.questionCount % 2 === 0 ? "min-h-52" : "min-h-64";
-
   return (
-    <article className={cn("group mb-5 break-inside-avoid", survey.status === "closed" && "opacity-60")}>
+    <article className={cn("group", survey.status === "closed" && "opacity-60")}>
       <button
         type="button"
         onClick={action.onClick}
         className={cn(
-          "relative flex w-full flex-col justify-between overflow-hidden rounded-[28px] p-5 text-left transition-transform duration-200 hover:scale-[1.015]",
-          previewHeight,
-          tone,
+          "relative flex min-h-[236px] w-full flex-col justify-between overflow-hidden rounded-[24px] bg-surface-muted p-5 text-left transition-transform duration-200 hover:-translate-y-1",
         )}
       >
         <div className="flex items-center justify-between gap-3">
@@ -324,11 +314,29 @@ function SurveyListRow({ survey }: { survey: DashboardSurveyRow }) {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, org } = useAuth();
   const [filter, setFilter] = useState<SurveyFilter>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [surveyRows, setSurveyRows] = useState<DashboardSurveyRow[]>([]);
+  const [setupPromptDismissed, setSetupPromptDismissed] = useState(() =>
+    window.localStorage.getItem("survica-workspace-setup-later") === "true",
+  );
+
+  function handleCreateSurvey() {
+    if (!org) {
+      setSetupPromptDismissed(false);
+      window.localStorage.removeItem("survica-workspace-setup-later");
+      return;
+    }
+
+    navigate("/dashboard/surveys/new");
+  }
+
+  function handleSetupLater() {
+    window.localStorage.setItem("survica-workspace-setup-later", "true");
+    setSetupPromptDismissed(true);
+  }
 
   useEffect(() => {
     let active = true;
@@ -445,13 +453,10 @@ export default function DashboardPage() {
       ) : (
         <div className="survica-page-shell py-8 lg:py-10">
           <div className="space-y-8">
-            <div className="relative overflow-hidden rounded-[32px] bg-brand-blue-light px-6 py-7 text-text-primary sm:px-8 sm:py-9">
-              <div className="pointer-events-none absolute -right-10 -top-20 h-64 w-64 rounded-full bg-white/70" />
-              <div className="pointer-events-none absolute bottom-[-90px] right-36 h-44 w-44 rounded-full bg-brand-blue/15 blur-2xl" />
-              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue">Your workspace</p>
-                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-text-primary sm:text-3xl">
+                <p className="mb-2 text-sm font-semibold text-brand-blue">Overview</p>
+                <h1 className="text-3xl font-semibold tracking-[-0.04em] text-text-primary sm:text-4xl">
                   {greeting}, {firstName}
                 </h1>
                 <p className="mt-2 text-sm text-text-secondary sm:text-base">
@@ -462,11 +467,10 @@ export default function DashboardPage() {
                 leadingIcon={<Plus className="h-4 w-4" />}
                 variant="gradient"
                 className="border-transparent"
-                onClick={() => navigate("/dashboard/surveys/new")}
+                onClick={handleCreateSurvey}
               >
                 New survey
               </Button>
-              </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -505,8 +509,8 @@ export default function DashboardPage() {
             <section className="space-y-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-blue">Your ideas</p>
-                  <h2 className="mt-1 text-2xl font-semibold tracking-[-0.035em] text-text-primary">Survey boards</h2>
+                  <p className="text-sm font-semibold text-brand-blue">Library</p>
+                  <h2 className="mt-1 text-2xl font-semibold tracking-[-0.035em] text-text-primary">Surveys</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {filters.map((item) => (
@@ -542,7 +546,7 @@ export default function DashboardPage() {
                   action={
                     <Button
                       leadingIcon={<Plus className="h-4 w-4" />}
-                      onClick={() => navigate("/dashboard/surveys/new")}
+                      onClick={handleCreateSurvey}
                     >
                       Create your first survey
                     </Button>
@@ -559,7 +563,7 @@ export default function DashboardPage() {
                   }
                 />
               ) : (
-                <div className="columns-1 gap-5 sm:columns-2 xl:columns-3">
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {filteredRows.map((survey) => (
                     <SurveyListRow key={survey.id} survey={survey} />
                   ))}
@@ -614,6 +618,36 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      <Modal
+        open={!org && !setupPromptDismissed}
+        onClose={handleSetupLater}
+        title="Set up your workspace?"
+        description="You are signed in. Workspace setup is optional for now, but you will need it before creating and sharing surveys."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button variant="secondary" onClick={handleSetupLater}>
+              Do this later
+            </Button>
+            <Button onClick={() => navigate("/onboarding")}>
+              Set up now
+            </Button>
+          </div>
+        }
+      >
+        <div className="rounded-[20px] bg-surface-muted p-5">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-text-primary">A workspace keeps your research organised</p>
+              <p className="mt-1 text-sm leading-6 text-text-secondary">
+                Add your organisation name, choose your main use case, and invite teammates whenever you are ready.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </AppShell>
   );
 }

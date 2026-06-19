@@ -17,7 +17,7 @@ import {
   signOutUser,
   signUpWithPassword,
 } from "../lib/auth";
-import { getOrganizationByOwnerId, type Organization } from "../lib/organization";
+import { getMyOrganizationMembership, type Organization } from "../lib/organization";
 import { supabase } from "../lib/supabase";
 
 export type AuthActionResult<T = void> = {
@@ -91,7 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const nextOrg = await getOrganizationByOwnerId(session.user.id);
+      const membership = await getMyOrganizationMembership();
+      const nextOrg = membership?.organization ?? null;
 
       if (requestId === syncVersionRef.current) {
         setUser(session.user);
@@ -183,11 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const safeRedirect = sanitizeRedirectPath(redirectTo);
 
-        if (!nextState.org) {
-          navigate("/onboarding", { replace: true });
-        } else {
-          navigate(safeRedirect || "/dashboard", { replace: true });
-        }
+        navigate(safeRedirect || "/dashboard", { replace: true });
 
         return {
           data: {
@@ -233,11 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         const nextState = await syncAuthState(data.session);
 
-        if (!nextState.org) {
-          navigate("/onboarding", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
+        navigate("/dashboard", { replace: true });
 
         return {
           data: {
