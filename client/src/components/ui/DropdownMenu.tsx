@@ -130,7 +130,7 @@ export function DropdownMenu({
           role="menu"
           aria-label={label}
           className={cn(
-            "absolute top-full z-40 mt-2 min-w-52 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-sm",
+            "absolute top-full z-40 mt-2 min-w-52 rounded-xl bg-[var(--surface)] p-1.5 shadow-md",
             align === "right" ? "right-0" : "left-0",
           )}
         >

@@ -63,7 +63,7 @@ export function RouteFallback({ variant = "public" }: RouteFallbackProps) {
       <div className="h-screen overflow-hidden bg-surface-page">
         <div className="hidden h-full w-[220px] bg-surface-card md:fixed md:left-0 md:top-0 md:block" />
         <div className="h-full md:pl-[220px]">
-          <div className="sticky top-0 z-20 border-b border-border bg-surface-card">
+          <div className="sticky top-0 z-20 bg-surface-card shadow-sm">
             <div className="survica-page-shell flex min-h-[52px] flex-col gap-3 py-3">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
@@ -83,7 +83,7 @@ export function RouteFallback({ variant = "public" }: RouteFallbackProps) {
             </div>
           </div>
           <div className="grid min-h-[calc(100vh-52px)] lg:grid-cols-[220px_minmax(0,1fr)_240px]">
-            <div className="border-r border-border bg-surface-muted p-4">
+            <div className="bg-surface-muted p-4">
               <div className="space-y-3">
                 {Array.from({ length: 5 }, (_, index) => (
                   <SkeletonBlock key={index} className="h-20 rounded-lg" />
@@ -98,7 +98,7 @@ export function RouteFallback({ variant = "public" }: RouteFallbackProps) {
                 <SkeletonBlock className="h-24 rounded-lg" />
               </Card>
             </div>
-            <div className="border-l border-border bg-surface-muted p-4">
+            <div className="bg-surface-muted p-4">
               <div className="space-y-4">
                 <SkeletonBlock className="h-32 rounded-lg" />
                 <SkeletonBlock className="h-28 rounded-lg" />
@@ -114,7 +114,7 @@ export function RouteFallback({ variant = "public" }: RouteFallbackProps) {
   if (variant === "auth") {
     return (
       <div className="min-h-screen bg-surface-page">
-        <div className="border-b border-border bg-surface-card">
+        <div className="bg-surface-card shadow-sm">
           <div className="survica-page-shell flex h-[60px] items-center justify-between">
             <SkeletonBlock className="h-7 w-28" />
             <SkeletonBlock className="hidden h-6 w-44 md:block" />
@@ -150,7 +150,7 @@ export function RouteFallback({ variant = "public" }: RouteFallbackProps) {
 
   return (
     <div className="min-h-screen bg-surface-page">
-      <div className="border-b border-border bg-surface-card">
+      <div className="bg-surface-card shadow-sm">
         <div className="survica-page-shell flex h-[60px] items-center justify-between">
           <SkeletonBlock className="h-7 w-28" />
           <SkeletonBlock className="hidden h-6 w-52 md:block" />

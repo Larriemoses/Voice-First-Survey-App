@@ -38,7 +38,7 @@ export function ExportPanel() {
       <h2 className="text-base font-medium text-gray-900">Export your insights</h2>
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         {options.map((option) => (
-          <div key={option.title} className="rounded-lg border border-gray-200 bg-white p-5">
+          <div key={option.title} className="rounded-xl bg-white p-5 shadow-sm">
             <option.icon className="h-5 w-5 text-primary-500" />
             <h3 className="mt-4 text-base font-medium text-gray-900">{option.title}</h3>
             <p className="mt-2 text-sm leading-5 text-gray-500">{option.description}</p>

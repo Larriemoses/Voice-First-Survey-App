@@ -87,7 +87,7 @@ export default function DashboardShell({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[var(--border-sub)] bg-[var(--surface)]/95 md:flex md:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 bg-[var(--surface)]/95 shadow-sm md:flex md:flex-col">
         <div className="flex h-14 items-center px-4">
           <div className="h-6">
             <AppLogo imageClassName="h-full w-auto" />
@@ -116,7 +116,7 @@ export default function DashboardShell({ children }: Props) {
               ))}
             </nav>
 
-            <div className="space-y-1 border-t border-[var(--color-border-subtle)] pt-4">
+            <div className="space-y-1 pt-4">
               {secondaryNav.map(({ to, label, icon: Icon }) => (
                 <NavLink
                   key={to}
@@ -138,7 +138,7 @@ export default function DashboardShell({ children }: Props) {
           </div>
 
           <div className="space-y-3">
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+            <div className="rounded-xl bg-[var(--surface)] p-3 shadow-sm">
               <div className="flex items-center gap-3">
                 <Avatar
                   name={accountLabel}
@@ -172,7 +172,7 @@ export default function DashboardShell({ children }: Props) {
         </div>
       </aside>
 
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-[var(--border-sub)] bg-[var(--surface)]/95 px-4 backdrop-blur md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 bg-[var(--surface)]/95 px-4 shadow-sm backdrop-blur md:hidden">
         <div className="mx-auto flex h-12 max-w-5xl items-center gap-3">
           <div className="h-5 shrink-0">
             <AppLogo imageClassName="h-full w-auto" />
@@ -191,8 +191,8 @@ export default function DashboardShell({ children }: Props) {
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border-sub)] bg-[var(--surface)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
-        <div className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-sm">
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-[var(--surface)]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-xl bg-[var(--surface)] p-1.5 shadow-lg">
           {primaryNav.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}

@@ -9,16 +9,16 @@
     --survica-brand-orange: #f59e0b;
     --survica-brand-orange-dark: #d97706;
     --survica-brand-orange-light: #fffbeb;
-    --survica-surface-page: #f8fafc;
+    --survica-surface-page: #f7f7fc;
     --survica-surface-card: #ffffff;
-    --survica-surface-muted: #f6f7fb;
+    --survica-surface-muted: #f3f2fc;
     --survica-surface-overlay: rgba(15, 23, 42, 0.5);
     --survica-text-primary: #0f172a;
     --survica-text-secondary: #64748b;
     --survica-text-hint: #94a3b8;
     --survica-text-inverse: #ffffff;
-    --survica-border-default: #e2e8f0;
-    --survica-border-strong: #cbd5e1;
+    --survica-border-default: transparent;
+    --survica-border-strong: transparent;
     --survica-border-focus: #6366f1;
     --survica-status-success: #10b981;
     --survica-status-warning: #f59e0b;
@@ -29,9 +29,9 @@
     --survica-radius-xl: 12px;
     --survica-radius-2xl: 12px;
     --survica-radius-full: 9999px;
-    --survica-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --survica-shadow-md: 0 8px 24px rgba(23, 23, 22, 0.07);
-    --survica-shadow-lg: 0 18px 50px rgba(23, 23, 22, 0.1);
+    --survica-shadow-sm: 0 2px 10px rgba(79, 70, 229, 0.06);
+    --survica-shadow-md: 0 8px 28px rgba(30, 41, 59, 0.07);
+    --survica-shadow-lg: 0 18px 55px rgba(30, 41, 59, 0.1);
     --survica-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.16);
   }
 
@@ -43,7 +43,7 @@
 
   html {
     min-height: 100%;
-    background: var(--survica-surface-page);
+    background: #ffffff;
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
   }
@@ -136,6 +136,12 @@
   ::selection {
     background: var(--survica-brand-blue-light);
     color: var(--survica-text-primary);
+  }
+
+  input,
+  textarea,
+  select {
+    border-color: transparent;
   }
 
   :where(

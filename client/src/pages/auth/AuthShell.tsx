@@ -72,7 +72,7 @@ export function AuthShell({
                 <p className="text-base text-text-secondary">{description}</p>
               </div>
             </div>
-            <div className={cn("rounded-2xl border border-border bg-white p-6 sm:p-8", cardClassName)}>{children}</div>
+            <div className={cn("rounded-xl bg-white p-6 shadow-md sm:p-8", cardClassName)}>{children}</div>
             {footer ? <div className="text-center">{footer}</div> : null}
           </div>
         </main>
@@ -84,8 +84,8 @@ export function AuthShell({
     <div className="min-h-screen bg-surface-page">
       <TopNav />
       <main className="min-h-[calc(100vh-68px)] bg-surface-page px-5 py-8 sm:px-8 lg:py-12">
-        <div className="mx-auto grid max-w-[1160px] overflow-hidden rounded-2xl border border-border bg-white lg:grid-cols-[minmax(0,1fr)_480px]">
-          <section className="relative hidden min-h-[680px] overflow-hidden border-r border-border bg-brand-blue-light p-10 text-text-primary lg:flex lg:flex-col lg:justify-between xl:p-14">
+        <div className="mx-auto grid max-w-[1160px] overflow-hidden rounded-2xl bg-white shadow-lg lg:grid-cols-[minmax(0,1fr)_480px]">
+          <section className="relative hidden min-h-[680px] overflow-hidden bg-brand-blue-light p-10 text-text-primary lg:flex lg:flex-col lg:justify-between xl:p-14">
             <div className="max-w-xl space-y-5">
               <p className="text-sm font-semibold text-brand-blue">{eyebrow}</p>
               <h1 className="text-4xl font-bold leading-[1.08] tracking-[-0.05em] xl:text-5xl">
@@ -101,7 +101,7 @@ export function AuthShell({
                   return (
                     <div
                       key={feature.title}
-                      className="flex items-start gap-4 rounded-xl border border-border bg-white p-4"
+                      className="flex items-start gap-4 rounded-xl bg-white p-4 shadow-sm"
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-blue-light text-brand-blue">
                           <Icon className="h-5 w-5" />

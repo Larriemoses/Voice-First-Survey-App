@@ -29,7 +29,7 @@ export default function SurveyPage() {
           <RecordButton recording={recording} onStart={() => setRecording(true)} onStop={() => setRecording(false)} />
           <Waveform />
         </section>
-        <footer className="sticky bottom-0 mt-auto grid grid-cols-2 gap-3 border-t border-gray-200 bg-white px-5 py-3">
+        <footer className="sticky bottom-0 mt-auto grid grid-cols-2 gap-3 bg-white px-5 py-3 shadow-[0_-8px_24px_rgba(30,41,59,0.06)]">
           <Button variant="secondary" onClick={() => (lastQuestion ? setSubmitted(true) : setCurrent((value) => value + 1))}>Skip</Button>
           <Button
             className={lastQuestion ? "border-accent-500 bg-accent-500 hover:border-accent-600 hover:bg-accent-600" : ""}

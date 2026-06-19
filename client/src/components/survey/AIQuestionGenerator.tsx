@@ -98,7 +98,7 @@ export function AIQuestionGenerator({ open, onClose, onAddQuestions }: AIQuestio
         {ready ? (
           <div className="space-y-2">
             {generatedQuestions.map((question) => (
-              <label key={question} className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700">
+              <label key={question} className="flex items-start gap-3 rounded-xl bg-white p-3 text-sm text-gray-700 shadow-sm">
                 <input type="checkbox" checked={selected.includes(question)} onChange={() => toggleQuestion(question)} className="mt-1 accent-primary-500" />
                 <span>{question}</span>
               </label>

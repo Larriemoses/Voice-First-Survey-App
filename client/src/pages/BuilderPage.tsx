@@ -1010,11 +1010,11 @@ export default function BuilderPage() {
       />
 
       <div className="grid min-h-[calc(100vh-84px)] grid-cols-1 gap-4 bg-surface-page p-4 md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)_240px]">
-        <aside className="hidden overflow-hidden rounded-2xl border border-border bg-white md:block">
+        <aside className="hidden overflow-hidden rounded-xl bg-white shadow-sm md:block">
           <QuestionsPanel {...panelProps} />
         </aside>
 
-        <section className="min-w-0 rounded-2xl border border-border bg-surface-card">
+        <section className="min-w-0 rounded-xl bg-surface-card shadow-sm">
           <div className="flex flex-col gap-5 p-4 md:p-6">
             <div className="flex items-center gap-2 lg:hidden">
               <Button
@@ -1099,7 +1099,7 @@ export default function BuilderPage() {
                     placeholder="Guide respondents toward the detail you need"
                   />
 
-                  <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white px-4 py-3">
+                  <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 shadow-sm">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-text-primary">Required</p>
                       <p className="text-sm text-text-secondary">
@@ -1118,7 +1118,7 @@ export default function BuilderPage() {
                   </div>
 
                   {selectedQuestion.responseType === "voice" ? (
-                    <div className="space-y-3 rounded-xl border border-border bg-white px-4 py-4">
+                    <div className="space-y-3 rounded-xl bg-white px-4 py-4 shadow-sm">
                       <div className="flex items-start gap-3">
                         <div className="rounded-lg bg-brand-blue-light p-2 text-brand-blue">
                           <Mic className="h-4 w-4" />
@@ -1158,8 +1158,8 @@ export default function BuilderPage() {
                     </h2>
                   </div>
 
-                  <div className="space-y-4 rounded-xl border border-border bg-surface-muted p-4">
-                    <div className="flex items-center gap-3 border-b border-border pb-3">
+                  <div className="space-y-4 rounded-xl bg-surface-muted p-4">
+                    <div className="flex items-center gap-3 pb-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
                         {companyName.trim().slice(0, 2).toUpperCase() || "SV"}
                       </div>
@@ -1178,7 +1178,7 @@ export default function BuilderPage() {
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-surface-card p-5">
+                    <div className="rounded-xl bg-surface-card p-5 shadow-sm">
                       <div className="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-brand-blue text-white shadow-[0_14px_28px_rgba(230,0,35,0.22)]">
                         <Mic className="h-6 w-6" />
                       </div>
@@ -1205,7 +1205,7 @@ export default function BuilderPage() {
           </div>
         </section>
 
-        <aside className="hidden overflow-hidden rounded-2xl border border-border bg-white lg:block">
+        <aside className="hidden overflow-hidden rounded-xl bg-white shadow-sm lg:block">
           <SettingsPanel {...settingsPanelProps} />
         </aside>
       </div>

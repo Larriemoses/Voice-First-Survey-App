@@ -10,7 +10,7 @@ type RespondentTableProps = {
 export function RespondentTable({ responses }: RespondentTableProps) {
   return (
     <Card className="overflow-hidden p-0">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <h2 className="text-base font-medium text-gray-900">Respondents</h2>
         <div className="flex gap-2">
           <Chip active>All</Chip>

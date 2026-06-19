@@ -25,7 +25,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
   secondary:
-    "border-border bg-surface-card text-text-primary hover:border-border-strong hover:bg-surface-muted",
+    "border-transparent bg-white text-text-primary shadow-sm hover:bg-surface-muted hover:shadow-md",
   ghost:
     "border-transparent bg-transparent text-text-secondary hover:bg-surface-muted hover:text-text-primary",
   danger:
@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-[10px] border font-semibold leading-[1.4] transition-[background-color,border-color,color,transform] duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-transparent font-semibold leading-[1.4] transition-[background-color,color,box-shadow,transform] duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60",
         variantClasses[variant],
         iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         className,
