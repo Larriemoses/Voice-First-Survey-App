@@ -53,7 +53,7 @@ function AuthCallbackRedirect() {
   if (error) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-surface-muted px-4">
-        <div className="w-full max-w-md rounded-[28px] bg-white p-8 text-center shadow-lg">
+        <div className="w-full max-w-md rounded-xl border border-border bg-white p-8 text-center shadow-md">
           <h1 className="text-2xl font-semibold tracking-[-0.03em] text-text-primary">
             Sign-in needs another try
           </h1>
@@ -71,7 +71,7 @@ function AuthCallbackRedirect() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface-muted px-4">
-      <div className="w-full max-w-sm rounded-[28px] bg-white p-8 text-center shadow-lg">
+      <div className="w-full max-w-sm rounded-xl border border-border bg-white p-8 text-center shadow-md">
         <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-brand-blue-light border-t-brand-blue" />
         <h1 className="mt-5 text-xl font-semibold text-text-primary">Finishing your sign-in</h1>
         <p className="mt-2 text-sm text-text-secondary">This should only take a moment.</p>

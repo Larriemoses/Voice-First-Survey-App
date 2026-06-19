@@ -1,26 +1,13 @@
-import { BarChart3, LayoutGrid, Radio, Settings } from "lucide-react";
+import { BarChart3, Home, Mic2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../../utils/helpers";
 
 type BottomTabItem = {
   label: string;
   href: string;
-  icon: typeof LayoutGrid;
+  icon: typeof Home;
   isActive: (pathname: string) => boolean;
 };
-
-const DEFAULT_RESULTS_PATH =
-  "/dashboard/surveys/q4-customer-satisfaction/results";
-
-function getCurrentResultsPath(pathname: string): string {
-  const match = pathname.match(/^\/dashboard\/surveys\/([^/]+)/);
-
-  if (!match?.[1]) {
-    return DEFAULT_RESULTS_PATH;
-  }
-
-  return `/dashboard/surveys/${match[1]}/results`;
-}
 
 function isSurveyBuilderRoute(pathname: string): boolean {
   return (
@@ -32,30 +19,22 @@ function isSurveyBuilderRoute(pathname: string): boolean {
 
 const items: BottomTabItem[] = [
   {
-    label: "Surveys",
+    label: "Dashboard",
     href: "/dashboard",
-    icon: LayoutGrid,
-    isActive: (pathname) => pathname === "/dashboard" || isSurveyBuilderRoute(pathname),
+    icon: Home,
+    isActive: (pathname) => pathname === "/dashboard",
   },
   {
-    label: "Analytics",
+    label: "Record",
+    href: "/dashboard/surveys/new",
+    icon: Mic2,
+    isActive: (pathname) => isSurveyBuilderRoute(pathname),
+  },
+  {
+    label: "Insights",
     href: "/dashboard/analytics",
     icon: BarChart3,
-    isActive: (pathname) =>
-      pathname === "/dashboard/analytics" ||
-      pathname.endsWith("/analytics"),
-  },
-  {
-    label: "Responses",
-    href: DEFAULT_RESULTS_PATH,
-    icon: Radio,
-    isActive: (pathname) => pathname.endsWith("/results"),
-  },
-  {
-    label: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
-    isActive: (pathname) => pathname.startsWith("/dashboard/settings"),
+    isActive: (pathname) => pathname.includes("analytics") || pathname.endsWith("/results"),
   },
 ];
 
@@ -64,13 +43,10 @@ export function BottomTabBar() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 backdrop-blur-xl md:hidden">
-      <div className="grid grid-cols-4 gap-1">
+      <div className="mx-auto grid max-w-sm grid-cols-3 gap-1">
         {items.map((item) => {
           const active = item.isActive(pathname);
-          const href =
-            item.label === "Responses"
-              ? getCurrentResultsPath(pathname)
-              : item.href;
+          const href = item.href;
 
           return (
             <Link
@@ -78,9 +54,11 @@ export function BottomTabBar() {
               to={href}
               className={cn(
                 "flex min-h-11 flex-col items-center justify-center gap-1 rounded-lg px-2 text-xs font-medium transition-colors duration-150",
-                active
-                  ? "bg-brand-blue-light text-brand-blue"
-                  : "text-text-hint hover:bg-surface-muted hover:text-text-primary",
+                item.label === "Record"
+                  ? "-mt-6 mx-auto h-14 w-14 rounded-full bg-[linear-gradient(135deg,#6366F1,#7C3AED)] text-white shadow-lg"
+                  : active
+                    ? "text-brand-blue"
+                    : "text-text-hint hover:bg-surface-muted hover:text-text-primary",
               )}
               aria-label={item.label}
               aria-current={active ? "page" : undefined}

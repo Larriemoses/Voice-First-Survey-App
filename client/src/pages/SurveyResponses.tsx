@@ -510,15 +510,15 @@ export default function SurveyResponses() {
               {Array.from({ length: 5 }).map((_, index) => (
                 <Card key={index} className="space-y-2 p-4 sm:space-y-3 sm:p-5">
                   <Skeleton className="h-4 w-20 rounded-full" />
-                  <Skeleton className="h-8 w-14 rounded-[18px] sm:h-9 sm:w-16 sm:rounded-[20px]" />
+                  <Skeleton className="h-8 w-14 rounded-xl sm:h-9 sm:w-16" />
                   <Skeleton className="h-4 w-24 rounded-full" />
                 </Card>
               ))}
             </div>
             <Card className="space-y-4">
-              <Skeleton className="h-12 rounded-[20px]" />
-              <Skeleton className="h-16 rounded-[24px]" />
-              <Skeleton className="h-16 rounded-[24px]" />
+              <Skeleton className="h-12 rounded-xl" />
+              <Skeleton className="h-16 rounded-xl" />
+              <Skeleton className="h-16 rounded-xl" />
             </Card>
           </div>
         ) : loadError ? (
@@ -669,7 +669,7 @@ export default function SurveyResponses() {
                   <TranscriptStatusBadge status={item.transcript_status} />
                 </div>
 
-                <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
                   <p className="text-sm font-semibold text-[var(--color-text)]">
                     Transcript
                   </p>
