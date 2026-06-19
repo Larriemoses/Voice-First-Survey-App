@@ -382,7 +382,7 @@ export default function SignUpPage() {
           />
 
           <div className="space-y-2">
-            <label className="flex items-start gap-3 rounded-[20px] bg-surface-muted p-4 text-sm text-text-secondary">
+            <label className="flex items-start gap-3 rounded-xl border border-border bg-surface-muted p-4 text-sm text-text-secondary">
               <input
                 type="checkbox"
                 className="mt-0.5 h-4 w-4 rounded border-border text-brand-blue focus:ring-brand-blue"

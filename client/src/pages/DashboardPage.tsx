@@ -267,7 +267,7 @@ function SurveyListRow({ survey }: { survey: DashboardSurveyRow }) {
         type="button"
         onClick={action.onClick}
         className={cn(
-          "relative flex min-h-[236px] w-full flex-col justify-between overflow-hidden rounded-[24px] bg-surface-muted p-5 text-left transition-transform duration-200 hover:-translate-y-1",
+          "relative flex min-h-[220px] w-full flex-col justify-between overflow-hidden rounded-2xl border border-border bg-white p-5 text-left transition-[border-color,box-shadow] duration-200 hover:border-border-strong hover:shadow-sm",
         )}
       >
         <div className="flex items-center justify-between gap-3">
@@ -634,7 +634,7 @@ export default function DashboardPage() {
           </div>
         }
       >
-        <div className="rounded-[20px] bg-surface-muted p-5">
+        <div className="rounded-xl border border-border bg-surface-muted p-5">
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
               <Building2 className="h-5 w-5" />

@@ -39,8 +39,8 @@ export function Select({
           aria-invalid={!!error}
           aria-describedby={helperText || error ? messageId : undefined}
           className={cn(
-            "h-12 w-full appearance-none rounded-2xl border bg-surface-muted px-4 pr-10 text-base text-text-primary transition-[background-color,box-shadow] duration-150 outline-none focus:bg-white focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:text-text-hint",
-            error ? "border-status-danger" : "border-transparent",
+            "h-11 w-full appearance-none rounded-[10px] border bg-surface-card px-3.5 pr-10 text-base text-text-primary transition-[border-color,box-shadow] duration-150 outline-none focus:border-brand-blue focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:text-text-hint",
+            error ? "border-status-danger" : "border-border",
             className,
           )}
           {...props}

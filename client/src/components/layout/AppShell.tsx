@@ -17,10 +17,10 @@ export function AppShell({
   return (
     <div className={cn("h-screen overflow-hidden bg-surface-page", className)}>
       <Sidebar />
-      <div className="h-screen md:pl-[220px]">
+      <div className="h-screen md:pl-[232px]">
         <main
           className={cn(
-            "h-full overflow-y-auto overflow-x-hidden pb-[calc(56px+env(safe-area-inset-bottom)+16px)] md:pb-0",
+            "h-full scroll-smooth overflow-y-auto overflow-x-hidden pb-[calc(64px+env(safe-area-inset-bottom)+16px)] md:pb-0",
             contentClassName,
           )}
         >

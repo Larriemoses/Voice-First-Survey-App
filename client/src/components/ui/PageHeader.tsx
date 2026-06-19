@@ -42,7 +42,7 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "sticky top-[calc(3rem+env(safe-area-inset-top))] z-20 -mx-4 mb-6 border-b border-[var(--border-sub)] bg-[color:color-mix(in_srgb,var(--bg)_88%,transparent)] px-4 py-4 backdrop-blur md:top-0 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
+        "sticky top-0 z-20 -mx-5 mb-8 border-b border-border bg-surface-page/95 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:-mx-10 lg:px-10",
         className,
       )}
     >
@@ -59,11 +59,11 @@ export function PageHeader({
               {backLabel}
             </Button>
           ) : null}
-          <h1 className="text-xl font-semibold text-[var(--text)] sm:text-2xl">
+          <h1 className="text-2xl font-bold tracking-[-0.035em] text-text-primary sm:text-3xl">
             {title}
           </h1>
           {subtitle ? (
-            <p className="mt-1 max-w-2xl text-sm text-[var(--text-muted)]">
+            <p className="mt-1.5 max-w-2xl text-sm text-text-secondary">
               {subtitle}
             </p>
           ) : null}

@@ -1,1352 +1,189 @@
 import {
-  AtSign,
-  BriefcaseBusiness,
-  Camera,
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  ClipboardList,
-  Code2,
-  Download,
+  ArrowRight,
+  AudioLines,
+  BarChart3,
+  Check,
   FileText,
-  Globe,
-  Heart,
-  MessageCircle,
-  Share2,
+  Mic2,
+  Play,
+  Quote,
   ShieldCheck,
   Sparkles,
-  Tag,
-  X,
-  Zap,
-  type LucideIcon,
+  Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { TopNav } from "@/components/layout/TopNav";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/Card";
-import { Toggle } from "@/components/ui/Toggle";
-import { Tooltip } from "@/components/ui/Tooltip";
-import { BRAND_LOGO_URL } from "@/lib/branding";
-import { cn } from "@/utils/helpers";
+import { useNavigate } from "react-router-dom";
+import AppLogo from "../components/AppLogo";
+import PageMeta from "../components/PageMeta";
+import { TopNav } from "../components/layout/TopNav";
+import { Button } from "../components/ui/button";
 
-type PricingFeature = {
-  label: string;
-  included: boolean;
-};
-
-type PricingPlan = {
-  name: string;
-  monthlyPrice: string;
-  annualPrice: string;
-  annualNote: string;
-  description: string;
-  features: PricingFeature[];
-  buttonLabel: string;
-  buttonVariant: "primary" | "secondary" | "orange";
-  finePrint: string;
-  href?: string;
-  mailto?: string;
-  featured?: boolean;
-  mobileOrderClassName?: string;
-  buttonAriaLabel?: string;
-};
-
-const howItWorksCards: Array<{
-  step: string;
-  title: string;
-  body: string;
-  icon: LucideIcon;
-  accent?: boolean;
-}> = [
+const workflow = [
   {
-    step: "1",
-    title: "Build your survey",
-    body:
-      "Write your questions manually or describe your goal and let AI generate them for you in seconds. Add your brand logo, choose your colours, and customise the header so your survey feels like it belongs to your company — not a generic form.",
-    icon: ClipboardList,
+    number: "01",
+    title: "Create naturally",
+    description: "Build a clear survey with typed or voice prompts, branching, and your own branding.",
+    icon: Mic2,
   },
   {
-    step: "2",
-    title: "Share a link, collect voice responses",
-    body:
-      "Share one URL anywhere — WhatsApp, email, SMS, or embed it on your site. Respondents tap to record and speak naturally on any device. No app download. No account needed. No typing. Works perfectly on mobile even on slower connections.",
-    icon: Share2,
+    number: "02",
+    title: "Share anywhere",
+    description: "Send one link. Respondents can answer by voice or text without creating an account.",
+    icon: Users,
   },
   {
-    step: "3",
-    title: "Get AI-powered insights instantly",
-    body:
-      "Survica automatically transcribes every response, analyses sentiment, extracts recurring themes, and writes an executive summary — ready to share with your team or present to leadership. Export as PDF or Excel with one click.",
-    icon: Sparkles,
-    accent: true,
+    number: "03",
+    title: "Understand the why",
+    description: "Turn transcripts into themes, sentiment, summaries, and reports your team can use.",
+    icon: BarChart3,
   },
 ];
 
-const analyticsTiles: Array<{
-  icon: LucideIcon;
-  title: string;
-  body: string;
-}> = [
-  {
-    icon: Heart,
-    title: "Sentiment analysis",
-    body:
-      "Every response is scored positive, neutral, or negative. See overall mood at a glance and drill into individual answers.",
-  },
-  {
-    icon: Tag,
-    title: "Theme extraction",
-    body:
-      "AI groups recurring keywords and phrases into themes automatically — no tagging, no manual coding, no spreadsheet gymnastics.",
-  },
-  {
-    icon: FileText,
-    title: "AI executive summary",
-    body:
-      "Get a 2–3 paragraph summary of all responses, written for stakeholders who need the headline — not the raw data.",
-  },
-  {
-    icon: Download,
-    title: "PDF & Excel export",
-    body:
-      "Download a polished analytics report as PDF to share, or a structured Excel workbook for your own deeper analysis.",
-  },
+const useCases = [
+  { title: "Customer research", description: "Hear the language customers use, not just the option they select.", icon: Quote },
+  { title: "Community feedback", description: "Collect richer stories across mobile and low-friction field contexts.", icon: AudioLines },
+  { title: "Team discovery", description: "Keep interviews, evidence, and decisions in one organised workspace.", icon: FileText },
 ];
 
-const whyVoiceStats = [
-  {
-    number: "4.8×",
-    label: "higher survey completion rate vs traditional text forms",
-    source: "(Mobile-first survey research, African markets)",
-  },
-  {
-    number: "3×",
-    label: "more words per response compared to typed answers",
-    source: "(Industry voice survey analysis)",
-  },
-  {
-    number: "88%",
-    label: "of Nigerian adults have used AI tools — your audience is ready",
-    source: "(Google / Ipsos AI Adoption Report, 2026)",
-  },
-  {
-    number: "0",
-    label: "typing required. Works for low-literacy and high-literacy users equally",
-    source: "(VOIS framework research)",
-  },
+const plans = [
+  { name: "Student", price: "$3", description: "For coursework, thesis research, and individual projects.", features: ["1 active survey", "50 responses monthly", "Voice transcription", "CSV export"] },
+  { name: "Professional", price: "$19", description: "For teams running continuous customer and user research.", features: ["Unlimited surveys", "500 responses monthly", "AI themes and sentiment", "PDF and Excel reports"], featured: true },
+  { name: "Organisation", price: "$49", description: "For agencies, NGOs, and multi-team research programmes.", features: ["Unlimited responses", "10 team seats", "Cross-survey analytics", "Priority support"] },
 ];
-
-const testimonials = [
-  {
-    quote:
-      "\"We used to spend three hours reading through survey responses every week. Now Survica generates a summary in under a minute. Our product team actually uses the insights now — they didn't before.\"",
-    name: "Sarah Chen",
-    role: "Head of Product",
-    company: "Finlo",
-    initials: "SC",
-    avatarClassName: "bg-brand-blue-light text-brand-blue",
-  },
-  {
-    quote:
-      "\"The voice format completely changed how our customers respond. We're getting three times more detail than we ever did with typed forms. People open up when they can just talk.\"",
-    name: "Marcus Adebayo",
-    role: "Customer Success Lead",
-    company: "Zenta",
-    initials: "MA",
-    avatarClassName: "bg-brand-orange-light text-brand-orange",
-  },
-  {
-    quote:
-      "\"The PDF report is what I send to leadership every quarter. It looks like something a consultant produced — but it takes me five minutes. That's the part that impressed everyone.\"",
-    name: "Priya Nair",
-    role: "Research Manager",
-    company: "Voxel Health",
-    initials: "PN",
-    avatarClassName: "bg-[#F0FDF4] text-status-success",
-  },
-];
-
-const pricingPlans: PricingPlan[] = [
-  {
-    name: "Student",
-    monthlyPrice: "$3 / mo",
-    annualPrice: "$2 / mo",
-    annualNote: "billed $24/yr",
-    description:
-      "Perfect for academic research, thesis surveys, and class projects. Get professional voice survey tools at a price that works for students.",
-    features: [
-      { label: "1 active survey at a time", included: true },
-      { label: "Up to 50 responses per month", included: true },
-      { label: "3 questions per survey", included: true },
-      { label: "Audio playback + basic transcription", included: true },
-      { label: "CSV export", included: true },
-      { label: "Shareable public link", included: true },
-      { label: "AI analytics", included: false },
-      { label: "PDF/Excel export", included: false },
-    ],
-    buttonLabel: "Get started free",
-    buttonVariant: "secondary",
-    href: "/signup?plan=student",
-    finePrint: "No card required for free tier",
-    buttonAriaLabel: "Create your free Survica account — no card required",
-  },
-  {
-    name: "Starter",
-    monthlyPrice: "$9 / mo",
-    annualPrice: "$6 / mo",
-    annualNote: "billed $72/yr",
-    description:
-      "For freelancers, consultants, and small teams running regular feedback collection. Everything you need to collect voice responses and export results.",
-    features: [
-      { label: "3 active surveys", included: true },
-      { label: "Up to 200 responses per month", included: true },
-      { label: "Unlimited questions per survey", included: true },
-      { label: "Full transcription", included: true },
-      { label: "Basic sentiment scoring", included: true },
-      { label: "CSV + Excel export", included: true },
-      { label: "Custom branding (logo + header)", included: true },
-      { label: "1 team member seat", included: true },
-      { label: "AI executive summary", included: false },
-      { label: "PDF analytics report", included: false },
-    ],
-    buttonLabel: "Start free trial",
-    buttonVariant: "secondary",
-    href: "/signup?plan=starter",
-    finePrint: "14-day free trial, no card required",
-    buttonAriaLabel: "Start your 14-day free trial",
-  },
-  {
-    name: "Professional",
-    monthlyPrice: "$19 / mo",
-    annualPrice: "$13 / mo",
-    annualNote: "billed $156/yr",
-    description:
-      "For growing teams that need the full power of AI analytics. Turn voice responses into insight reports, share with stakeholders, and make decisions faster.",
-    features: [
-      { label: "Unlimited active surveys", included: true },
-      { label: "Up to 500 responses per month", included: true },
-      { label: "Unlimited questions", included: true },
-      { label: "Full transcription + AI analytics", included: true },
-      { label: "Sentiment analysis + theme extraction", included: true },
-      { label: "AI executive summary (generated automatically)", included: true },
-      { label: "PDF analytics report + Excel workbook", included: true },
-      { label: "Custom branding", included: true },
-      { label: "3 team member seats", included: true },
-      { label: "Survey health AI coach", included: true },
-      { label: "Response quality scoring", included: true },
-    ],
-    buttonLabel: "Start free trial",
-    buttonVariant: "primary",
-    href: "/signup?plan=professional",
-    finePrint: "14-day free trial, cancel anytime",
-    featured: true,
-    mobileOrderClassName: "order-first md:order-none",
-    buttonAriaLabel: "Start your 14-day free trial",
-  },
-  {
-    name: "Organisation",
-    monthlyPrice: "$49 / mo",
-    annualPrice: "$34 / mo",
-    annualNote: "billed $408/yr",
-    description:
-      "For research organisations, NGOs, agencies, and enterprise teams running large-scale voice data collection with full control and team access.",
-    features: [
-      { label: "Everything in Professional", included: true },
-      { label: "Unlimited responses", included: true },
-      { label: "Up to 10 team member seats", included: true },
-      { label: "Organisation-wide analytics dashboard", included: true },
-      { label: "Cross-survey theme comparison", included: true },
-      { label: "Shareable public analytics reports", included: true },
-      { label: "Webhook + Slack integration", included: true },
-      { label: "Priority support", included: true },
-      { label: "Custom onboarding session", included: true },
-      { label: "API access (coming soon)", included: true },
-    ],
-    buttonLabel: "Contact us",
-    buttonVariant: "orange",
-    mailto: "mailto:hello@survica.io",
-    finePrint: "Custom pricing available for large institutions",
-    buttonAriaLabel: "Contact the Survica team for organisation pricing",
-  },
-];
-
-const faqs = [
-  {
-    question: "Do respondents need to create an account?",
-    answer:
-      "No. Respondents never sign up or log in. They simply open your survey link and tap to record. It works on any smartphone or computer, no app download required.",
-  },
-  {
-    question: "What happens when I reach my response limit?",
-    answer:
-      "Your survey stays live, but new responses are paused until your next billing cycle or you upgrade your plan. We'll notify you at 80% and 100% of your limit.",
-  },
-  {
-    question: "Can I use Survica in Nigerian Pidgin or local languages?",
-    answer:
-      "Respondents can speak in any language — Survica records whatever they say. AI transcription currently works best with English and Pidgin English, with support for Yoruba, Hausa, and Igbo coming in 2025.",
-  },
-  {
-    question: "Is my respondents' audio data secure?",
-    answer:
-      "Yes. All audio files are encrypted at rest and in transit. We never share or sell respondent data. You can request deletion of all responses at any time from your dashboard.",
-  },
-  {
-    question: "Can I try before I pay?",
-    answer:
-      "Absolutely. The Student plan is free with no card required. Starter and Professional plans both include a 14-day free trial.",
-  },
-  {
-    question: "What export formats are available?",
-    answer:
-      "CSV on all plans. Excel workbook and PDF analytics report on Starter and above. The PDF is designed to be shared directly with stakeholders.",
-  },
-];
-
-const footerSocialLinks: Array<{
-  name: string;
-  href: string;
-  icon: LucideIcon;
-}> = [
-  {
-    name: "LinkedIn",
-    href: "https://linkedin.com/company/survica",
-    icon: BriefcaseBusiness,
-  },
-  {
-    name: "Instagram",
-    href: "https://instagram.com/survica",
-    icon: Camera,
-  },
-  {
-    name: "X",
-    href: "https://x.com/survica",
-    icon: AtSign,
-  },
-  {
-    name: "WhatsApp",
-    href: "https://wa.me/message/survica",
-    icon: MessageCircle,
-  },
-  {
-    name: "GitHub",
-    href: "https://github.com/Larriemoses/Voice-First-Survey-App",
-    icon: Code2,
-  },
-];
-
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Survica",
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  description:
-    "Voice-first survey platform with AI-generated analytics, transcription, sentiment analysis, and PDF/XLSX export.",
-  offers: [
-    {
-      "@type": "Offer",
-      name: "Student",
-      price: "3",
-      priceCurrency: "USD",
-    },
-    {
-      "@type": "Offer",
-      name: "Starter",
-      price: "9",
-      priceCurrency: "USD",
-    },
-    {
-      "@type": "Offer",
-      name: "Professional",
-      price: "19",
-      priceCurrency: "USD",
-    },
-    {
-      "@type": "Offer",
-      name: "Organisation",
-      price: "49",
-      priceCurrency: "USD",
-    },
-  ],
-  url: "https://survica.vercel.app",
-};
-
-function HomePageHelmet() {
-  useEffect(() => {
-    const previousTitle = document.title;
-    const createdElements: HTMLElement[] = [];
-
-    document.title = "Survica — Voice Surveys & AI-Powered Feedback Analytics";
-
-    function appendElement<TagName extends keyof HTMLElementTagNameMap>(
-      tagName: TagName,
-      attributes: Record<string, string>,
-      textContent?: string,
-    ) {
-      const element = document.createElement(tagName);
-      Object.entries(attributes).forEach(([key, value]) => {
-        element.setAttribute(key, value);
-      });
-      element.setAttribute("data-survica-homepage-head", "true");
-      if (textContent) {
-        element.textContent = textContent;
-      }
-      document.head.appendChild(element);
-      createdElements.push(element);
-    }
-
-    appendElement("meta", {
-      name: "description",
-      content:
-        "Survica helps teams collect spoken feedback from customers, employees, and communities — then turns those voice responses into transcripts, sentiment scores, and AI-generated insight reports. No login required for respondents.",
-    });
-
-    appendElement("meta", {
-      name: "keywords",
-      content:
-        "voice survey platform, audio feedback tool, AI survey analytics, voice-first surveys Africa, survey transcription software, customer feedback AI, employee pulse survey, qualitative research tool Nigeria, sentiment analysis survey, spoken feedback collection",
-    });
-
-    appendElement("meta", { property: "og:type", content: "website" });
-    appendElement("meta", {
-      property: "og:url",
-      content: "https://survica.vercel.app",
-    });
-    appendElement("meta", {
-      property: "og:title",
-      content: "Survica — Voice Surveys & AI-Powered Feedback Analytics",
-    });
-    appendElement("meta", {
-      property: "og:description",
-      content:
-        "Collect spoken feedback. Get structured insight. Survica turns voice responses into transcripts, themes, and board-ready reports — automatically.",
-    });
-    appendElement("meta", {
-      property: "og:image",
-      content: "https://survica.vercel.app/og-image.png",
-    });
-
-    appendElement("meta", {
-      name: "twitter:card",
-      content: "summary_large_image",
-    });
-    appendElement("meta", {
-      name: "twitter:title",
-      content: "Survica — Voice Surveys & AI Feedback Analytics",
-    });
-    appendElement("meta", {
-      name: "twitter:description",
-      content:
-        "Voice surveys that actually get answered. AI turns spoken responses into insight reports in minutes.",
-    });
-    appendElement("meta", {
-      name: "twitter:image",
-      content: "https://survica.vercel.app/og-image.png",
-    });
-
-    appendElement("link", {
-      rel: "canonical",
-      href: "https://survica.vercel.app",
-    });
-
-    appendElement(
-      "script",
-      { type: "application/ld+json" },
-      JSON.stringify(structuredData),
-    );
-
-    return () => {
-      document.title = previousTitle;
-      createdElements.forEach((element) => element.remove());
-    };
-  }, []);
-
-  return null;
-}
-
-function SectionLabel({ children, className }: { children: string; className?: string }) {
-  return (
-    <p className={cn("text-[10px] uppercase tracking-[0.24em] text-text-hint", className)}>
-      {children}
-    </p>
-  );
-}
-
-function SocialIconLink({
-  href,
-  icon: Icon,
-  name,
-}: {
-  href: string;
-  icon: LucideIcon;
-  name: string;
-}) {
-  return (
-    <Tooltip content={name} side="top">
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Survica on ${name}`}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-muted text-text-secondary transition-colors duration-150 hover:bg-brand-blue hover:text-white"
-      >
-        <Icon className="h-4 w-4" />
-      </a>
-    </Tooltip>
-  );
-}
-
-function PricingCard({
-  plan,
-  billingCycle,
-  fading,
-}: {
-  plan: PricingPlan;
-  billingCycle: "monthly" | "annual";
-  fading: boolean;
-}) {
-  const navigate = useNavigate();
-
-  function handleAction() {
-    if (plan.href) {
-      navigate(plan.href);
-      return;
-    }
-
-    if (plan.mailto) {
-      window.location.href = plan.mailto;
-    }
-  }
-
-  const price = billingCycle === "monthly" ? plan.monthlyPrice : plan.annualPrice;
-  const note =
-    billingCycle === "monthly" ? "Billed monthly" : plan.annualNote;
-
-  return (
-    <div className={cn("relative", plan.mobileOrderClassName)}>
-      {plan.featured ? (
-        <Badge
-          className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 bg-brand-blue px-3 py-1 text-white"
-        >
-          Most popular
-        </Badge>
-      ) : null}
-      <Card
-        hoverable={false}
-        className={cn(
-          "flex h-full flex-col rounded-xl p-6",
-          plan.featured
-            ? "bg-brand-blue-light shadow-md"
-            : "bg-surface-muted",
-        )}
-      >
-        <div
-          className={cn(
-            "transition-opacity duration-150",
-            fading ? "opacity-60" : "opacity-100",
-          )}
-        >
-          <h3 className="text-lg font-medium text-text-primary">{plan.name}</h3>
-          <p className="mt-4 text-[32px] font-medium leading-none text-text-primary">
-            {price}
-          </p>
-          <p className="mt-2 text-xs text-text-hint">{note}</p>
-          <p className="mt-4 text-sm leading-6 text-text-secondary">
-            {plan.description}
-          </p>
-        </div>
-
-        <ul className="mt-6 flex flex-1 flex-col gap-3">
-          {plan.features.map((feature) => (
-            <li key={feature.label} className="flex items-start gap-2">
-              {feature.included ? (
-                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-status-success" />
-              ) : (
-                <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-text-hint" />
-              )}
-              <span
-                className={cn(
-                  "text-sm leading-6",
-                  feature.included ? "text-text-primary" : "text-text-hint",
-                )}
-              >
-                {feature.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-6">
-          <Button
-            variant={plan.buttonVariant}
-            className="w-full"
-            onClick={handleAction}
-            aria-label={plan.buttonAriaLabel}
-            title={plan.buttonAriaLabel}
-          >
-            {plan.buttonLabel}
-          </Button>
-          <p className="mt-3 text-xs text-text-hint">{plan.finePrint}</p>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function FaqItem({
-  answer,
-  open,
-  question,
-  onToggle,
-}: {
-  answer: string;
-  open: boolean;
-  question: string;
-  onToggle: () => void;
-}) {
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 py-4 text-left"
-      >
-        <span className="text-base font-medium text-text-primary">{question}</span>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 text-text-secondary transition-transform duration-200",
-            open ? "rotate-180" : "",
-          )}
-        />
-      </button>
-      <div
-        className={cn(
-          "grid transition-[grid-template-rows] duration-[250ms] ease-in-out",
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
-        )}
-      >
-        <div className="overflow-hidden">
-          <p className="pb-4 text-base leading-[1.7] text-text-secondary">
-            {answer}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HeroMockup() {
-  const pins = [
-    {
-      label: "Customer love",
-      quote: "The delivery was faster than I expected, and the support felt genuinely human.",
-      meta: "42 voice responses",
-      tone: "bg-[#ffd9dc]",
-      height: "min-h-[250px]",
-    },
-    {
-      label: "Top theme",
-      quote: "People keep mentioning how easy the new experience feels.",
-      meta: "Positive · 86%",
-      tone: "bg-[#dcefe7]",
-      height: "min-h-[190px]",
-    },
-    {
-      label: "AI summary",
-      quote: "Speed, support quality, and simple onboarding are driving satisfaction this week.",
-      meta: "Updated 2m ago",
-      tone: "bg-[#fff0c9]",
-      height: "min-h-[230px]",
-    },
-    {
-      label: "Needs attention",
-      quote: "A few customers want clearer pricing before they commit.",
-      meta: "8 related responses",
-      tone: "bg-[#e6e0ff]",
-      height: "min-h-[180px]",
-    },
-  ];
-
-  return (
-    <div className="relative mx-auto mt-14 w-full max-w-[1020px] overflow-hidden rounded-[32px] bg-surface-muted p-4 shadow-[0_24px_60px_rgba(0,0,0,0.1)] sm:p-6">
-      <div className="mb-5 flex items-center justify-between gap-3 px-1 text-text-primary">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-blue">Live insight board</p>
-          <p className="mt-1 text-lg font-semibold">What customers are saying</p>
-        </div>
-        <span className="rounded-full bg-brand-blue px-4 py-2 text-xs font-semibold">128 responses</span>
-      </div>
-      <div className="columns-2 gap-3 md:columns-4">
-        {pins.map((pin) => (
-          <article
-            key={pin.label}
-            className={cn("mb-3 flex break-inside-avoid flex-col justify-between rounded-[24px] p-4 text-left", pin.tone, pin.height)}
-          >
-            <span className="w-fit rounded-full bg-white/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-primary">
-              {pin.label}
-            </span>
-            <div>
-              <p className="text-sm font-semibold leading-6 text-text-primary sm:text-base">“{pin.quote}”</p>
-              <p className="mt-3 text-xs text-text-secondary">{pin.meta}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [navSolid, setNavSolid] = useState(false);
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [priceFading, setPriceFading] = useState(false);
-  const [openFaq, setOpenFaq] = useState<string | null>(null);
-
-  useEffect(() => {
-    const previousScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = "smooth";
-
-    function handleScroll() {
-      setNavSolid(window.scrollY > 10);
-      setShowBackToTop(window.scrollY > 400);
-    }
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      document.documentElement.style.scrollBehavior = previousScrollBehavior;
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  function scrollToSection(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function changeBillingCycle(nextCycle: "monthly" | "annual") {
-    if (nextCycle === billingCycle) {
-      return;
-    }
-
-    setPriceFading(true);
-    setBillingCycle(nextCycle);
-    window.setTimeout(() => setPriceFading(false), 150);
-  }
-
-  const topNavItems = useMemo(
-    () => [
-      { label: "Product", href: "#features" },
-      { label: "Use cases", href: "#why-voice" },
-      { label: "Pricing", href: "#pricing" },
-    ],
-    [],
-  );
 
   return (
-    <>
-      <HomePageHelmet />
-      <div className="min-h-screen bg-surface-page text-text-primary">
-        <TopNav
-          items={topNavItems}
-          className={cn(
-            "border-border transition-[background-color,box-shadow,backdrop-filter] duration-150 ease-linear",
-            navSolid
-              ? "bg-white/95 shadow-sm backdrop-blur-sm"
-              : "bg-transparent shadow-none backdrop-blur-none",
-          )}
-        />
+    <div className="min-h-screen bg-surface-page text-text-primary">
+      <PageMeta title="Survica — Voice-first research, made clear" description="Create voice-first surveys, collect natural responses, and turn feedback into clear research insight." />
+      <TopNav />
 
-        <main>
-          <section className="relative overflow-hidden bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF5F6_72%,#FFFFFF_100%)]">
-            <div className="absolute -left-28 top-20 h-80 w-80 rounded-full bg-brand-orange/10 blur-3xl" />
-            <div className="absolute -right-24 top-0 h-[420px] w-[420px] rounded-full bg-brand-blue/10 blur-3xl" />
-            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle,_#E5C7CC_1px,_transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
-            <div className="relative mx-auto max-w-[1180px] px-6 pb-20 pt-24 sm:px-8 sm:pt-28 lg:px-10">
-              <div className="mx-auto max-w-[780px] text-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/20 bg-white/80 px-4 py-2 text-xs font-semibold text-brand-orange shadow-sm backdrop-blur">
-                  <Sparkles className="h-3.5 w-3.5" /> Built for real voices, not checkbox answers
-                </span>
-                <h1 className="mt-7 text-[42px] font-semibold leading-[1.02] tracking-[-0.055em] text-text-primary sm:text-[64px] lg:text-[74px]">
-                  <span className="block">Hear the whole story.</span>
-                  <span className="mt-2 block text-brand-blue">Understand what matters.</span>
-                </h1>
-                <p className="mx-auto mt-7 max-w-[650px] text-base leading-8 text-text-secondary sm:text-lg">
-                  Ask better questions, collect natural voice responses, and let Survica turn every conversation into clear themes, sentiment, and shareable insight.
-                </p>
+      <main>
+        <section className="survica-page-shell grid gap-12 py-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,1.1fr)] lg:items-center lg:py-24">
+          <div className="max-w-2xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-medium text-text-secondary">
+              <Sparkles className="h-4 w-4 text-brand-blue" />
+              Voice-first research workspace
+            </div>
+            <h1 className="max-w-[720px] text-5xl font-bold leading-[1.02] tracking-[-0.055em] sm:text-6xl lg:text-[68px]">
+              Better answers begin with a better way to ask.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-text-secondary">
+              Create surveys people can answer naturally. Survica captures voice and text, organises every response, and reveals the patterns behind what people say.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button size="lg" onClick={() => navigate("/signup")} trailingIcon={<ArrowRight className="h-4 w-4" />}>
+                Start a survey
+              </Button>
+              <Button size="lg" variant="secondary" onClick={() => navigate("/login")} leadingIcon={<Play className="h-4 w-4" />}>
+                Explore the workspace
+              </Button>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-secondary">
+              {["No card required", "Voice and text responses", "Export-ready insight"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-status-success" />{item}</span>
+              ))}
+            </div>
+          </div>
 
-                <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => navigate("/signup")}
-                    aria-label="Create your free Survica account"
-                    title="Create your free Survica account — no card required"
-                    className="w-full sm:w-auto"
-                  >
-                    Create your first survey
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    onClick={() => scrollToSection("how-it-works")}
-                    aria-label="Learn how Survica works"
-                    title="Jump to the how it works section"
-                    className="w-full sm:w-auto"
-                  >
-                    Watch how it works →
-                  </Button>
+          <div className="rounded-2xl border border-border bg-white p-3 shadow-lg sm:p-5">
+            <div className="overflow-hidden rounded-xl border border-border bg-[#FBFBF9]">
+              <div className="flex items-center justify-between border-b border-border bg-white px-5 py-4">
+                <div>
+                  <p className="text-sm font-semibold">Customer experience study</p>
+                  <p className="mt-0.5 text-xs text-text-hint">24 responses · collecting</p>
                 </div>
-
-                <p className="mt-5 text-xs tracking-[0.2px] text-text-hint">
-                  Free to start · No respondent login · Publish in minutes
-                </p>
-
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-                  <div className="flex items-center gap-1.5 text-xs text-text-hint">
-                    <ShieldCheck className="h-3 w-3 text-brand-blue" />
-                    <span>GDPR-ready</span>
+                <span className="rounded-full bg-status-success/10 px-2.5 py-1 text-xs font-medium text-status-success">Live</span>
+              </div>
+              <div className="grid min-h-[430px] md:grid-cols-[180px_1fr]">
+                <aside className="hidden border-r border-border bg-white p-3 md:block">
+                  {["Overview", "Responses", "Themes", "Reports"].map((item, index) => (
+                    <div key={item} className={`mb-1 rounded-lg px-3 py-2 text-sm ${index === 0 ? "bg-brand-blue-light font-medium text-brand-blue" : "text-text-secondary"}`}>{item}</div>
+                  ))}
+                </aside>
+                <div className="p-5 sm:p-7">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-hint">Research summary</p>
+                  <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em]">People value speed, but need clearer follow-up.</h2>
+                  <p className="mt-3 text-sm leading-6 text-text-secondary">Most respondents completed the flow easily. The strongest opportunity is explaining what happens after they submit.</p>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {[["24", "Responses"], ["4m 12s", "Avg. response"], ["82%", "Positive"]].map(([value, label]) => (
+                      <div key={label} className="rounded-xl border border-border bg-white p-4"><p className="text-xl font-bold">{value}</p><p className="mt-1 text-xs text-text-hint">{label}</p></div>
+                    ))}
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-text-hint">
-                    <Zap className="h-3 w-3 text-brand-blue" />
-                    <span>Works offline</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-text-hint">
-                    <Globe className="h-3 w-3 text-brand-blue" />
-                    <span>Multilingual support</span>
-                  </div>
-                </div>
-              </div>
-
-              <HeroMockup />
-            </div>
-          </section>
-
-          <section
-            id="social-proof"
-            className="bg-white px-6 py-9 sm:px-8 lg:px-10"
-          >
-            <div className="mx-auto max-w-[1100px]">
-              <div className="grid grid-cols-2 gap-y-6 md:flex md:items-center md:justify-between">
-                <div className="text-center md:flex-1">
-                  <p className="text-[28px] font-medium leading-none text-brand-blue">4.8×</p>
-                  <p className="mx-auto mt-1.5 max-w-[120px] text-[13px] text-text-secondary">
-                    higher completion vs text surveys
-                  </p>
-                </div>
-                <div className="hidden h-10 w-px self-center bg-border md:block" />
-                <div className="text-center md:flex-1">
-                  <p className="text-[28px] font-medium leading-none text-brand-blue">2 min</p>
-                  <p className="mx-auto mt-1.5 max-w-[120px] text-[13px] text-text-secondary">
-                    to publish your first survey
-                  </p>
-                </div>
-                <div className="hidden h-10 w-px self-center bg-border md:block" />
-                <div className="col-span-2 justify-self-center text-center md:col-span-1 md:flex-1">
-                  <p className="text-[28px] font-medium leading-none text-brand-blue">0 login</p>
-                  <p className="mx-auto mt-1.5 max-w-[120px] text-[13px] text-text-secondary">
-                    required for respondents
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section
-            id="how-it-works"
-            className="bg-surface-page px-6 py-[88px] sm:px-8 lg:px-10"
-          >
-            <div className="mx-auto max-w-[1100px] text-center">
-              <SectionLabel className="text-center">HOW IT WORKS</SectionLabel>
-              <h2 className="mt-3 text-2xl font-medium tracking-[-0.3px] text-text-primary sm:text-[32px]">
-                From question to insight in minutes
-              </h2>
-              <p className="mx-auto mt-2 max-w-[480px] text-md leading-[1.7] text-text-secondary">
-                No training needed. No complicated setup. Survica works the moment you publish.
-              </p>
-
-              <div className="relative mx-auto mt-14 max-w-[960px]">
-                <div className="grid gap-5 lg:grid-cols-3">
-                  {howItWorksCards.map((card) => {
-                    const Icon = card.icon;
-
-                    return (
-                      <Card
-                        key={card.title}
-                        hoverable={false}
-                        className={cn(
-                          "relative rounded-xl p-7 text-left",
-                          card.accent
-                            ? "bg-brand-orange-light"
-                            : "bg-white",
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium",
-                            card.accent
-                              ? "bg-brand-orange text-white"
-                              : "bg-brand-blue-light text-brand-blue",
-                          )}
-                        >
-                          {card.step}
-                        </div>
-                        <Icon
-                          className={cn(
-                            "mt-5 h-6 w-6",
-                            card.accent ? "text-brand-orange" : "text-brand-blue",
-                          )}
-                        />
-                        <h3 className="mt-5 text-lg font-medium text-text-primary">
-                          {card.title}
-                        </h3>
-                        <p className="mt-3 text-md leading-[1.75] text-text-secondary">
-                          {card.body}
-                        </p>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="features" className="bg-surface-muted px-6 py-[88px] sm:px-8 lg:px-10">
-            <div className="mx-auto grid max-w-[1100px] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
-              <div>
-                <SectionLabel className="text-brand-orange">ANALYTICS ENGINE</SectionLabel>
-                <h2 className="mt-4 text-[26px] font-medium leading-[1.2] tracking-[-0.4px] text-text-primary sm:text-[36px]">
-                  <span className="block">Spoken feedback in.</span>
-                  <span className="block">Business insight out.</span>
-                </h2>
-                <div className="mt-5 space-y-5 text-md leading-[1.75] text-text-secondary">
-                  <p>
-                    Most survey tools give you numbers. Survica gives you understanding. Every voice response is transcribed, analysed for sentiment, grouped by theme, and distilled into plain-language summaries — generated by AI, verified by your instincts.
-                  </p>
-                  <p>
-                    Whether you're running customer research, employee pulse checks, or community consultations, Survica turns qualitative voice data into the kind of insight that actually drives decisions.
-                  </p>
-                </div>
-                <div className="mt-8">
-                  <Button
-                    variant="gradient"
-                    size="lg"
-                    onClick={() => navigate("/signup")}
-                    aria-label="Sign up for Survica free plan"
-                    title="Sign up for Survica free plan"
-                  >
-                    Start building for free →
-                  </Button>
-                  <p className="mt-3 text-xs text-[#64748B]">
-                    Trusted by researchers, product teams, and community organisations across Africa.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                {analyticsTiles.map((tile) => {
-                  const Icon = tile.icon;
-
-                  return (
-                    <div
-                      key={tile.title}
-                    className="rounded-[24px] bg-white p-5"
-                    >
-                      <Icon className="h-6 w-6 text-brand-orange" />
-                      <h3 className="mt-3 text-md font-medium text-text-primary">
-                        {tile.title}
-                      </h3>
-                      <p className="mt-1.5 text-sm leading-[1.6] text-text-secondary">
-                        {tile.body}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          <section id="why-voice" className="bg-white px-6 py-[88px] sm:px-8 lg:px-10">
-            <div className="mx-auto max-w-[1100px] text-center">
-              <SectionLabel className="text-center">WHY VOICE?</SectionLabel>
-              <h2 className="mt-3 text-2xl font-medium text-text-primary sm:text-[32px]">
-                People talk more than they type
-              </h2>
-              <p className="mx-auto mt-3 max-w-[440px] text-md leading-[1.7] text-text-secondary">
-                Voice responses are longer, richer, and more honest. Here's what the research shows.
-              </p>
-
-              <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {whyVoiceStats.map((stat) => (
-                  <Card
-                    key={stat.number + stat.label}
-                    variant="muted"
-                    hoverable={false}
-                    className="rounded-xl p-6 text-center"
-                  >
-                    <p className="text-[36px] font-medium leading-none text-brand-blue">
-                      {stat.number}
-                    </p>
-                    <p className="mx-auto mt-2 max-w-[160px] text-[13px] leading-[1.5] text-text-secondary">
-                      {stat.label}
-                    </p>
-                    <p className="mt-1.5 text-[10px] italic text-text-hint">
-                      {stat.source}
-                    </p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section
-            id="testimonials"
-            className="bg-surface-page px-6 py-[88px] sm:px-8 lg:px-10"
-          >
-            <div className="mx-auto max-w-[1100px]">
-              <SectionLabel className="text-center">WHAT PEOPLE SAY</SectionLabel>
-              <h2 className="mt-3 text-center text-2xl font-medium text-text-primary sm:text-[32px]">
-                Trusted by teams who need real answers
-              </h2>
-
-              <div className="mt-12 grid gap-5 lg:grid-cols-3">
-                {testimonials.map((testimonial) => (
-                  <Card
-                    key={testimonial.name}
-                    className="rounded-xl p-7 transition-shadow duration-150 hover:shadow-md"
-                  >
-                    <div className="mb-3 flex gap-0.5 text-[13px] text-brand-orange">
-                      {Array.from({ length: 5 }, (_, index) => (
-                        <span key={index}>★</span>
+                  <div className="mt-3 rounded-xl border border-border bg-white p-5">
+                    <div className="flex items-center gap-2 text-sm font-semibold"><AudioLines className="h-4 w-4 text-brand-blue" />Emerging themes</div>
+                    <div className="mt-5 space-y-4">
+                      {[["Ease of use", "88%"], ["Fast completion", "72%"], ["Follow-up clarity", "46%"]].map(([label, value], index) => (
+                        <div key={label}><div className="mb-1.5 flex justify-between text-xs"><span>{label}</span><span className="text-text-hint">{value}</span></div><div className="h-2 rounded-full bg-surface-muted"><div className="h-full rounded-full bg-brand-blue" style={{ width: ["88%", "72%", "46%"][index] }} /></div></div>
                       ))}
                     </div>
-                    <span className="mb-[-8px] block text-[40px] leading-none text-border">
-                      &quot;
-                    </span>
-                    <p className="text-md italic leading-[1.75] text-text-secondary">
-                      {testimonial.quote}
-                    </p>
-                    <div className="mt-5 flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium",
-                          testimonial.avatarClassName,
-                        )}
-                      >
-                        {testimonial.initials}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-primary">
-                          {testimonial.name}
-                        </p>
-                        <p className="text-xs text-text-hint">
-                          {testimonial.role}, {testimonial.company}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section id="pricing" className="bg-white px-6 py-[88px] sm:px-8 lg:px-10">
-            <div className="mx-auto max-w-[1000px]">
-              <SectionLabel className="text-center">PRICING</SectionLabel>
-              <h2 className="mt-3 text-center text-2xl font-medium text-text-primary sm:text-[32px]">
-                Simple, honest pricing
-              </h2>
-              <p className="mx-auto mt-3 max-w-[520px] text-center text-md leading-[1.7] text-text-secondary">
-                Start free. Pay only when you grow. No hidden fees, no per-response charges, no surprises. All plans include unlimited surveys and the full voice collection experience.
-              </p>
-
-              <div className="mt-6 flex items-center justify-center gap-3">
-                <span
-                  className={cn(
-                    "text-sm transition-colors duration-150",
-                    billingCycle === "monthly" ? "text-text-primary" : "text-text-secondary",
-                  )}
-                >
-                  Monthly
-                </span>
-                <Toggle
-                  checked={billingCycle === "annual"}
-                  onCheckedChange={(checked) =>
-                    changeBillingCycle(checked ? "annual" : "monthly")
-                  }
-                />
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "text-sm transition-colors duration-150",
-                      billingCycle === "annual" ? "text-text-primary" : "text-text-secondary",
-                    )}
-                  >
-                    Annual
-                  </span>
-                  {billingCycle === "annual" ? (
-                    <Badge className="bg-status-success/10 text-status-success">
-                      Save 30%
-                    </Badge>
-                  ) : null}
+                  </div>
                 </div>
-              </div>
-
-              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {pricingPlans.map((plan) => (
-                  <PricingCard
-                    key={plan.name}
-                    plan={plan}
-                    billingCycle={billingCycle}
-                    fading={priceFading}
-                  />
-                ))}
-              </div>
-
-              <div className="mt-14">
-                <SectionLabel>FREQUENTLY ASKED QUESTIONS</SectionLabel>
-                <div className="mt-4">
-                  {faqs.map((faq) => (
-                    <FaqItem
-                      key={faq.question}
-                      question={faq.question}
-                      answer={faq.answer}
-                      open={openFaq === faq.question}
-                      onToggle={() =>
-                        setOpenFaq((current) =>
-                          current === faq.question ? null : faq.question,
-                        )
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-[linear-gradient(135deg,#1A56DB_0%,#1342B0_100%)] px-10 py-[72px] text-center">
-            <div className="mx-auto max-w-[720px]">
-              <h2 className="text-2xl font-medium text-white sm:text-[32px]">
-                Ready to hear what people actually think?
-              </h2>
-              <p className="mx-auto mt-3 max-w-[480px] text-base leading-[1.7] text-white/80">
-                Join researchers, product teams, and organisations across Africa who collect richer feedback with Survica — and spend less time making sense of it.
-              </p>
-              <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
-                <Button
-                  variant="gradient"
-                  size="lg"
-                  onClick={() => navigate("/signup")}
-                  aria-label="Create your free Survica account — no card required"
-                  title="Create your free Survica account — no card required"
-                  className="w-full sm:w-auto"
-                >
-                  Start for free
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => scrollToSection("pricing")}
-                  className="w-full border-transparent bg-white text-brand-blue hover:bg-white/95 hover:text-brand-blue-dark sm:w-auto"
-                >
-                  See pricing →
-                </Button>
-              </div>
-              <p className="mt-3.5 text-xs text-white/60">
-                Free plan available · No credit card · Cancel anytime
-              </p>
-            </div>
-          </section>
-        </main>
-
-        <footer className="bg-white px-6 pb-8 pt-14 text-text-secondary sm:px-8 lg:px-10 [&_a]:text-text-secondary [&_a:hover]:text-brand-blue">
-          <div className="mx-auto max-w-[1280px]">
-            <div className="grid gap-10 md:grid-cols-2 md:items-start">
-          <div className="text-center md:text-left">
-                <div className="mx-auto mb-4 w-fit rounded-full bg-white px-4 py-2 md:mx-0">
-                  <img src={BRAND_LOGO_URL} alt="Survica" className="h-7 w-auto" />
-                </div>
-                <p className="mx-auto max-w-[200px] text-[13px] leading-[1.7] text-[#94A3B8] md:mx-0">
-                  Voice surveys. AI insights. Built for Africa and beyond.
-                </p>
-                <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
-                  {footerSocialLinks.map((link) => (
-                    <SocialIconLink
-                      key={link.name}
-                      name={link.name}
-                      href={link.href}
-                      icon={link.icon}
-                    />
-                  ))}
-                </div>
-              </div>
-
-          <div className="text-center md:text-left">
-                  <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
-                  Product
-                </p>
-                <div className="space-y-1">
-                  <Link
-                    to="/dashboard/surveys/new"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Survey builder
-                  </Link>
-                  <Link
-                    to="/dashboard/analytics"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Analytics
-                  </Link>
-                  <Link
-                    to="/dashboard/templates"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Templates
-                  </Link>
-                  <a
-                    href="/#pricing"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Pricing
-                  </a>
-                  <span className="block cursor-default py-1 text-[13px] text-[#475569]">
-                    API (coming soon)
-                  </span>
-                </div>
-              </div>
-
-          <div className="hidden">
-                  <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
-                  Company
-                </p>
-                <div className="space-y-1">
-                  <Link
-                    to="/about"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    About us
-                  </Link>
-                  <Link
-                    to="/blog"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Blog
-                  </Link>
-                  <Link
-                    to="/careers"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Careers
-                  </Link>
-                  <Link
-                    to="/press"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Press kit
-                  </Link>
-                  <a
-                    href="mailto:hello@survica.io"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Contact us
-                  </a>
-                </div>
-              </div>
-
-          <div className="hidden">
-                  <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-text-hint">
-                  Support
-                </p>
-                <div className="space-y-1">
-                  <Link
-                    to="/help"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Help centre
-                  </Link>
-                  <Link
-                    to="/docs"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Documentation
-                  </Link>
-                  <Link
-                    to="/privacy"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Privacy policy
-                  </Link>
-                  <Link
-                    to="/terms"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Terms of service
-                  </Link>
-                  <Link
-                    to="/status"
-                    className="block py-1 text-[13px] text-[#94A3B8] transition-colors duration-150 hover:text-white"
-                  >
-                    Status page
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10 flex flex-wrap items-center justify-between gap-4 pt-6">
-              <p className="text-xs text-[#64748B]">
-                © 2025 Survica Technologies Ltd. All rights reserved.
-              </p>
-              <p className="hidden text-xs text-[#475569] md:block">
-                Made with care for African voices
-              </p>
-              <div className="hidden items-center gap-4">
-                <Link
-                  to="/privacy"
-                  className="text-xs text-[#64748B] transition-colors duration-150 hover:text-[#94A3B8]"
-                >
-                  Privacy policy
-                </Link>
-                <Link
-                  to="/terms"
-                  className="text-xs text-[#64748B] transition-colors duration-150 hover:text-[#94A3B8]"
-                >
-                  Terms of service
-                </Link>
               </div>
             </div>
           </div>
-        </footer>
+        </section>
 
-        <a
-          href="https://wa.me/message/survica"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat with us on WhatsApp"
-          title="Chat with us on WhatsApp"
-          className="fixed bottom-4 right-4 z-40 inline-flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#25D366] text-white shadow-md md:hidden"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </a>
+        <section id="product" className="border-y border-border bg-white py-20 lg:py-24">
+          <div className="survica-page-shell">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-brand-blue">A clearer workflow</p>
+              <h2 className="mt-3 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">From question to evidence, without the busywork.</h2>
+              <p className="mt-4 text-lg leading-8 text-text-secondary">A focused process that keeps your team close to the people behind the data.</p>
+            </div>
+            <div className="mt-12 grid border-y border-border md:grid-cols-3 md:divide-x md:divide-border">
+              {workflow.map(({ number, title, description, icon: Icon }) => (
+                <article key={number} className="border-b border-border py-8 md:border-b-0 md:px-8 md:first:pl-0 md:last:pr-0">
+                  <div className="flex items-center justify-between"><span className="text-sm font-semibold text-text-hint">{number}</span><Icon className="h-5 w-5 text-brand-blue" /></div>
+                  <h3 className="mt-10 text-xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-text-secondary">{description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
 
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Back to top"
-          title="Back to top"
-          className={cn(
-            "fixed bottom-6 right-6 z-40 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-text-secondary shadow-md transition-opacity duration-150 md:inline-flex",
-            showBackToTop ? "opacity-100" : "pointer-events-none opacity-0",
-          )}
-        >
-          <ChevronUp className="h-4 w-4" />
-        </button>
-      </div>
-    </>
+        <section id="use-cases" className="survica-page-shell py-20 lg:py-24">
+          <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+            <div className="max-w-md"><p className="text-sm font-semibold text-brand-blue">Built for listening</p><h2 className="mt-3 text-4xl font-bold tracking-[-0.045em]">Research that sounds like the people you serve.</h2><p className="mt-4 leading-7 text-text-secondary">For teams that need context, emotion, and explanation—not another spreadsheet full of checked boxes.</p></div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {useCases.map(({ title, description, icon: Icon }) => (
+                <article key={title} className="rounded-2xl border border-border bg-white p-6"><div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-blue-light text-brand-blue"><Icon className="h-5 w-5" /></div><h3 className="mt-8 text-lg font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-text-secondary">{description}</p></article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="border-t border-border bg-white py-20 lg:py-24">
+          <div className="survica-page-shell">
+            <div className="max-w-2xl"><p className="text-sm font-semibold text-brand-blue">Simple pricing</p><h2 className="mt-3 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">Start small. Keep the full research workflow.</h2><p className="mt-4 text-lg leading-8 text-text-secondary">Choose the response volume and collaboration level that fits your work.</p></div>
+            <div className="mt-12 grid gap-4 lg:grid-cols-3">
+              {plans.map((plan) => (
+                <article key={plan.name} className={`flex flex-col rounded-2xl border p-6 ${plan.featured ? "border-brand-blue bg-brand-blue-light" : "border-border bg-white"}`}>
+                  <div className="flex items-center justify-between"><h3 className="text-lg font-semibold">{plan.name}</h3>{plan.featured ? <span className="rounded-full bg-brand-blue px-2.5 py-1 text-xs font-medium text-white">Most popular</span> : null}</div>
+                  <p className="mt-6"><span className="text-4xl font-bold tracking-[-0.05em]">{plan.price}</span><span className="text-sm text-text-secondary"> / month</span></p>
+                  <p className="mt-4 min-h-12 text-sm leading-6 text-text-secondary">{plan.description}</p>
+                  <ul className="mt-7 flex-1 space-y-3">{plan.features.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-status-success" />{feature}</li>)}</ul>
+                  <Button className="mt-8 w-full" variant={plan.featured ? "primary" : "secondary"} onClick={() => navigate(`/signup?plan=${plan.name.toLowerCase()}`)}>Choose {plan.name}</Button>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#20201E] py-20 text-white lg:py-24">
+          <div className="survica-page-shell grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-3xl"><div className="flex items-center gap-2 text-sm font-semibold text-[#FF9AAF]"><ShieldCheck className="h-4 w-4" />Responsible by design</div><h2 className="mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">Make space for the full answer.</h2><p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">Give respondents a natural way to speak, and give your team a disciplined way to turn those voices into decisions.</p></div>
+            <Button size="lg" className="w-fit" onClick={() => navigate("/signup")} trailingIcon={<ArrowRight className="h-4 w-4" />}>Create your workspace</Button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-border bg-white">
+        <div className="survica-page-shell flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
+          <div><AppLogo className="h-8 max-w-[126px]" /><p className="mt-3 text-sm text-text-hint">Voice-first research, made clear.</p></div>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-secondary"><a href="#product">Product</a><a href="#use-cases">Use cases</a><a href="/login">Sign in</a><span>© 2026 Survica</span></div>
+        </div>
+      </footer>
+    </div>
   );
 }

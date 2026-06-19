@@ -32,18 +32,18 @@ export function ChartCard({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-[24px] border border-transparent bg-surface-card",
+        "overflow-hidden rounded-2xl border border-border bg-surface-card",
         className,
       )}
     >
       <div
         className={cn(
-          "flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
+          "flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-start sm:justify-between",
           headerClassName,
         )}
       >
         <div className="min-w-0">
-          <h3 className="text-base font-medium text-text-primary">{title}</h3>
+          <h3 className="text-base font-semibold text-text-primary">{title}</h3>
           {subtitle ? (
             <p className="mt-1 text-sm text-text-secondary">{subtitle}</p>
           ) : null}

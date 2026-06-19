@@ -38,10 +38,10 @@ export function Textarea({
       ) : null}
       <div
         className={cn(
-          "flex gap-2 rounded-md border bg-surface-card px-3 py-2.5 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
+          "flex gap-2 rounded-[10px] border bg-surface-card px-3.5 py-3 text-base text-text-primary transition-[border-color,box-shadow] duration-150",
           error
             ? "border-status-danger focus-within:border-status-danger"
-            : "border-transparent bg-surface-muted focus-within:bg-white focus-within:shadow-focus",
+            : "border-border focus-within:border-brand-blue focus-within:shadow-focus",
           props.disabled ? "bg-surface-muted text-text-hint" : "",
         )}
       >
