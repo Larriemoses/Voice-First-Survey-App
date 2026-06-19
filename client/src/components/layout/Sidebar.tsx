@@ -86,17 +86,17 @@ export function Sidebar() {
   const { pathname } = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[220px] bg-surface-card px-3 md:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[232px] border-r border-border bg-surface-card px-4 md:flex">
       <div className="flex h-full w-full flex-col">
         <Link
           to="/"
-          className="flex h-[72px] items-center px-3"
+          className="flex h-[76px] items-center px-2"
           aria-label="Survica home"
         >
           <AppLogo className="h-9 max-w-[136px]" imageClassName="max-w-full" />
         </Link>
-        <nav className="flex flex-1 flex-col justify-between py-4">
-          <div className="flex flex-col gap-1">
+        <nav className="flex flex-1 flex-col justify-between pb-5 pt-3">
+          <div className="flex flex-col gap-1.5">
             {middleItems.map((item) => {
               const href =
                 item.label === "Responses"
@@ -108,9 +108,9 @@ export function Sidebar() {
                   key={item.label}
                   to={href}
                   className={cn(
-                    "flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition-colors",
+                    "flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium transition-colors",
                     item.isActive(pathname)
-                      ? "bg-brand-blue text-white"
+                      ? "bg-brand-blue-light text-brand-blue"
                       : "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
                   )}
                   aria-current={item.isActive(pathname) ? "page" : undefined}
@@ -121,15 +121,15 @@ export function Sidebar() {
               );
             })}
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5 border-t border-border pt-4">
             {bottomItems.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold transition-colors",
+                  "flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium transition-colors",
                   item.isActive(pathname)
-                    ? "bg-brand-blue text-white"
+                    ? "bg-brand-blue-light text-brand-blue"
                     : "text-text-secondary hover:bg-surface-muted hover:text-text-primary",
                 )}
                 aria-current={item.isActive(pathname) ? "page" : undefined}

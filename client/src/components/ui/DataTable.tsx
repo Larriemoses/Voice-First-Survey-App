@@ -86,7 +86,7 @@ export function DataTable<T>({
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-sm md:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-[var(--color-border-subtle)]">
             <thead className="bg-[var(--color-surface)]">

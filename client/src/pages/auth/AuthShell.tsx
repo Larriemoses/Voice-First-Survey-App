@@ -6,8 +6,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { TopNav } from "../../components/layout/TopNav";
-import { Card } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
 import { cn } from "../../utils/helpers";
 
 type AuthFeature = {
@@ -47,12 +45,6 @@ const defaultFeatures: AuthFeature[] = [
   },
 ];
 
-const pinStyles = [
-  "min-h-44 bg-[#ffd7d9]",
-  "min-h-64 bg-[#d9efe6]",
-  "min-h-52 bg-[#ffe7bd]",
-] as const;
-
 export function AuthShell({
   title,
   description,
@@ -69,12 +61,10 @@ export function AuthShell({
     return (
       <div className="min-h-screen bg-surface-page">
         <TopNav />
-        <main className="survica-page-shell flex min-h-[calc(100vh-72px)] items-center justify-center bg-[radial-gradient(circle_at_15%_15%,#fff0f3_0%,transparent_28%),radial-gradient(circle_at_85%_75%,#f3f3f3_0%,transparent_32%)] py-8 md:py-10">
-          <div className="w-full max-w-2xl space-y-5">
+        <main className="survica-page-shell flex min-h-[calc(100vh-68px)] items-center justify-center py-10 md:py-16">
+          <div className="w-full max-w-[520px] space-y-7">
             <div className="space-y-3 text-center">
-              <Badge variant="done" className="mx-auto">
-                {eyebrow}
-              </Badge>
+              <p className="text-sm font-semibold text-brand-blue">{eyebrow}</p>
               <div className="space-y-2">
                 <h1 className="text-3xl font-semibold tracking-[-0.04em] text-text-primary sm:text-4xl">
                   {title}
@@ -82,7 +72,7 @@ export function AuthShell({
                 <p className="text-base text-text-secondary">{description}</p>
               </div>
             </div>
-            <Card className={cn("p-6 shadow-lg sm:p-8", cardClassName)}>{children}</Card>
+            <div className={cn("rounded-2xl border border-border bg-white p-6 sm:p-8", cardClassName)}>{children}</div>
             {footer ? <div className="text-center">{footer}</div> : null}
           </div>
         </main>
@@ -93,40 +83,34 @@ export function AuthShell({
   return (
     <div className="min-h-screen bg-surface-page">
       <TopNav />
-      <main className="min-h-[calc(100vh-72px)] bg-[#f7f7f7] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div className="mx-auto grid max-w-[1320px] gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(390px,480px)] lg:items-stretch">
-          <section className="relative hidden min-h-[720px] overflow-hidden rounded-[32px] bg-brand-blue-light p-7 text-text-primary lg:block">
-            <div className="relative z-10 max-w-xl space-y-3">
-              <Badge className="bg-white text-brand-blue">{eyebrow}</Badge>
-              <h1 className="text-4xl font-semibold leading-tight tracking-[-0.045em] xl:text-5xl">
+      <main className="min-h-[calc(100vh-68px)] bg-surface-page px-5 py-8 sm:px-8 lg:py-12">
+        <div className="mx-auto grid max-w-[1160px] overflow-hidden rounded-2xl border border-border bg-white lg:grid-cols-[minmax(0,1fr)_480px]">
+          <section className="relative hidden min-h-[680px] overflow-hidden bg-[#20201E] p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-14">
+            <div className="max-w-xl space-y-5">
+              <p className="text-sm font-semibold text-[#FF9AAF]">{eyebrow}</p>
+              <h1 className="text-4xl font-bold leading-[1.08] tracking-[-0.05em] xl:text-5xl">
                 {helperTitle}
               </h1>
-              <p className="max-w-lg text-base leading-7 text-text-secondary">
+              <p className="max-w-lg text-base leading-7 text-white/65">
                 {helperDescription}
               </p>
             </div>
-
-            <div className="absolute inset-x-7 bottom-[-70px] top-[250px] columns-3 gap-3 overflow-hidden">
+            <div className="space-y-2">
                 {helperFeatures.map((feature) => {
                   const Icon = feature.icon;
-                  const index = helperFeatures.indexOf(feature);
-
                   return (
                     <div
                       key={feature.title}
-                      className={cn(
-                        "mb-3 break-inside-avoid rounded-[28px] p-5 text-text-primary shadow-lg",
-                        pinStyles[index % pinStyles.length],
-                      )}
+                      className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"
                     >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/75 text-brand-blue">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#FF9AAF]">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <div className="mt-8 space-y-2">
-                          <h2 className="text-lg font-semibold">
+                        <div className="space-y-1">
+                          <h2 className="text-sm font-semibold text-white">
                             {feature.title}
                           </h2>
-                          <p className="text-sm leading-6 text-text-secondary">
+                          <p className="text-sm leading-6 text-white/60">
                             {feature.description}
                           </p>
                         </div>
@@ -136,9 +120,9 @@ export function AuthShell({
             </div>
           </section>
 
-          <section className="flex flex-col justify-center rounded-[32px] bg-white p-6 shadow-sm sm:p-9 lg:p-10">
-            <div className="space-y-6">
-              <Badge variant="done" className="w-fit">{eyebrow}</Badge>
+          <section className="flex flex-col justify-center p-6 sm:p-10 lg:p-12">
+            <div className="space-y-7">
+              <p className="text-sm font-semibold text-brand-blue">{eyebrow}</p>
               <div className="space-y-2">
                 <h1 className="text-3xl font-semibold tracking-[-0.045em] text-text-primary sm:text-4xl">
                   {title}

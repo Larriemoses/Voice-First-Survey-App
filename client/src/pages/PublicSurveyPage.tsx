@@ -459,8 +459,8 @@ export default function PublicSurveyPage() {
 
   if (submitted) {
     return (
-      <main className="min-h-screen bg-[#f3f3f3] px-4 py-6 md:flex md:items-center md:justify-center md:p-8">
-        <div className="w-full max-w-[520px] rounded-[32px] bg-surface-card shadow-lg">
+      <main className="min-h-screen bg-surface-page px-4 py-6 md:flex md:items-center md:justify-center md:p-8">
+        <div className="w-full max-w-[520px] rounded-2xl border border-border bg-surface-card shadow-md">
           <div className="flex flex-col items-center px-6 py-10 text-center md:px-8 md:py-12">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
               {survey.logoSrc ? (
@@ -484,7 +484,7 @@ export default function PublicSurveyPage() {
             </p>
             <p className="mt-6 text-xs text-text-hint">{survey.companyName}</p>
             {survey.redirectUrl ? (
-              <div className="mt-6 rounded-[20px] bg-surface-muted px-4 py-3 text-sm text-text-secondary">
+              <div className="mt-6 rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-text-secondary">
                 Redirecting in {redirectCountdown} second
                 {redirectCountdown === 1 ? "" : "s"}.
               </div>
@@ -496,8 +496,8 @@ export default function PublicSurveyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f3f3] px-0 md:flex md:items-center md:justify-center md:bg-[radial-gradient(circle_at_top_left,#ffd9dc_0%,transparent_32%),radial-gradient(circle_at_bottom_right,#dcefe7_0%,transparent_35%),#f3f3f3] md:p-6">
-      <div className="flex min-h-screen w-full max-w-[540px] flex-col bg-surface-card md:min-h-[760px] md:overflow-hidden md:rounded-[36px] md:shadow-lg">
+    <main className="min-h-screen bg-surface-page px-0 md:flex md:items-center md:justify-center md:p-6">
+      <div className="flex min-h-screen w-full max-w-[540px] flex-col bg-surface-card md:min-h-[760px] md:overflow-hidden md:rounded-2xl md:border md:border-border md:shadow-md">
         <header className="bg-surface-card px-5 py-5 md:px-7">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-light text-sm font-medium text-brand-blue">
@@ -545,7 +545,7 @@ export default function PublicSurveyPage() {
               </p>
             </div>
 
-            <div className="rounded-[28px] bg-surface-muted px-5 py-9 text-center">
+            <div className="rounded-2xl border border-border bg-surface-muted px-5 py-9 text-center">
               {recordState === "recorded" ? (
                 <div className="space-y-4">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-status-success/10 text-status-success">
@@ -559,7 +559,7 @@ export default function PublicSurveyPage() {
                       {currentDurationMs ? formatDuration(currentDurationMs) : "Voice answer"}
                     </p>
                   </div>
-                  <div className="rounded-[20px] bg-surface-card px-3 py-3">
+                  <div className="rounded-xl border border-border bg-surface-card px-3 py-3">
                     <audio controls src={currentAudioUrl ?? undefined} className="w-full" />
                   </div>
                   <button
@@ -607,7 +607,7 @@ export default function PublicSurveyPage() {
                     </p>
                   </div>
 
-                  <div className="overflow-hidden rounded-[20px] bg-surface-card px-3 py-3">
+                  <div className="overflow-hidden rounded-xl border border-border bg-surface-card px-3 py-3">
                     {recordState === "recording" ? (
                       <div className="flex h-8 items-center justify-center gap-1">
                         {Array.from({ length: 16 }, (_, index) => (

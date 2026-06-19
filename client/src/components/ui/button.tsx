@@ -25,7 +25,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "border-brand-blue bg-brand-blue text-text-inverse hover:border-brand-blue-dark hover:bg-brand-blue-dark",
   secondary:
-    "border-transparent bg-surface-muted text-text-primary hover:bg-[#e2e2e2]",
+    "border-border bg-surface-card text-text-primary hover:border-border-strong hover:bg-surface-muted",
   ghost:
     "border-transparent bg-transparent text-text-secondary hover:bg-surface-muted hover:text-text-primary",
   danger:
@@ -38,8 +38,8 @@ const variantClasses: Record<ButtonVariant, string> = {
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: "h-9 min-w-9 px-3.5 text-sm",
-  md: "h-11 min-w-11 px-5 text-base",
-  lg: "h-12 min-w-12 px-6 text-base",
+  md: "h-11 min-w-11 px-4.5 text-sm",
+  lg: "h-12 min-w-12 px-5 text-base",
 };
 
 const iconOnlySizeClasses: Record<ButtonSize, string> = {
@@ -73,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-full border font-semibold leading-[1.4] transition-[background-color,color,transform] duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex shrink-0 items-center justify-center gap-2 rounded-[10px] border font-semibold leading-[1.4] transition-[background-color,border-color,color,transform] duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60",
         variantClasses[variant],
         iconOnly ? iconOnlySizeClasses[size] : sizeClasses[size],
         className,

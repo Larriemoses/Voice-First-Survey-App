@@ -124,7 +124,7 @@ export default function OnboardingPage() {
                 <div
                   key={label}
                   className={cn(
-                    "rounded-[20px] border border-transparent p-3 text-left",
+                    "rounded-xl border border-border p-3 text-left",
                     active
                       ? "bg-brand-blue text-white"
                       : complete
@@ -219,7 +219,7 @@ export default function OnboardingPage() {
                   onChange={(event) => setInviteDraft(event.target.value)}
                 />
                 {inviteList.length > 0 ? (
-                  <div className="rounded-[20px] bg-surface-card p-4">
+                  <div className="rounded-xl border border-border bg-surface-card p-4">
                     <p className="text-sm font-medium text-text-primary">
                       {inviteList.length} teammate{inviteList.length === 1 ? "" : "s"} ready
                     </p>
@@ -230,7 +230,7 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-[20px] bg-surface-card p-4 text-sm text-text-secondary">
+                  <div className="rounded-xl border border-border bg-surface-card p-4 text-sm text-text-secondary">
                     Leave this blank if you want to finish setup first and invite your team later.
                   </div>
                 )}

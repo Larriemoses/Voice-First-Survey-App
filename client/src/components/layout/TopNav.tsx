@@ -39,21 +39,21 @@ export function TopNav({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 bg-surface-card/95 backdrop-blur-xl",
+        "sticky top-0 z-50 border-b border-border bg-surface-card/95 backdrop-blur-xl",
         className,
       )}
     >
-      <div className="survica-page-shell flex h-[72px] items-center justify-between gap-4">
+      <div className="survica-page-shell flex h-[68px] items-center justify-between gap-4">
         <Link to="/" className="flex h-10 items-center" aria-label="Survica home">
           <AppLogo className="h-9 max-w-[138px]" imageClassName="max-w-full" />
         </Link>
 
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {items.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="rounded-full px-4 py-3 text-sm font-semibold text-text-primary transition-colors duration-150 hover:bg-surface-muted"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-surface-muted hover:text-text-primary"
             >
               {item.label}
             </a>
@@ -86,7 +86,7 @@ export function TopNav({
       <div
         id="top-nav-mobile-drawer"
         className={cn(
-          "overflow-hidden bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
+          "overflow-hidden border-t border-border bg-surface-card transition-[max-height,opacity] duration-200 md:hidden",
           open ? "max-h-80 opacity-100" : "max-h-0 opacity-0",
         )}
       >

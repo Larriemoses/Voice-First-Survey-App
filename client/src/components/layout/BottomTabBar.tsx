@@ -63,7 +63,7 @@ export function BottomTabBar() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-50 rounded-[24px] bg-white px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-lg md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white/95 px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 backdrop-blur-xl md:hidden">
       <div className="grid grid-cols-4 gap-1">
         {items.map((item) => {
           const active = item.isActive(pathname);
@@ -77,9 +77,9 @@ export function BottomTabBar() {
               key={item.label}
               to={href}
               className={cn(
-                "flex min-h-11 flex-col items-center justify-center gap-1 rounded-md px-2 text-xs font-medium transition-colors duration-150",
+                "flex min-h-11 flex-col items-center justify-center gap-1 rounded-lg px-2 text-xs font-medium transition-colors duration-150",
                 active
-                  ? "bg-brand-blue text-white"
+                  ? "bg-brand-blue-light text-brand-blue"
                   : "text-text-hint hover:bg-surface-muted hover:text-text-primary",
               )}
               aria-label={item.label}
